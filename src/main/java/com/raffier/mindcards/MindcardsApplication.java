@@ -9,7 +9,7 @@ public class MindcardsApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(MindcardsApplication.class, args);
-		AppDatabase.createDatabase("coolDatabase");
+		AppDatabase testDatabase = new AppDatabase("testDatabase");
 	}
 
 }

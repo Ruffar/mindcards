@@ -6,10 +6,17 @@ public class AppDatabase {
 
     private static String dbFolderUrl = "jdbc:sqlite:src/main/resources/db/";
 
-    public static void createDatabase(String dbName) {
+    private final String dbUrl;
 
-        String dbUrl = dbFolderUrl + dbName + ".db";
+    public AppDatabase(String dbName) {
 
+        dbUrl = dbFolderUrl + dbName + ".db";
+        getConnection();
+
+    }
+
+    public Connection getConnection() {
+        
         try (Connection connection = DriverManager.getConnection(dbUrl)) {
 
             if (connection != null) {
@@ -18,9 +25,13 @@ public class AppDatabase {
                 System.out.println("A new database has been created.");
             }
 
+            return connection;
+
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
+
+        return null;
 
     }
     
