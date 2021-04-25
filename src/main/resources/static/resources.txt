@@ -1,0 +1,4 @@
+https://online.visual-paradigm.com/app/diagrams/#G1DjO9afm2hbQUdilxvTugzNYg4ho-eKE7
+
+https://mvnrepository.com/artifact/org.xerial/sqlite-jdbc/3.34.0
+https://www.sqlitetutorial.net/sqlite-java/
