@@ -7,11 +7,13 @@ public class AppDatabase {
     private static String dbFolderUrl = "jdbc:sqlite:src/main/resources/db/";
 
     private final String dbUrl;
+    
+    private Connection connection;
 
     public AppDatabase(String dbName) {
 
         dbUrl = dbFolderUrl + dbName + ".db";
-        getConnection();
+        this.connection = getConnection();
 
     }
 
@@ -34,5 +36,16 @@ public class AppDatabase {
         return null;
 
     }
+    
+    private void executeSqlStatement(String sqlStatement) {
+        try (Statement statement = conn.createStatement() {
+            statement.execute(sqlStatement);
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
+    }
+             
+    //Create tables
+    
     
 }
