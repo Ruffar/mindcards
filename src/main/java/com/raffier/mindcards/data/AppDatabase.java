@@ -4,16 +4,13 @@ import java.sql.*;
 
 public class AppDatabase {
 
-    private static String dbFolderUrl = "jdbc:sqlite:src/main/resources/db/";
+    private static final String dbFolderUrl = "jdbc:sqlite:src/main/resources/db/";
 
     private final String dbUrl;
-    
-    private Connection connection;
 
     public AppDatabase(String dbName) {
 
         dbUrl = dbFolderUrl + dbName + ".db";
-        this.connection = getConnection();
 
     }
 
@@ -38,7 +35,8 @@ public class AppDatabase {
     }
     
     private void executeSqlStatement(String sqlStatement) {
-        try (Statement statement = conn.createStatement() {
+        Connection conn = getConnection();
+        try (Statement statement = conn.createStatement()) {
             statement.execute(sqlStatement);
         } catch (SQLException e) {
             System.out.println(e.getMessage());
