@@ -9,6 +9,7 @@ public class HelloController {
     @RequestMapping("/")
     public String index() {
         return "src/main/resources/page/home.html";
+        //hey
     }
     
 }
