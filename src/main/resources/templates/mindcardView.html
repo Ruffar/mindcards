@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org/">
+<head>
+    <link rel="stylesheet" th:href="@{/css/mindcardView.css}"/>
+    <link rel="stylesheet" th:href="@{/css/navbar.css}"/>
+
+    <style>
+        body {
+            background-color: #444;
+        }
+    </style>
+
+    <meta charset="UTF-8">
+    <title th:text="${mindcard.title}">Mindcard</title>
+</head>
+
+<body>
+
+<div class="navbar">
+    <a class="active" href="#home">Home</a>
+    <a href="#news">News</a>
+    <a href="#contact">Contact</a>
+    <a href="#about">About</a>
+</div>
+
+<br style="height:10px;">
+
+<div class="card" style="margin: auto;">
+    <img th:src="@{/images/monkey.png}" style="width:50%; float: left;">
+    <div class="card-text">
+        <h4 th:text="${mindcard.title}"><b> MindcardTitle </b></h4>
+        <p th:utext="${mindcard.description}"> Description </p>
+    </div>
+</div>
+
+<hr>
+
+<div style="text-align: center;">
+    <div class="infocard-grid" th:each="infocard: ${infocards}">
+        <div class="card">
+            <img th:src="@{/images/monkey.png}" style="width:50%; float: left;">
+            <div class="card-text">
+                <p th:utext="${infocard.description}"> Description </p>
+            </div>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
