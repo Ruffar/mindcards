@@ -1,8 +1,7 @@
-package com.raffier.mindcards.data.table;
+package com.raffier.mindcards.model.table;
 
-import com.raffier.mindcards.data.AppDatabase;
+import com.raffier.mindcards.model.AppDatabase;
 
-import java.io.Serializable;
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,13 +13,8 @@ public class Mindcard extends DatabaseTable {
     private final int packId;
 
     private String title;
-    private int imageId;
+    private Image image;
     private String description;
-
-    //Prepared statements
-    private PreparedStatement titleStatement;
-    private PreparedStatement imageStatement;
-    private PreparedStatement descStatement;
 
     private Mindcard(AppDatabase database, int mindcardId, ResultSet rawData) throws SQLException {
         super(database,"Mindcard");
@@ -29,51 +23,46 @@ public class Mindcard extends DatabaseTable {
         this.packId = rawData.getInt("packId");
 
         this.title = rawData.getString("title");
-        this.imageId = rawData.getInt("imageId");
         this.description = rawData.getString("description");
+
+        int imageId = rawData.getInt("imageId");
+        if (imageId != 0) this.image = Image.getImage(database,imageId);
 
     }
 
     public int getMindcardId() { return this.mindcardId; }
     public int getPackId() { return this.packId; }
     public String getTitle() { return this.title; }
-    public int getImageId() { return this.imageId; }
+    public Image getImage() { return this.image; }
     public String getDescription() { return this.description; }
 
     public void updateTitle(String newTitle) {
-        try {
-            if (titleStatement == null) {
-                titleStatement = database.getConnection().prepareStatement("UPDATE Mindcard SET title=? WHERE mindcardId=?");
-                titleStatement.setInt(2, mindcardId);
-            }
-            titleStatement.setString(1, newTitle);
-            titleStatement.executeUpdate();
+        try (PreparedStatement statement = database.getConnection().prepareStatement("UPDATE Mindcard SET title=? WHERE mindcardId=?")) {
+            statement.setInt(2, mindcardId);
+            statement.setString(1, newTitle);
+            statement.executeUpdate();
             this.title = newTitle;
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
     public void updateImage(int newImageId) {
-        try {
-            if (imageStatement == null) {
-                imageStatement = database.getConnection().prepareStatement("UPDATE Mindcard SET imageId=? WHERE mindcardId=?");
-                imageStatement.setInt(2, mindcardId);
-            }
-            imageStatement.setInt(1, newImageId);
-            imageStatement.executeUpdate();
-            this.imageId = newImageId;
+        try (PreparedStatement statement = database.getConnection().prepareStatement("UPDATE Mindcard SET imageId=? WHERE mindcardId=?")) {
+            statement.setInt(2, mindcardId);
+            statement.setInt(1, newImageId);
+            statement.executeUpdate();
+
+            if (newImageId == 0) this.image = null;
+            else this.image = Image.getImage(database,newImageId);
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
     public void updateDescription(String newDesc) {
-        try {
-            if (descStatement == null) {
-                descStatement = database.getConnection().prepareStatement("UPDATE Mindcard SET description=? WHERE mindcardId=?");
-                descStatement.setInt(2, mindcardId);
-            }
-            descStatement.setString(1, newDesc);
-            descStatement.executeUpdate();
+        try (PreparedStatement statement = database.getConnection().prepareStatement("UPDATE Mindcard SET description=? WHERE mindcardId=?")) {
+            statement.setInt(2, mindcardId);
+            statement.setString(1, newDesc);
+            statement.executeUpdate();
             this.description = newDesc;
         } catch (SQLException e) {
             e.printStackTrace();

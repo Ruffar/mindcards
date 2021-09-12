@@ -1,6 +1,6 @@
-package com.raffier.mindcards.data.table;
+package com.raffier.mindcards.model.table;
 
-import com.raffier.mindcards.data.AppDatabase;
+import com.raffier.mindcards.model.AppDatabase;
 
 import java.sql.*;
 
@@ -20,14 +20,13 @@ public class Image extends DatabaseTable {
         this.imagePath = rawData.getString("imagePath");
     }
 
+    public String getImagePath() { return imagePath; }
+
     public void updatePath(String newPath) {
-        try {
-            if (pathStatement == null) {
-                pathStatement = database.getConnection().prepareStatement("UPDATE Image SET imagePath=? WHERE imageId=?");
-                pathStatement.setInt(2, imageId);
-            }
-            pathStatement.setString(1, newPath);
-            pathStatement.executeUpdate();
+        try (PreparedStatement statement = database.getConnection().prepareStatement("UPDATE Image SET imagePath=? WHERE imageId=?")) {
+            statement.setInt(2, imageId);
+            statement.setString(1, newPath);
+            statement.executeUpdate();
             this.imagePath = newPath;
         } catch (SQLException e) {
             e.printStackTrace();

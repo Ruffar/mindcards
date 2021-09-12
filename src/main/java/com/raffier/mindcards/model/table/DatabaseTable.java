@@ -1,11 +1,6 @@
-package com.raffier.mindcards.data.table;
+package com.raffier.mindcards.model.table;
 
-import com.raffier.mindcards.data.AppDatabase;
-
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Statement;
+import com.raffier.mindcards.model.AppDatabase;
 
 public abstract class DatabaseTable {
 

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org/">
+<head>
+    <link rel="stylesheet" th:href="@{/css/navbar.css}"/>
+
+    <style>
+        body {
+            background-color: #444;
+        }
+    </style>
+
+    <meta charset="UTF-8">
+    <title>Mindcards</title>
+</head>
+
+<body>
+
+<div class="navbar">
+    <a class="active" th:href="@{/home}">Home</a>
+    <a href="#contact">Contact</a>
+    <a href="#about">About</a>
+    <a th:href="@{/login}" style="align: right;" th:text="${user != null} ? ${user.username} : 'Login'">Login</a>
+</div>
+
+<br style="height:10px;">
+
+<p> Home </p>
+
+</body>
+</html>

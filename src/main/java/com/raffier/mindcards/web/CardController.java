@@ -1,30 +1,28 @@
 package com.raffier.mindcards.web;
 
-import com.raffier.mindcards.AppSettings;
-import com.raffier.mindcards.data.table.Infocard;
-import com.raffier.mindcards.data.table.Mindcard;
+import com.raffier.mindcards.AppConfig;
+import com.raffier.mindcards.model.table.Infocard;
+import com.raffier.mindcards.model.table.Mindcard;
+import com.raffier.mindcards.model.table.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpSession;
 import java.util.List;
 
 @Controller
 public class CardController {
 
-    @GetMapping("/")
-    public String index() {
-        return "index";
-    }
+    @GetMapping(value="pack/{packId}/{mindcardId}")
+    public String mindcardView(@PathVariable int packId, @PathVariable int mindcardId, HttpSession session, Model model) {
 
-    @RequestMapping(value="pack/{packId}/{mindcardId}", method = {RequestMethod.GET})
-    public String mindcardView(@PathVariable int packId, @PathVariable int mindcardId, Model model) {
+        ControllerUtil.setUserSession(session,model);
 
-        Mindcard card = Mindcard.getMindcard(AppSettings.database, mindcardId);
+        Mindcard card = Mindcard.getMindcard(AppConfig.getDatabase(), mindcardId);
         if (card == null) return "error";
 
         List<Infocard> infocards = card.getInfocards();
-        for (Infocard info: infocards) System.out.println(info.getDescription());
 
         model.addAttribute("mindcard",card);
         model.addAttribute("infocards",infocards);

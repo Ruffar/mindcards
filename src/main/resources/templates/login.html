@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org/">
+<head>
+  <link rel="stylesheet" th:href="@{/css/navbar.css}"/>
+
+  <style>
+        body {
+            background-color: #444;
+        }
+    </style>
+
+  <meta charset="UTF-8">
+  <title>Mindcards Login</title>
+</head>
+
+<body>
+
+  <div class="navbar">
+    <a th:href="@{/home}">Home</a>
+    <a href="#contact">Contact</a>
+    <a href="#about">About</a>
+    <a class="active" th:href="@{/login}" style="align: right;">Login</a>
+  </div>
+
+  <br style="height:10px;">
+
+  <div align="center">
+    <h1>User Login</h1>
+    <form action="#" th:action="@{/login}" method="post" th:object="${submission}">
+
+      <label>E-mail:</label>
+      <input type="text" th:field="*{email}" /><br/>
+
+      <label>Password:</label>
+      <input type="password" th:field="*{password}" /><br/>
+
+      <label th:if="${param.invalid}" style="color: #f77">Invalid e-mail or password...</label><br/>
+
+      <button type="submit">Login</button>
+    </form>
+  </div>
+
+</body>
+</html>

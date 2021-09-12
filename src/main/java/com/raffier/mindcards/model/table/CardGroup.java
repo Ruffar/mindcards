@@ -1,6 +1,6 @@
-package com.raffier.mindcards.data.table;
+package com.raffier.mindcards.model.table;
 
-import com.raffier.mindcards.data.AppDatabase;
+import com.raffier.mindcards.model.AppDatabase;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -15,11 +15,6 @@ public class CardGroup extends DatabaseTable {
     private String title;
     private int imageId;
     private String description;
-
-    //Prepared statements
-    private PreparedStatement titleStatement;
-    private PreparedStatement imageStatement;
-    private PreparedStatement descStatement;
 
     private CardGroup(AppDatabase database, int cardGroupId, ResultSet rawData) throws SQLException {
         super(database,"Card Group");
@@ -40,39 +35,30 @@ public class CardGroup extends DatabaseTable {
     public String getDescription() { return this.description; }
 
     public void updateTitle(String newTitle) {
-        try {
-            if (titleStatement == null) {
-                titleStatement = database.getConnection().prepareStatement("UPDATE CardGroup SET title=? WHERE cardGroupId=?");
-                titleStatement.setInt(2, cardGroupId);
-            }
-            titleStatement.setString(1, newTitle);
-            titleStatement.executeUpdate();
+        try (PreparedStatement statement = database.getConnection().prepareStatement("UPDATE CardGroup SET title=? WHERE cardGroupId=?")) {
+            statement.setInt(2, cardGroupId);
+            statement.setString(1, newTitle);
+            statement.executeUpdate();
             this.title = newTitle;
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
     public void updateImage(int newImageId) {
-        try {
-            if (imageStatement == null) {
-                imageStatement = database.getConnection().prepareStatement("UPDATE CardGroup SET imageId=? WHERE cardGroupId=?");
-                imageStatement.setInt(2, cardGroupId);
-            }
-            imageStatement.setInt(1, newImageId);
-            imageStatement.executeUpdate();
+        try (PreparedStatement statement = database.getConnection().prepareStatement("UPDATE CardGroup SET imageId=? WHERE cardGroupId=?")) {
+            statement.setInt(2, cardGroupId);
+            statement.setInt(1, newImageId);
+            statement.executeUpdate();
             this.imageId = newImageId;
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
     public void updateDescription(String newDesc) {
-        try {
-            if (descStatement == null) {
-                descStatement = database.getConnection().prepareStatement("UPDATE CardGroup SET description=? WHERE cardGroupId=?");
-                descStatement.setInt(2, cardGroupId);
-            }
-            descStatement.setString(1, newDesc);
-            descStatement.executeUpdate();
+        try (PreparedStatement statement = database.getConnection().prepareStatement("UPDATE CardGroup SET description=? WHERE cardGroupId=?")) {
+            statement.setInt(2, cardGroupId);
+            statement.setString(1, newDesc);
+            statement.executeUpdate();
             this.description = newDesc;
         } catch (SQLException e) {
             e.printStackTrace();
