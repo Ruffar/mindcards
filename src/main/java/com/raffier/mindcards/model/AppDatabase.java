@@ -1,4 +1,4 @@
-package com.raffier.mindcards.data;
+package com.raffier.mindcards.model;
 
 import java.sql.*;
 
@@ -163,8 +163,9 @@ public class AppDatabase {
                     "(userId INTEGER PRIMARY KEY AUTOINCREMENT," +
                     "username TEXT," +
                     "password TEXT," +
+                    "email TEXT NOT NULL," +
                     "isDeveloper INTEGER Default 0)");
-            statement.executeUpdate("INSERT OR REPLACE INTO User VALUES (0,'DeletedUser','deletedpassword1234',0)");
+            statement.executeUpdate("INSERT OR REPLACE INTO User VALUES (0,'DeletedUser','deletedpassword1234','deleted@mindcards.com',0)");
         } catch (SQLException e) {
             e.printStackTrace();
         }

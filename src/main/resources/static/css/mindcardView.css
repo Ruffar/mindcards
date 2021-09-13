@@ -1,35 +1,50 @@
 .card {
     width: 516px;
-    height: 250px;
+    /*height: 250px;*/
     box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
     transition: 0.3s;
     border-radius: 5px;
     background-color: #333;
+    margin: 0 auto;
+}
+
+.card-main {
+    width: 774px;
+    height: 375px;
 }
 
 .card:hover {
     box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
 }
 
-.card-text {
-    padding: 12px 6px;
+.cardtext {
     text-align: left;
     color: #f2f2f2;
 }
 
-.card-rightsided {
-    margin-left: 256px;
+.cardtext-right {
+    margin-left: 50%;
+    padding: 20px 16px;
+}
+
+.cardtext-full {
+    padding: 20px 32px;
 }
 
 img {
     width: 100%;
     height: 100%;
-    border-radius: 5px 0 5px 0;
+    border-radius: 5px 0 0 5px;
+}
+
+.cardimg {
+    width:50%;
+    float: left;
 }
 
 .infocard-grid {
-    display: inline-block;
-    grid-template-columns: repeat(auto-fit, minmax(516, 1fr));
+    display: flex;
+    flex-wrap:wrap;
     grid-gap: 16px;
     padding: 16px;
 }
