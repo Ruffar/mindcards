@@ -15,16 +15,11 @@
 
 <body>
 
-<div class="navbar">
-    <a class="active" th:href="@{/home}">Home</a>
-    <a href="#contact">Contact</a>
-    <a href="#about">About</a>
-    <a th:href="@{/login}" style="align: right;" th:text="${user != null} ? ${user.username} : 'Login'">Login</a>
-</div>
+    <div th:insert="~{fragments/pageLayout :: navbar}"></div>
 
-<br style="height:10px;">
+    <br style="height:10px;">
 
-<p> Home </p>
+    <p> Home </p>
 
 </body>
 </html>

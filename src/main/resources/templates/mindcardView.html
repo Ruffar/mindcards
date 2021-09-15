@@ -16,14 +16,11 @@
 
 <body>
 
-<div class="navbar">
-    <a th:href="@{/home}">Home</a>
-    <a href="#contact">Contact</a>
-    <a href="#about">About</a>
-    <a th:href="@{/login(redirect=${#httpServletRequest.requestURI})}" style="align: right;" th:text="${user != null} ? ${user.username} : 'Login'">Login</a>
-</div>
+<div th:insert="~{fragments/pageLayout :: navbar}"></div>
 
 <br style="height:10px;">
+
+<div th:replace="~{fragments/card :: card(true,${mindcard.getImage() != null} ? ${mindcard.image.getImagePath()} : null, ${mindcard.title}, ${mindcard.description}}"></div>
 
 <div class="card card-main" style="margin: auto;">
     <img th:if="${mindcard.getImage() != null}" th:src="@{${mindcard.image.getImagePath()}}" class="cardimg">
@@ -47,4 +44,3 @@
 </div>
 
 </body>
-</html>

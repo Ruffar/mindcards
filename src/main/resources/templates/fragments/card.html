@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org/">
+
+<head>
+    <link rel="stylesheet" th:href="@{/css/mindcardView.css}"/>
+</head>
+
+<body>
+
+<div th:fragment="card(isMain,imagePath,title,description)" class="card" th:classappend="${isMain} ? 'card-main' : ''" style="margin: auto;">
+    <img th:if="${imagePath != null}" th:src="@{${imagePath}}" class="cardimg">
+    <div class="cardtext" th:classappend="${imagePath != null} ? 'cardtext-right' : 'cardtext-full'">
+        <h4 th:if="${title != null}" th:text="${title}"><b> MindcardTitle </b></h4>
+        <p th:utext="${description}"> Description </p>
+    </div>
+</div>
+
+</body>
+</html>

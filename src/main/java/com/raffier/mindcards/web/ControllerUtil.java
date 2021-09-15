@@ -17,4 +17,22 @@ public interface ControllerUtil {
         model.addAttribute("user",user);
     }
 
+    static void setPageModule(Model model, PageModule pageModule) {
+        model.addAttribute("module", pageModule.toString());
+    }
+
+    public enum PageModule {
+        none("none"),
+        home("home"),
+        login("login");
+
+        private String stringVal;
+
+        private PageModule(String stringVal) {
+            this.stringVal = stringVal;
+        }
+
+        public String toString() { return this.stringVal; }
+    }
+
 }

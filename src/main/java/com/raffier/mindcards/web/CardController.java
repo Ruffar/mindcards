@@ -18,6 +18,7 @@ public class CardController {
     public String mindcardView(@PathVariable int packId, @PathVariable int mindcardId, HttpSession session, Model model) {
 
         ControllerUtil.setUserSession(session,model);
+        ControllerUtil.setPageModule(model, ControllerUtil.PageModule.none);
 
         Mindcard card = Mindcard.getMindcard(AppConfig.getDatabase(), mindcardId);
         if (card == null) return "error";

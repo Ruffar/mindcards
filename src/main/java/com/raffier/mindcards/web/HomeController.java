@@ -19,6 +19,7 @@ public class HomeController {
     @GetMapping("home")
     public String home(HttpSession session, Model model) {
         ControllerUtil.setUserSession(session, model);
+        ControllerUtil.setPageModule(model, ControllerUtil.PageModule.home);
         return "home";
     }
 
