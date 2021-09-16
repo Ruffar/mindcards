@@ -15,6 +15,7 @@ public class UserController {
     @GetMapping(value="login")
     public String loginPage(Model model) {
 
+        ControllerUtil.setPageModule(model, ControllerUtil.PageModule.login);
         model.addAttribute("submission",new LoginSubmission());
 
         return "login";
