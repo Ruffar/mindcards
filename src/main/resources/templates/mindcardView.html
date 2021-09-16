@@ -1,8 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org/">
 <head>
-    <link rel="stylesheet" th:href="@{/css/mindcardView.css}"/>
-    <link rel="stylesheet" th:href="@{/css/navbar.css}"/>
+    <link rel="stylesheet" th:href="@{/css/cards.css}"/>
 
     <style>
         body {
@@ -16,35 +15,20 @@
 
 <body>
 
-<div class="navbar">
-    <a th:href="@{/home}">Home</a>
-    <a href="#contact">Contact</a>
-    <a href="#about">About</a>
-    <a th:href="@{/login(redirect=${#httpServletRequest.requestURI})}" style="align: right;" th:text="${user != null} ? ${user.username} : 'Login'">Login</a>
-</div>
+<div th:insert="~{fragments/pageLayout :: navbar('')}"></div>
 
 <br style="height:10px;">
 
-<div class="card card-main" style="margin: auto;">
-    <img th:if="${mindcard.getImage() != null}" th:src="@{${mindcard.image.getImagePath()}}" class="cardimg">
-    <div class="cardtext" th:classappend="${mindcard.getImage() != null} ? 'cardtext-right' : 'cardtext-full'">
-        <h4 th:text="${mindcard.title}"><b> MindcardTitle </b></h4>
-        <p th:utext="${mindcard.description}"> Description </p>
-    </div>
-</div>
+<div th:replace="~{fragments/card :: card(isMain=${true},image=${mindcard.image}, title=${mindcard.title}, description=${mindcard.description})}"></div>
 
 <hr>
 
 <div style="text-align: center;">
     <div class="infocard-grid">
-        <div class="card" th:each="infocard: ${infocards}" style="flex: 0 0 auto;">
-            <img th:if="${infocard.getImage() != null}" th:src="@{${infocard.image.getImagePath()}}" class="cardimg">
-            <div class="cardtext" th:classappend="${infocard.getImage() != null} ? 'cardtext-right' : 'cardtext-full'">
-                <p th:utext="${infocard.description}"> Description </p>
-            </div>
-        </div>
+        <th:block th:each="infocard: ${infocards}">
+            <div th:replace="~{fragments/card :: card(isMain=${false},image=${infocard.image}, title='', description=${infocard.description})}" style="flex: 0 0 auto;"></div>
+        </th:block>
     </div>
 </div>
 
 </body>
-</html>

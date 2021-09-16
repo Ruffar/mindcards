@@ -34,4 +34,20 @@ public class UserController {
 
     }
 
+    @GetMapping(value="profile")
+    public String profile(HttpSession session, Model model) {
+
+        ControllerUtil.setUserSession(session, model);
+
+        return "profilePage";
+    }
+
+    @GetMapping(value="logout")
+    public String logout(HttpSession session, Model model) {
+
+        session.setAttribute("user",null);
+
+        return "redirect:home";
+    }
+
 }

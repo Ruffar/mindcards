@@ -1,0 +1,35 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org/">
+
+<head>
+    <link rel="stylesheet" th:href="@{/css/navbar.css}"/>
+</head>
+
+<body>
+
+<div th:fragment="navbar(module)" class="navbar">
+    <a th:href="@{/home}" th:classappend="${module == 'home'} ? 'active' : ''">Home</a>
+    <a href="#contact">Contact</a>
+    <a href="#about">About</a>
+    <div class="navbar-right">
+        <a th:if="${user == null}" th:href="@{/login}" th:classappend="${module == 'login'} ? 'active' : ''">Login</a>
+        <th:block th:if="${user}">
+            <a th:href="@{/profile}" th:classappend="${module == 'profile'} ? 'active' : ''" th:text="${user} ? ${user.username} : 'Username'">Username</a>
+            <a class="popup" onclick="logoutPopup()">Logout
+                <span th:href="@{/logout}" class="popuptext" id="logoutPopup">Confirm Logout</span>
+            </a>
+        </th:block>
+    </div>
+
+    <br style="height:10px;">
+
+    <script>
+        function logoutPopup() {
+            var popup = document.getElementById("logoutPopup");
+            popup.classList.toggle("show");
+        }
+    </script>
+</div>
+
+</body>
+</html>
