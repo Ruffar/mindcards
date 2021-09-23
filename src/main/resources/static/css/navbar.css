@@ -25,3 +25,11 @@
 .navbar-right {
   float: right;
 }
+
+.navbar .logout {
+}
+
+.navbar .logout:hover {
+  background-color: #f33;
+  color: black;
+}

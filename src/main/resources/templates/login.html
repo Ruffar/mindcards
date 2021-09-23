@@ -15,25 +15,23 @@
 
 <body>
 
-  <div th:insert="~{fragments/pageLayout :: navbar}"></div>
+<div th:insert="~{fragments/pageLayout :: navbar('login')}"></div>
 
-  <br style="height:10px;">
+<div align="center">
+  <h1>User Login</h1>
+  <form action="#" th:action="@{/login}" method="post" th:object="${submission}">
 
-  <div align="center">
-    <h1>User Login</h1>
-    <form action="#" th:action="@{/login}" method="post" th:object="${submission}">
+    <label>E-mail:</label>
+    <input type="text" th:field="*{email}" /><br/>
 
-      <label>E-mail:</label>
-      <input type="text" th:field="*{email}" /><br/>
+    <label>Password:</label>
+    <input type="password" th:field="*{password}" /><br/>
 
-      <label>Password:</label>
-      <input type="password" th:field="*{password}" /><br/>
+    <label th:if="${param.invalid}" style="color: #f77">Invalid e-mail or password...</label><br/>
 
-      <label th:if="${param.invalid}" style="color: #f77">Invalid e-mail or password...</label><br/>
-
-      <button type="submit">Login</button>
-    </form>
-  </div>
+    <button type="submit">Login</button>
+  </form>
+</div>
 
 </body>
 </html>

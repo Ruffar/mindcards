@@ -8,7 +8,7 @@ import javax.servlet.http.HttpSession;
 
 public interface ControllerUtil {
 
-    static void setUserSession(HttpSession session, Model model) {
+    static void setSessionUser(HttpSession session, Model model) {
         Integer userId = (Integer) session.getAttribute("userId");
         User user = null;
         if (userId != null && userId != 0) {
@@ -17,22 +17,12 @@ public interface ControllerUtil {
         model.addAttribute("user",user);
     }
 
-    static void setPageModule(Model model, PageModule pageModule) {
-        model.addAttribute("module", pageModule.toString());
-    }
-
-    public enum PageModule {
-        none("none"),
-        home("home"),
-        login("login");
-
-        private String stringVal;
-
-        private PageModule(String stringVal) {
-            this.stringVal = stringVal;
+    static User getSessionUser(HttpSession session) {
+        Integer userId = (Integer) session.getAttribute("userId");
+        if (userId != null && userId != 0) {
+            return User.getUser(AppConfig.getDatabase(),userId);
         }
-
-        public String toString() { return this.stringVal; }
+        return null;
     }
 
 }

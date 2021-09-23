@@ -7,14 +7,19 @@
 
 <body>
 
-    <div th:fragment="navbar" class="navbar">
-        <a th:href="@{/home}" th:classappend="${module? == 'home'} ? 'active' : ''">Home</a>
-        <a href="#contact">Contact</a>
-        <a href="#about">About</a>
-        <div class="navbar-right">
-            <a th:href="@{/login}" th:classappend="${module? == 'login'} ? 'active' : ''" th:text="${user != null} ? ${user.username} : 'Login'">Login</a>
-        </div>
+<div th:fragment="navbar(module)" class="navbar">
+    <a th:href="@{/home}" th:classappend="${module == 'home'} ? 'active' : ''">Home</a>
+    <a href="#contact">Contact</a>
+    <a href="#about">About</a>
+    <div class="navbar-right">
+        <a th:unless="${user}" th:href="@{/login}" th:classappend="${module == 'login'} ? 'active' : ''">Login</a>
+        <th:block th:if="${user}">
+            <a th:href="@{/profile}" th:classappend="${module == 'profile'} ? 'active' : ''" th:text="${user} ? ${user.username} : 'Profile'">Profile</a>
+            <a th:href="@{/logout}" class="logout">Logout</a>
+        </th:block>
     </div>
+    <br style="height:10px;">
+</div>
 
 </body>
 </html>

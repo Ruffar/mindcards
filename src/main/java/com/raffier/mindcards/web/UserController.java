@@ -13,11 +13,14 @@ import javax.servlet.http.HttpSession;
 public class UserController {
 
     @GetMapping(value="login")
-    public String loginPage(Model model) {
+    public String loginPage(Model model, HttpSession session) {
 
-        ControllerUtil.setPageModule(model, ControllerUtil.PageModule.login);
-        model.addAttribute("submission",new LoginSubmission());
+        User user = ControllerUtil.getSessionUser(session);
+        if (user != null) {
+            return "redirect:/profile";
+        }
 
+        model.addAttribute("submission", new LoginSubmission());
         return "login";
     }
 
@@ -33,6 +36,26 @@ public class UserController {
             return "redirect:login?invalid";
         }
 
+    }
+
+    @GetMapping(value="profile")
+    public String profile(HttpSession session, Model model) {
+
+        User user = ControllerUtil.getSessionUser(session);
+        if (user == null) {
+            return "redirect:/login";
+        }
+
+        model.addAttribute("user",user);
+        return "profilePage";
+    }
+
+    @GetMapping(value="logout")
+    public String logout(HttpSession session, Model model) {
+
+        session.setAttribute("userId", null);
+
+        return "redirect:/home";
     }
 
 }

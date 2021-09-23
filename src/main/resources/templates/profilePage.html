@@ -15,9 +15,9 @@
 
 <body>
 
-    <div th:insert="~{fragments/pageLayout :: navbar('home')}"></div>
+<div th:insert="~{fragments/pageLayout :: navbar('profile')}"></div>
 
-    <p> Home </p>
+<h3 th:text="${user} ? ${user.username} : 'Username'"> Username </h3>
 
 </body>
 </html>
