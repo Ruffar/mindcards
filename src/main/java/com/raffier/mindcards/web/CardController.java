@@ -1,11 +1,14 @@
 package com.raffier.mindcards.web;
 
 import com.raffier.mindcards.AppConfig;
+import com.raffier.mindcards.errorHandling.EntityNotFoundException;
 import com.raffier.mindcards.model.table.Infocard;
 import com.raffier.mindcards.model.table.Mindcard;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.servlet.View;
 
 import javax.servlet.http.HttpSession;
 import java.util.List;
@@ -14,18 +17,20 @@ import java.util.List;
 public class CardController {
 
     @GetMapping(value="pack/{packId}/{mindcardId}")
-    public String mindcardView(@PathVariable int packId, @PathVariable int mindcardId, HttpSession session, Model model) {
+    public ModelAndView mindcardView(@PathVariable int packId, @PathVariable int mindcardId, HttpSession session) {
 
-        ControllerUtil.setSessionUser(session,model);
+        ModelAndView mv = ControllerUtil.getGenericMV(session);
 
         Mindcard card = Mindcard.getMindcard(AppConfig.getDatabase(), mindcardId);
-        if (card == null) throw new RuntimeException("Mindcard can't be found...");
+        if (card == null) throw new EntityNotFoundException("Mindcard", mindcardId);
 
         List<Infocard> infocards = card.getInfocards();
 
-        model.addAttribute("mindcard",card);
-        model.addAttribute("infocards",infocards);
-        return "cards/mindcard";
+        mv.addObject("mindcard",card);
+        mv.addObject("infocards",infocards);
+
+        mv.setViewName("cards/mindcard");
+        return mv;
     }
 
 }

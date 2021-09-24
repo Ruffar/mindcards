@@ -122,7 +122,8 @@ public class Mindcard extends DatabaseTable {
             if (results.next()) {
                 return new Mindcard(database, mindcardId, results);
             } else {
-                System.out.println("Mindcard with ID "+mindcardId+" cannot be found.");
+                //throw new RuntimeException("Mindcard with ID "+mindcardId+" cannot be found...");
+                //System.out.println("Mindcard with ID "+mindcardId+" cannot be found.");
             }
         } catch (SQLException e) {
             e.printStackTrace();

@@ -17,7 +17,7 @@
 
     <div th:insert="~{fragments/pageLayout :: navbar('')}"></div>
 
-    <div th:fragment="error" th:with="title=${title} ?: 'Error', message=${message} ?: 'Error encountered...'" style="align-text: center;">
+    <div th:fragment="error" th:with="title=${title} ?: (${error.status.value()}?:'Error'), message=${message} ?: (${error.message}?:'Error encountered...')" style="align-text: center;">
 
         <h1 th:text="${title}">Error</h1>
 
