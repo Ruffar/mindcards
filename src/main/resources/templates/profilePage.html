@@ -1,25 +1,23 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org/">
 <head>
-  <link rel="stylesheet" th:href="@{/css/navbar.css}"/>
+    <link rel="stylesheet" th:href="@{/css/navbar.css}"/>
 
-  <style>
+    <style>
         body {
             background-color: #444;
         }
     </style>
 
-  <meta charset="UTF-8">
-  <title>Mindcards</title>
+    <meta charset="UTF-8">
+    <title>Mindcards</title>
 </head>
 
 <body>
 
-<div th:insert="~{fragments/pageLayout :: navbar('home')}"></div>
+<div th:insert="~{fragments/pageLayout :: navbar('profile')}"></div>
 
-<h3 th:text="${user} ? ${user.username} : 'Username'"></h3>
-<br/>
-
+<h3 th:text="${user} ? ${user.username} : 'Username'"> Username </h3>
 
 </body>
 </html>

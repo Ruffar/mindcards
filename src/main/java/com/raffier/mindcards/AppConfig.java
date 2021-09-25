@@ -17,7 +17,7 @@ import javax.annotation.Resource;
 @ConfigurationProperties
 public class AppConfig {
 
-    private static AppDatabase database;
+    private static AppDatabase database;// = new AppDatabase("testDatabase");
 
     public static AppDatabase getDatabase() { return database; }
     @Value("${databasename}")
