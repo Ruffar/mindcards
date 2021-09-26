@@ -8,4 +8,6 @@ public class EntityNotFoundException extends RuntimeException {
         super(tableName+" with ID "+id+" cannot be found...");
     }
 
+    protected EntityNotFoundException(String message) { super(message); }
+
 }

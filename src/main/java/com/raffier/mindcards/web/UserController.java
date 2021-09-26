@@ -4,6 +4,7 @@ import com.raffier.mindcards.AppConfig;
 import com.raffier.mindcards.model.table.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -28,16 +29,18 @@ public class UserController {
     }
 
     @PostMapping(value="login")
-    public String loginSubmit(@ModelAttribute LoginSubmission submission, @RequestParam(name="return",required=false) String returnUrl, HttpSession session, HttpServletRequest request) {
+    public ModelAndView loginSubmit(@ModelAttribute("submission") LoginSubmission submission, @RequestParam(name="return",defaultValue="") String returnUrl, HttpSession session, HttpServletRequest request, BindingResult result) {
         ModelAndView mv = ControllerUtil.getGenericMV(session);
 
-        User user = User.getUserFromEmail(AppConfig.getDatabase(),submission.getEmail());
-        if (user != null && user.getPassword().equals(submission.getPassword())) {
+        User user = User.getUserByLogin(AppConfig.getDatabase(),submission.getEmail(),submission.getPassword());
+        if (user != null) {
             session.setAttribute("userId", user.getUserId());
-            return "redirect:/"+returnUrl;
+            return new ModelAndView("redirect:"+returnUrl);
         }
         else {
-            return "redirect:login?invalid";
+            mv.addObject("invalid",true);
+            mv.setViewName("login");
+            return mv;
         }
 
     }

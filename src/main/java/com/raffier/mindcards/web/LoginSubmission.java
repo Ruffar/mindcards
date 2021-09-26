@@ -1,5 +1,6 @@
 package com.raffier.mindcards.web;
 
+import org.springframework.context.annotation.Bean;
 import org.springframework.lang.Nullable;
 
 public class LoginSubmission {

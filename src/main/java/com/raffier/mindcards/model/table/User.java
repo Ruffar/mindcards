@@ -117,10 +117,11 @@ public class User extends DatabaseTable {
 
     }
 
-    public static User getUserFromEmail(AppDatabase database, String email) {
+    public static User getUserByLogin(AppDatabase database, String email, String password) {
 
-        try (PreparedStatement stmnt = database.getConnection().prepareStatement("SELECT userId,username,password,email,isDeveloper FROM User WHERE email=?")) {
+        try (PreparedStatement stmnt = database.getConnection().prepareStatement("SELECT userId,username,password,email,isDeveloper FROM User WHERE email=? AND password=?")) {
             stmnt.setString(1,email);
+            stmnt.setString(2,password);
             ResultSet results = stmnt.executeQuery();
             if (results.next()) {
                 return new User(database, results.getInt("userId"), results);
