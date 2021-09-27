@@ -5,6 +5,8 @@ import com.raffier.mindcards.model.AppDatabase;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class CardPack extends DatabaseTable {
 
@@ -63,6 +65,24 @@ public class CardPack extends DatabaseTable {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+
+    public List<Tag> getTags() {
+        List<Tag> outList = new ArrayList<>();
+        try {
+            PreparedStatement statement = database.getConnection().prepareStatement("SELECT Tag.tagId FROM Tag, PackTag WHERE PackTag.packId=? AND Tag.tagId=PackTag.packId");
+            statement.setInt(1,packId);
+            ResultSet result = statement.executeQuery();
+            while (result.next()) {
+                int tagId = result.getInt("tagId");
+                Tag tagObj = Tag.getTag(database,tagId);
+                if (tagObj != null) outList.add(tagObj);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return outList;
     }
 
 

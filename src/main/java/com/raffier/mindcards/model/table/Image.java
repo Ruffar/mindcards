@@ -10,9 +10,6 @@ public class Image extends DatabaseTable {
     private final int imageId;
     private String imagePath;
 
-    //Prepared statements
-    private PreparedStatement pathStatement;
-
     private Image(AppDatabase database, int imageId, ResultSet rawData) throws SQLException {
         super(database, "Image");
 
