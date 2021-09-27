@@ -20,7 +20,10 @@ public class AppDatabase {
         createGroupCardTable();
         createCardPackTable();
         createImageTable();
+        createTagTable();
+        createPackTagTable();
         createUserTable();
+        createUserCardStatsTable();
     }
 
     public Connection getConnection() {
@@ -157,6 +160,30 @@ public class AppDatabase {
         }
         System.out.println("Image Table created successfully!");
     }
+    private void createTagTable() {
+        try (Statement statement = genericConnection.createStatement()) {
+            statement.executeUpdate("CREATE TABLE IF NOT EXISTS Tag" +
+                    "(tagId INTEGER PRIMARY KEY AUTOINCREMENT," +
+                    "tagName TEXT )");
+            statement.executeUpdate("INSERT OR REPLACE INTO Tag VALUES (0,'DeletedTag')");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        System.out.println("Tag Table created successfully!");
+    }
+    private void createPackTagTable() {
+        try (Statement statement = genericConnection.createStatement()) {
+            statement.executeUpdate("CREATE TABLE IF NOT EXISTS PackTag" +
+                    "(packId INTEGER NOT NULL," +
+                    "tagId INTEGER NOT NULL," +
+                    "PRIMARY KEY (packId,tagId)," +
+                    "FOREIGN KEY (packId) references CardPack(packId)," +
+                    "FOREIGN KEY (tagId) references Tag(tagId) )");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        System.out.println("Pack Tag Table created successfully!");
+    }
     private void createUserTable() {
         try (Statement statement = genericConnection.createStatement()) {
             statement.executeUpdate("CREATE TABLE IF NOT EXISTS User" +
@@ -164,14 +191,28 @@ public class AppDatabase {
                     "username TEXT," +
                     "password TEXT," +
                     "email TEXT NOT NULL," +
-                    "isDeveloper INTEGER Default 0)");
+                    "isDeveloper INTEGER Default 0,"+
+                    "studyHelp INTEGER Default 1)");
             statement.executeUpdate("INSERT OR REPLACE INTO User VALUES (0,'DeletedUser','deletedpassword1234','deleted@mindcards.com',0)");
         } catch (SQLException e) {
             e.printStackTrace();
         }
         System.out.println("User Table created successfully!");
     }
-
+    private void createUserCardStatsTable() {
+        try (Statement statement = genericConnection.createStatement()) {
+            statement.executeUpdate("CREATE TABLE IF NOT EXISTS UserCardStats" +
+                    "(userId INTEGER NOT NULL," +
+                    "mindcardId INTEGER NOT NULL," +
+                    "mastery INTEGER Default 0,"+
+                    "PRIMARY KEY (userId,mindcardId)," +
+                    "FOREIGN KEY (userId) references User(userId)," +
+                    "FOREIGN KEY (mindcardId) references Mindcard(mindcardId) )");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        System.out.println("User Card Stats Table created successfully!");
+    }
 
     
 }
