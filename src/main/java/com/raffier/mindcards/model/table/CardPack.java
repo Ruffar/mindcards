@@ -96,7 +96,7 @@ public class CardPack extends DatabaseTable {
         }
     }
 
-    public static CardPack cardPack(AppDatabase database, int ownerId, String title) {
+    public static CardPack addCardPack(AppDatabase database, int ownerId, String title) {
         try (PreparedStatement stmnt = database.getConnection().prepareStatement("INSERT INTO CardPack (ownerId, title) VALUES (?,?)")) {
             stmnt.setInt(1,ownerId);
             stmnt.setString(2,title);

@@ -76,7 +76,7 @@ public class CardGroup extends DatabaseTable {
         }
     }
 
-    public static CardGroup addMindcard(AppDatabase database, int packId, String title) {
+    public static CardGroup addCardGroup(AppDatabase database, int packId, String title) {
         try (PreparedStatement stmnt = database.getConnection().prepareStatement("INSERT INTO CardGroup (packId, title) VALUES (?,?)")) {
             stmnt.setInt(1,packId);
             stmnt.setString(2,title);
