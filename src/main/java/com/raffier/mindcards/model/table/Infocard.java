@@ -1,6 +1,6 @@
 package com.raffier.mindcards.model.table;
 
-import com.raffier.mindcards.model.AppDatabase;
+import com.raffier.mindcards.repository.AppDatabase;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;

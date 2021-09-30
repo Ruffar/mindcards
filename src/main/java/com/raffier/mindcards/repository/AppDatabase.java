@@ -1,4 +1,4 @@
-package com.raffier.mindcards.model;
+package com.raffier.mindcards.repository;
 
 import java.sql.*;
 

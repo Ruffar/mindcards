@@ -1,6 +1,7 @@
 package com.raffier.mindcards.web;
 
 import com.raffier.mindcards.AppConfig;
+import com.raffier.mindcards.model.LoginSubmission;
 import com.raffier.mindcards.model.table.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;

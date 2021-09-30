@@ -1,6 +1,7 @@
 package com.raffier.mindcards.model.table;
 
-import com.raffier.mindcards.model.AppDatabase;
+import com.raffier.mindcards.repository.AppDatabase;
+import com.raffier.mindcards.service.RepositoryService;
 
 import java.sql.*;
 import java.util.ArrayList;
@@ -9,66 +10,47 @@ import java.util.List;
 public class Mindcard extends DatabaseTable {
 
     //Database columns
-    private final int mindcardId;
-    private final int packId;
+    private int mindcardId;
+    private int packId;
 
     private String title;
-    private Image image;
+    private int imageId;
     private String description;
 
-    private Mindcard(AppDatabase database, int mindcardId, ResultSet rawData) throws SQLException {
-        super(database,"Mindcard");
-
+    public Mindcard(int mindcardId) {
+        super("Mindcard");
         this.mindcardId = mindcardId;
-        this.packId = rawData.getInt("packId");
+    }
 
-        this.title = rawData.getString("title");
-        this.description = rawData.getString("description");
+    public Mindcard(int mindcardId, CardPack pack, String title, Image image, String description) {
+        this(mindcardId);
+        this.packId = pack.getPackId();
+        this.title = title;
+        this.description = description;
+        this.imageId = image.getImageId();
+    }
 
-        int imageId = rawData.getInt("imageId");
-        if (imageId != 0) this.image = Image.getImage(database,imageId);
-
+    public Mindcard(int mindcardId, int packId, String title, int imageId, String description) {
+        this(mindcardId);
+        this.packId = packId;
+        this.title = title;
+        this.description = description;
+        this.imageId = imageId;
     }
 
     public int getMindcardId() { return this.mindcardId; }
-    public int getPackId() { return this.packId; }
+    public CardPack getPack() { return RepositoryService.getMindcardRepository(); }
     public String getTitle() { return this.title; }
     public Image getImage() { return this.image; }
     public String getDescription() { return this.description; }
 
-    public void updateTitle(String newTitle) {
-        try (PreparedStatement statement = database.getConnection().prepareStatement("UPDATE Mindcard SET title=? WHERE mindcardId=?")) {
-            statement.setInt(2, mindcardId);
-            statement.setString(1, newTitle);
-            statement.executeUpdate();
-            this.title = newTitle;
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-    public void updateImage(int newImageId) {
-        try (PreparedStatement statement = database.getConnection().prepareStatement("UPDATE Mindcard SET imageId=? WHERE mindcardId=?")) {
-            statement.setInt(2, mindcardId);
-            statement.setInt(1, newImageId);
-            statement.executeUpdate();
-
-            if (newImageId == 0) this.image = null;
-            else this.image = Image.getImage(database,newImageId);
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-    public void updateDescription(String newDesc) {
-        try (PreparedStatement statement = database.getConnection().prepareStatement("UPDATE Mindcard SET description=? WHERE mindcardId=?")) {
-            statement.setInt(2, mindcardId);
-            statement.setString(1, newDesc);
-            statement.executeUpdate();
-            this.description = newDesc;
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
+    public void setMindcardId(int mindcardId) { this.mindcardId = mindcardId; }
+    public void setPack(CardPack pack) { this.packId = pack.getPackId(); }
+    public void setPackId(int packId) { this.packId = packId; }
+    public void setTitle(String title) { this.title = title; }
+    public void setImage(Image image) { this.imageId = image.getImageId(); }
+    public void setImageId(int imageId) { this.imageId = imageId; }
+    public void setDescription(String description) { this.description = description; }
 
     public List<Infocard> getInfocards() {
         List<Infocard> outList = new ArrayList<>();
@@ -123,7 +105,7 @@ public class Mindcard extends DatabaseTable {
                 return new Mindcard(database, mindcardId, results);
             } else {
                 //throw new RuntimeException("Mindcard with ID "+mindcardId+" cannot be found...");
-                //System.out.println("Mindcard with ID "+mindcardId+" cannot be found.");
+                System.out.println("Mindcard with ID "+mindcardId+" cannot be found.");
             }
         } catch (SQLException e) {
             e.printStackTrace();

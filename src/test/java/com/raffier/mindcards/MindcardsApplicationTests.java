@@ -1,6 +1,5 @@
 package com.raffier.mindcards;
 
-import com.raffier.mindcards.model.AppDatabase;
 import com.raffier.mindcards.model.table.Image;
 import com.raffier.mindcards.model.table.Infocard;
 import com.raffier.mindcards.model.table.Mindcard;

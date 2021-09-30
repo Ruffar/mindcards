@@ -1,22 +1,23 @@
 package com.raffier.mindcards.model.table;
 
-import com.raffier.mindcards.model.AppDatabase;
+import com.raffier.mindcards.repository.AppDatabase;
 
 import java.sql.*;
 
 public class Image extends DatabaseTable {
 
     //Database columns
-    private final int imageId;
+    private int imageId;
     private String imagePath;
 
     private Image(AppDatabase database, int imageId, ResultSet rawData) throws SQLException {
-        super(database, "Image");
+        super("Image");
 
         this.imageId = imageId;
         this.imagePath = rawData.getString("imagePath");
     }
 
+    public int getImageId() { return imageId; }
     public String getImagePath() { return imagePath; }
 
     public void updatePath(String newPath) {

@@ -1,15 +1,7 @@
 package com.raffier.mindcards;
 
-import com.raffier.mindcards.model.table.Image;
-import com.raffier.mindcards.model.table.Infocard;
-import com.raffier.mindcards.model.table.Mindcard;
-import com.raffier.mindcards.model.table.User;
-import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import com.raffier.mindcards.model.AppDatabase;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.core.env.Environment;
 
 @SpringBootApplication
 public class MindcardsApplication {

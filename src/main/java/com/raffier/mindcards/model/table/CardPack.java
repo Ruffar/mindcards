@@ -1,6 +1,6 @@
 package com.raffier.mindcards.model.table;
 
-import com.raffier.mindcards.model.AppDatabase;
+import com.raffier.mindcards.repository.AppDatabase;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -11,24 +11,19 @@ import java.util.List;
 public class CardPack extends DatabaseTable {
 
     //Database columns
-    private final int packId;
-    private final int ownerId;
+    private int packId;
+    private int ownerId;
 
     private String title;
     private int imageId;
     private String description;
 
-    private CardPack(AppDatabase database, int packId, ResultSet rawData) throws SQLException {
-        super(database,"CardPack");
-
+    public CardPack(int packId) {
+        super("CardPack");
         this.packId = packId;
-        this.ownerId = rawData.getInt("ownerId");
-
-        this.title = rawData.getString("title");
-        this.imageId = rawData.getInt("imageId");
-        this.description = rawData.getString("description");
-
     }
+
+    public
 
     public int getPackId() { return this.packId; }
     public int getOwnerId() { return ownerId; }
