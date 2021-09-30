@@ -6,7 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class CardGroup extends DatabaseTable {
+public class CardGroup extends EntityTable {
 
     //Database columns
     private final int cardGroupId;

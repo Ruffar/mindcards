@@ -4,7 +4,7 @@ import com.raffier.mindcards.repository.AppDatabase;
 
 import java.sql.*;
 
-public class Image extends DatabaseTable {
+public class Image extends EntityTable {
 
     //Database columns
     private int imageId;

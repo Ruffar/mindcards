@@ -6,7 +6,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class Infocard extends DatabaseTable {
+public class Infocard extends EntityTable {
 
     //Database columns
     private final int infocardId;

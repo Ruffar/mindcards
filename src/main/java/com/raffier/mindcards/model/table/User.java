@@ -4,7 +4,7 @@ import com.raffier.mindcards.repository.AppDatabase;
 
 import java.sql.*;
 
-public class User extends DatabaseTable {
+public class User extends EntityTable {
 
     //Database columns
     private final int userId;

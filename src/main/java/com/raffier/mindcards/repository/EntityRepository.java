@@ -7,14 +7,14 @@ public abstract class EntityRepository<T, ID> {
         this.database = database;
     }
 
-    abstract <S extends T> void save(S entity);
+    public abstract <S extends T> void save(S entity);
 
-    abstract T getById(ID id);
+    public abstract T getById(ID id);
 
-    abstract <S extends T> T add(S entity);
+    public abstract <S extends T> T add(S entity);
 
-    abstract <S extends T> void delete(S entity);
+    public abstract <S extends T> void delete(S entity);
 
-    abstract void deleteById(ID id);
+    public abstract void deleteById(ID id);
 
 }

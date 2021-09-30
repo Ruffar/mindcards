@@ -1,7 +1,5 @@
 package com.raffier.mindcards.errorHandling;
 
-import com.raffier.mindcards.model.table.DatabaseTable;
-
 public class EntityNotFoundException extends RuntimeException {
 
     public EntityNotFoundException(String tableName, int id) {

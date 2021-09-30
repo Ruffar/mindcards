@@ -12,11 +12,11 @@ public class MindcardRepository extends EntityRepository<Mindcard,Integer> {
         super(database);
     }
 
-    <S extends Mindcard> void save(S entity) {
+    public <S extends Mindcard> void save(S entity) {
         try (PreparedStatement statement = database.getConnection().prepareStatement("UPDATE Mindcard SET packId=?,title=?,imageId=?,description=? WHERE mindcardId=?")) {
-            statement.setInt(2, entity.getPack().getPackId());
+            statement.setInt(2, entity.getPackId());
             statement.setString(1, entity.getTitle());
-            statement.setInt(3,entity.getImage().getImageId());
+            statement.setInt(3,entity.getImageId());
             statement.setString(4,entity.getDescription());
             statement.executeUpdate();
         } catch (SQLException e) {
@@ -24,7 +24,7 @@ public class MindcardRepository extends EntityRepository<Mindcard,Integer> {
         }
     }
 
-    Mindcard getById(Integer id) {
+    public Mindcard getById(Integer id) {
         try (PreparedStatement stmnt = database.getConnection().prepareStatement("SELECT packId, title, imageId, description FROM Mindcard WHERE mindcardId=?")) {
             stmnt.setInt(1,id);
             ResultSet results = stmnt.executeQuery();
@@ -40,7 +40,7 @@ public class MindcardRepository extends EntityRepository<Mindcard,Integer> {
         return null;
     }
 
-    <S extends Mindcard> Mindcard add(S entity) {
+    public <S extends Mindcard> Mindcard add(S entity) {
         try (PreparedStatement stmnt = database.getConnection().prepareStatement("INSERT INTO Mindcard (packId, title, imageId, description) VALUES (?,?,?,?)")) {
             stmnt.setInt(1,entity.getPack().getPackId());
             stmnt.setString(2,entity.getTitle());
@@ -59,12 +59,18 @@ public class MindcardRepository extends EntityRepository<Mindcard,Integer> {
         return null;
     }
 
-    <S extends Mindcard> void delete(S entity) {
-
+    public <S extends Mindcard> void delete(S entity) {
+        deleteById(entity.getMindcardId());
     }
 
-    void deleteById(Integer integer) {
-
+    public void deleteById(Integer id) {
+        try (PreparedStatement stmnt = database.getConnection().prepareStatement("DELETE FROM Mindcard WHERE mindcardId=?")) {
+            stmnt.setInt(1,id);
+            stmnt.executeUpdate();
+            System.out.println("Mindcard with ID "+id+" successfully deleted.");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
 }

@@ -1,13 +1,12 @@
 package com.raffier.mindcards.model.table;
 
-import com.raffier.mindcards.repository.AppDatabase;
 import com.raffier.mindcards.service.RepositoryService;
 
 import java.sql.*;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Mindcard extends DatabaseTable {
+public class Mindcard extends EntityTable {
 
     //Database columns
     private int mindcardId;
@@ -22,14 +21,6 @@ public class Mindcard extends DatabaseTable {
         this.mindcardId = mindcardId;
     }
 
-    public Mindcard(int mindcardId, CardPack pack, String title, Image image, String description) {
-        this(mindcardId);
-        this.packId = pack.getPackId();
-        this.title = title;
-        this.description = description;
-        this.imageId = image.getImageId();
-    }
-
     public Mindcard(int mindcardId, int packId, String title, int imageId, String description) {
         this(mindcardId);
         this.packId = packId;
@@ -39,9 +30,11 @@ public class Mindcard extends DatabaseTable {
     }
 
     public int getMindcardId() { return this.mindcardId; }
-    public CardPack getPack() { return RepositoryService.getMindcardRepository(); }
+    public int getPackId() { return this.packId; }
+    public CardPack getPack() { return RepositoryService.getCardPackRepository().getById(this.packId); }
     public String getTitle() { return this.title; }
-    public Image getImage() { return this.image; }
+    public int getImageId() { return this.imageId; }
+    public Image getImage() { return return RepositoryService.getImageRepository().getById(this.imageId); }
     public String getDescription() { return this.description; }
 
     public void setMindcardId(int mindcardId) { this.mindcardId = mindcardId; }
@@ -67,50 +60,6 @@ public class Mindcard extends DatabaseTable {
             e.printStackTrace();
         }
         return outList;
-    }
-
-
-    public void delete() {
-        try (PreparedStatement stmnt = database.getConnection().prepareStatement("DELETE FROM Mindcard WHERE mindcardId=?")) {
-            stmnt.setInt(1,mindcardId);
-            stmnt.executeUpdate();
-            System.out.println("Mindcard with ID "+mindcardId+" successfully deleted.");
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public static Mindcard addMindcard(AppDatabase database, int packId, String title) {
-        try (PreparedStatement stmnt = database.getConnection().prepareStatement("INSERT INTO Mindcard (packId, title) VALUES (?,?)")) {
-            stmnt.setInt(1,packId);
-            stmnt.setString(2,title);
-            stmnt.executeUpdate();
-            ResultSet generatedIds = stmnt.getGeneratedKeys();
-            if (generatedIds.next()) {
-                int newId = generatedIds.getInt(1);
-                System.out.println("Mindcard with ID "+newId+" successfully created.");
-                return getMindcard(database, newId);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    public static Mindcard getMindcard(AppDatabase database, int mindcardId) {
-        try (PreparedStatement stmnt = database.getConnection().prepareStatement("SELECT packId, title, imageId, description FROM Mindcard WHERE mindcardId=?")) {
-            stmnt.setInt(1,mindcardId);
-            ResultSet results = stmnt.executeQuery();
-            if (results.next()) {
-                return new Mindcard(database, mindcardId, results);
-            } else {
-                //throw new RuntimeException("Mindcard with ID "+mindcardId+" cannot be found...");
-                System.out.println("Mindcard with ID "+mindcardId+" cannot be found.");
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return null;
     }
 
 }
