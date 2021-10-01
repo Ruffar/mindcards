@@ -9,23 +9,24 @@ import java.sql.SQLException;
 public class CardGroup extends EntityTable {
 
     //Database columns
-    private final int cardGroupId;
-    private final int packId;
+    private int cardGroupId;
+    private int packId;
 
     private String title;
     private int imageId;
     private String description;
 
-    private CardGroup(AppDatabase database, int cardGroupId, ResultSet rawData) throws SQLException {
-        super(database,"Card Group");
-
+    public CardGroup(int cardGroupId) {
+        super("CardGroup");
         this.cardGroupId = cardGroupId;
-        this.packId = rawData.getInt("packId");
+    }
 
-        this.title = rawData.getString("title");
-        this.imageId = rawData.getInt("imageId");
-        this.description = rawData.getString("description");
-
+    public CardGroup(int cardGroupId, int packId, String title, int imageId, String description) {
+        this(cardGroupId);
+        this.packId = packId;
+        this.title = title;
+        this.imageId = imageId;
+        this.description = description;
     }
 
     public int getCardGroupId() { return cardGroupId; }
@@ -33,6 +34,9 @@ public class CardGroup extends EntityTable {
     public String getTitle() { return this.title; }
     public int getImageId() { return this.imageId; }
     public String getDescription() { return this.description; }
+
+    public void setCardGroupId(int cardGroupId) { this.cardGroupId = cardGroupId; }
+    public void setPackId(int packId) { this.packId = packId; }
 
     public void updateTitle(String newTitle) {
         try (PreparedStatement statement = database.getConnection().prepareStatement("UPDATE CardGroup SET title=? WHERE cardGroupId=?")) {

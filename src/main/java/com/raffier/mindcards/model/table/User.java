@@ -7,21 +7,26 @@ import java.sql.*;
 public class User extends EntityTable {
 
     //Database columns
-    private final int userId;
+    private int userId;
 
     private String username;
     private String password;
     private String email;
     private boolean isDeveloper;
+    private boolean studyHelp;
 
-    private User(AppDatabase database, int userId, ResultSet rawData) throws SQLException {
-        super(database, "User");
-
+    public User(int userId) {
+        super("User");
         this.userId = userId;
-        this.username = rawData.getString("username");
-        this.password = rawData.getString("password");
-        this.email = rawData.getString("email");
-        this.isDeveloper = rawData.getBoolean("isDeveloper");
+    }
+
+    public User(int userId, String username, String password, String email, boolean isDeveloper, boolean studyHelp) {
+        this(userId);
+        this.username = username;
+        this.password = password;
+        this.email = email;
+        this.isDeveloper = isDeveloper;
+        this.studyHelp = studyHelp;
     }
 
     public int getUserId() { return userId; }
@@ -29,111 +34,13 @@ public class User extends EntityTable {
     public String getPassword() { return password; }
     public String getEmail() { return email; }
     public boolean isDeveloper() { return isDeveloper; }
+    public boolean isUsingStudyHelp() { return studyHelp; }
 
-    public void updateUsername(String newName) {
-        try (PreparedStatement statement = database.getConnection().prepareStatement("UPDATE User SET username=? WHERE userId=?")) {
-            statement.setInt(2, userId);
-            statement.setString(1, newName);
-            statement.executeUpdate();
-            this.username = newName;
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-    public void updatePassword(String newPassword) {
-        try (PreparedStatement statement = database.getConnection().prepareStatement("UPDATE User SET password=? WHERE userId=?")) {
-            statement.setInt(2, userId);
-            statement.setString(1, newPassword);
-            statement.executeUpdate();
-            this.password = newPassword;
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-    public void updateEmail(String newEmail) {
-        try (PreparedStatement statement = database.getConnection().prepareStatement("UPDATE User SET email=? WHERE userId=?")) {
-            statement.setInt(2, userId);
-            statement.setString(1, newEmail);
-            statement.executeUpdate();
-            this.email = newEmail;
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-    public void updateDeveloperStatus(boolean newStatus) {
-        try (PreparedStatement statement = database.getConnection().prepareStatement("UPDATE User SET isDeveloper=? WHERE userId=?")) {
-            statement.setInt(2, userId);
-            statement.setBoolean(1, newStatus);
-            statement.executeUpdate();
-            this.isDeveloper = newStatus;
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void delete() {
-        try (PreparedStatement stmnt = database.getConnection().prepareStatement("DELETE FROM User WHERE userId=?")) {
-            stmnt.setInt(1,userId);
-            stmnt.executeUpdate();
-            System.out.println("User with ID "+userId+" successfully deleted.");
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public static User addUser(AppDatabase database, String username, String password, String email) {
-        try (PreparedStatement stmnt = database.getConnection().prepareStatement("INSERT INTO User (username,password,email) VALUES (?,?,?)")) {
-            stmnt.setString(1,username);
-            stmnt.setString(2,password);
-            stmnt.setString(3,email);
-            stmnt.executeUpdate();
-            ResultSet generatedIds = stmnt.getGeneratedKeys();
-            if (generatedIds.next()) {
-                int newId = generatedIds.getInt(1);
-                System.out.println("User with ID "+newId+" successfully created.");
-                return getUser(database, newId);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    public static User getUser(AppDatabase database, int userId) {
-
-        try (PreparedStatement stmnt = database.getConnection().prepareStatement("SELECT username,password,email,isDeveloper FROM User WHERE userId=?")) {
-            stmnt.setInt(1,userId);
-            ResultSet results = stmnt.executeQuery();
-            if (results.next()) {
-                return new User(database, userId, results);
-            } else {
-                System.out.println("User with ID "+userId+" cannot be found.");
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return null;
-
-    }
-
-    public static User getUserByLogin(AppDatabase database, String email, String password) {
-
-        try (PreparedStatement stmnt = database.getConnection().prepareStatement("SELECT userId,username,password,email,isDeveloper FROM User WHERE email=? AND password=?")) {
-            stmnt.setString(1,email);
-            stmnt.setString(2,password);
-            ResultSet results = stmnt.executeQuery();
-            if (results.next()) {
-                return new User(database, results.getInt("userId"), results);
-            } else {
-                System.out.println("User with E-Mail "+email+" cannot be found.");
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-
-        return null;
-
-    }
+    public void setUserId(int userId) { this.userId = userId; }
+    public void setUsername(String username) { this.username = username; }
+    public void setPassword(String password) { this.password = password; }
+    public void setEmail(String email) { this.email = email; }
+    public void setDeveloperStatus(boolean isDeveloper) { this.isDeveloper = isDeveloper; }
+    public void setStudyHelpStatus(boolean studyHelp) { this.studyHelp = studyHelp; }
 
 }

@@ -1,10 +1,16 @@
-package com.raffier.mindcards.repository;
+package com.raffier.mindcards.repository.table;
 
 import com.raffier.mindcards.model.table.CardPack;
+import com.raffier.mindcards.model.table.Image;
+import com.raffier.mindcards.model.table.Tag;
+import com.raffier.mindcards.repository.AppDatabase;
+import com.raffier.mindcards.repository.table.EntityRepository;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class CardPackRepository extends EntityRepository<CardPack,Integer> {
 
@@ -18,6 +24,7 @@ public class CardPackRepository extends EntityRepository<CardPack,Integer> {
             statement.setString(1, entity.getTitle());
             statement.setInt(3,entity.getImageId());
             statement.setString(4,entity.getDescription());
+            statement.setInt(5,entity.getPackId());
             statement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -71,4 +78,34 @@ public class CardPackRepository extends EntityRepository<CardPack,Integer> {
             e.printStackTrace();
         }
     }
+
+    public Image getImage(int packId) {
+        try {
+            PreparedStatement statement = database.getConnection().prepareStatement("SELECT Image.imageId, Image.imagePath FROM CardPack, Image WHERE packId = ? AND CardPack.imageId = Image.imageId");
+            statement.setInt(1,packId);
+            ResultSet result = statement.executeQuery();
+            if (result.next()) {
+                return new Image(result.getInt("imageId"),result.getString("imagePath"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public List<Tag> getTags(int packId) {
+        List<Tag> outList = new ArrayList<>();
+        try {
+            PreparedStatement statement = database.getConnection().prepareStatement("SELECT Tag.tagId, Tag.tagName FROM Tag, PackTag WHERE PackTag.packId=? AND Tag.tagId=PackTag.tagId");
+            statement.setInt(1,packId);
+            ResultSet result = statement.executeQuery();
+            while (result.next()) {
+                outList.add(new Tag(result.getInt("tagId"),result.getString("tagName")));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return outList;
+    }
+
 }

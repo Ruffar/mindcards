@@ -1,4 +1,6 @@
-package com.raffier.mindcards.repository;
+package com.raffier.mindcards.repository.table;
+
+import com.raffier.mindcards.repository.AppDatabase;
 
 public abstract class EntityRepository<T, ID> {
 

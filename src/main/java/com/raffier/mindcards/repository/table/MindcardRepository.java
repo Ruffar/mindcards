@@ -1,6 +1,8 @@
-package com.raffier.mindcards.repository;
+package com.raffier.mindcards.repository.table;
 
+import com.raffier.mindcards.model.table.Image;
 import com.raffier.mindcards.model.table.Mindcard;
+import com.raffier.mindcards.repository.AppDatabase;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -14,10 +16,11 @@ public class MindcardRepository extends EntityRepository<Mindcard,Integer> {
 
     public <S extends Mindcard> void save(S entity) {
         try (PreparedStatement statement = database.getConnection().prepareStatement("UPDATE Mindcard SET packId=?,title=?,imageId=?,description=? WHERE mindcardId=?")) {
-            statement.setInt(2, entity.getPackId());
-            statement.setString(1, entity.getTitle());
+            statement.setInt(1, entity.getPackId());
+            statement.setString(2, entity.getTitle());
             statement.setInt(3,entity.getImageId());
             statement.setString(4,entity.getDescription());
+            statement.setInt(5,entity.getMindcardId());
             statement.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
@@ -42,9 +45,9 @@ public class MindcardRepository extends EntityRepository<Mindcard,Integer> {
 
     public <S extends Mindcard> Mindcard add(S entity) {
         try (PreparedStatement stmnt = database.getConnection().prepareStatement("INSERT INTO Mindcard (packId, title, imageId, description) VALUES (?,?,?,?)")) {
-            stmnt.setInt(1,entity.getPack().getPackId());
+            stmnt.setInt(1,entity.getPackId());
             stmnt.setString(2,entity.getTitle());
-            stmnt.setInt(3,entity.getImage().getImageId());
+            stmnt.setInt(3,entity.getImageId());
             stmnt.setString(4,entity.getDescription());
             stmnt.executeUpdate();
             ResultSet generatedIds = stmnt.getGeneratedKeys();
@@ -71,6 +74,20 @@ public class MindcardRepository extends EntityRepository<Mindcard,Integer> {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+    }
+
+    public Image getImage(int mindcardId) {
+        try {
+            PreparedStatement statement = database.getConnection().prepareStatement("SELECT Image.imageId, Image.imagePath FROM Mindcard, Image WHERE mindcardId = ? AND Mindcard.imageId = Image.imageId");
+            statement.setInt(1,mindcardId);
+            ResultSet result = statement.executeQuery();
+            if (result.next()) {
+                return new Image(result.getInt("imageId"),result.getString("imagePath"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
 }
