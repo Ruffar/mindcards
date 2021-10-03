@@ -27,13 +27,13 @@ public class CardGroupRepository extends EntityRepository<CardGroup,Integer> {
     }
 
     public CardGroup getById(Integer id) {
-        try (PreparedStatement stmnt = database.getConnection().prepareStatement("SELECT ownerId, title, imageId, description FROM CardGroup WHERE cardGroupId=?")) {
+        try (PreparedStatement stmnt = database.getConnection().prepareStatement("SELECT packId, title, imageId, description FROM CardGroup WHERE cardGroupId=?")) {
             stmnt.setInt(1,id);
             ResultSet results = stmnt.executeQuery();
             if (results.next()) {
-                return new CardGroup(id,results.getInt("ownerId"),results.getString("title"),results.getInt("imageId"),results.getString("description"));
+                return new CardGroup(id,results.getInt("packId"),results.getString("title"),results.getInt("imageId"),results.getString("description"));
             } else {
-                System.out.println("Card Pack with ID "+id+" cannot be found.");
+                System.out.println("Card Group with ID "+id+" cannot be found.");
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -42,8 +42,8 @@ public class CardGroupRepository extends EntityRepository<CardGroup,Integer> {
     }
 
     public <S extends CardGroup> CardGroup add(S entity) {
-        try (PreparedStatement stmnt = database.getConnection().prepareStatement("INSERT INTO CardGroup (ownerId, title, imageId, description) VALUES (?,?,?,?)")) {
-            stmnt.setInt(1,entity.getOwnerId());
+        try (PreparedStatement stmnt = database.getConnection().prepareStatement("INSERT INTO CardGroup (packId, title, imageId, description) VALUES (?,?,?,?)")) {
+            stmnt.setInt(1,entity.getPackId());
             stmnt.setString(2,entity.getTitle());
             stmnt.setInt(3,entity.getImageId());
             stmnt.setString(4,entity.getDescription());
@@ -51,7 +51,7 @@ public class CardGroupRepository extends EntityRepository<CardGroup,Integer> {
             ResultSet generatedIds = stmnt.getGeneratedKeys();
             if (generatedIds.next()) {
                 int newId = generatedIds.getInt(1);
-                System.out.println("Card Pack with ID "+newId+" successfully created.");
+                System.out.println("Card Group with ID "+newId+" successfully created.");
                 return getById(newId);
             }
         } catch (SQLException e) {
@@ -76,7 +76,7 @@ public class CardGroupRepository extends EntityRepository<CardGroup,Integer> {
 
     public Image getImage(int packId) {
         try {
-            PreparedStatement statement = database.getConnection().prepareStatement("SELECT Image.imageId, Image.imagePath FROM CardPack, Image WHERE packId = ? AND CardPack.imageId = Image.imageId");
+            PreparedStatement statement = database.getConnection().prepareStatement("SELECT Image.imageId, Image.imagePath FROM CardGroup, Image WHERE cardGroupId = ? AND CardGroup.imageId = Image.imageId");
             statement.setInt(1,packId);
             ResultSet result = statement.executeQuery();
             if (result.next()) {

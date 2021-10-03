@@ -18,7 +18,7 @@ public class MindcardsApplicationTests {
 	@Test
 	void contextLoads() {
 		//AppConfig.getConfig().getDatabase() = new AppDatabase("testDatabase");
-		User user1 = User.addUser(AppConfig.getDatabase(), "admin", "admin1234!", "admin@mindcards.com");
+		/*User user1 = User.addUser(AppConfig.getDatabase(), "admin", "admin1234!", "admin@mindcards.com");
 		user1.updateDeveloperStatus(true);
 		User user2 = User.addUser(AppConfig.getDatabase(), "dave", "password", "dave@somemail.com");
 
@@ -40,7 +40,7 @@ public class MindcardsApplicationTests {
 		infocard2.updateDescription("Bad cards don't deserve to be read");
 		Infocard infocard3 = Infocard.addInfocard(AppConfig.getDatabase(),3);
 		infocard3.updateDescription("This bad card was made with bad intentions");
-		infocard3.updateImage(1);
+		infocard3.updateImage(1);*/
 
 	}
 

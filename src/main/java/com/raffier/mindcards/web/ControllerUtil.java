@@ -2,6 +2,7 @@ package com.raffier.mindcards.web;
 
 import com.raffier.mindcards.AppConfig;
 import com.raffier.mindcards.model.table.User;
+import com.raffier.mindcards.service.RepositoryService;
 import org.springframework.ui.Model;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -15,7 +16,7 @@ public interface ControllerUtil {
         Integer userId = (Integer) session.getAttribute("userId");
         User user = null;
         if (userId != null && userId != 0) {
-            user = User.getUser(AppConfig.getDatabase(),userId);
+            user = RepositoryService.getUserRepository().getById(userId);//User.getUser(AppConfig.getDatabase(),userId);
         }
         mv.addObject("user",user);
 
@@ -26,7 +27,7 @@ public interface ControllerUtil {
         Integer userId = (Integer) session.getAttribute("userId");
         User user = null;
         if (userId != null && userId != 0) {
-            user = User.getUser(AppConfig.getDatabase(),userId);
+            user = RepositoryService.getUserRepository().getById(userId);
         }
         model.addAttribute("user",user);
     }
@@ -34,7 +35,7 @@ public interface ControllerUtil {
     static User getSessionUser(HttpSession session) {
         Integer userId = (Integer) session.getAttribute("userId");
         if (userId != null && userId != 0) {
-            return User.getUser(AppConfig.getDatabase(),userId);
+            return RepositoryService.getUserRepository().getById(userId);
         }
         return null;
     }

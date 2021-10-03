@@ -193,7 +193,7 @@ public class AppDatabase {
                     "email TEXT NOT NULL," +
                     "isDeveloper INTEGER Default 0,"+
                     "studyHelp INTEGER Default 1)");
-            statement.executeUpdate("INSERT OR REPLACE INTO User VALUES (0,'DeletedUser','deletedpassword1234','deleted@mindcards.com',0)");
+            statement.executeUpdate("INSERT OR REPLACE INTO User VALUES (0,'DeletedUser','deletedpassword1234','deleted@mindcards.com',0,1)");
         } catch (SQLException e) {
             e.printStackTrace();
         }

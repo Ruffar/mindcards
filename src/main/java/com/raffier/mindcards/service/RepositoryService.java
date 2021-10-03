@@ -1,7 +1,10 @@
 package com.raffier.mindcards.service;
 
-
 import com.raffier.mindcards.AppConfig;
+import com.raffier.mindcards.model.CardElement;
+import com.raffier.mindcards.model.table.Image;
+import com.raffier.mindcards.model.table.Infocard;
+import com.raffier.mindcards.model.table.Mindcard;
 import com.raffier.mindcards.repository.table.*;
 
 public class RepositoryService {
@@ -17,5 +20,17 @@ public class RepositoryService {
     public static CardPackRepository getCardPackRepository() { return cardPackRepository; }
     public static ImageRepository getImageRepository() { return imageRepository; }
     public static UserRepository getUserRepository() { return userRepository; }
+
+    public static CardElement getElement(Mindcard mindcard) {
+        Image image = mindcardRepository.getImage(mindcard.getMindcardId());
+        String imagePath = image != null ? image.getImagePath() : "";
+        return new CardElement(mindcard.getTitle(),imagePath,mindcard.getDescription());
+    }
+
+    public static CardElement getElement(Infocard infocard) {
+        Image image = infocardRepository.getImage(infocard.getInfocardId());
+        String imagePath = image != null ? image.getImagePath() : "";
+        return new CardElement("",imagePath,infocard.getDescription());
+    }
 
 }

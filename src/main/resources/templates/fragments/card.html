@@ -7,11 +7,11 @@
 
 <body>
 
-<div th:fragment="card(isMain,image,title,description)" class="card" th:classappend="${isMain} ? 'card-main' : ''" style="margin: auto;">
-    <img th:if="${image}" th:src="@{${image.getImagePath()}}" class="cardimg">
-    <div class="cardtext" th:classappend="${image} ? 'cardtext-right' : 'cardtext-full'">
-        <h4 th:if="${title != null && title != ''}" th:text="${title}"><b> MindcardTitle </b></h4>
-        <p th:utext="${description}"> Description </p>
+<div th:fragment="card(isMain,cardElement)" class="card" th:classappend="${isMain} ? 'card-main' : ''" style="margin: auto;">
+    <img th:if="${cardElement.imagePath != null && cardElement.imagePath != ''}" th:src="@{${cardElement.imagePath}}" class="cardimg">
+    <div class="cardtext" th:classappend="${cardElement.imagePath != null && cardElement.imagePath != ''} ? 'cardtext-right' : 'cardtext-full'">
+        <h4 th:if="${cardElement.title != null && cardElement.title != ''}" th:text="${cardElement.title}"><b> MindcardTitle </b></h4>
+        <p th:utext="${cardElement.description}"> Description </p>
     </div>
 </div>
 

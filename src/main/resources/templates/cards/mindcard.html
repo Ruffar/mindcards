@@ -17,14 +17,14 @@
 
 <div th:insert="~{fragments/pageLayout :: navbar('')}"></div>
 
-<div th:replace="~{fragments/card :: card(isMain=${true},image=${mindcard.image}, title=${mindcard.title}, description=${mindcard.description})}"></div>
+<div th:replace="~{fragments/card :: card(isMain=${true},cardElement=${mindcard})}"></div>
 
 <hr>
 
 <div style="text-align: center;">
     <div class="infocard-grid">
         <th:block th:each="infocard: ${infocards}">
-            <div th:replace="~{fragments/card :: card(isMain=${false},image=${infocard.image}, title='', description=${infocard.description})}" style="flex: 0 0 auto;"></div>
+            <div th:replace="~{fragments/card :: card(isMain=${false},cardElement=${infocard})}" style="flex: 0 0 auto;"></div>
         </th:block>
     </div>
 </div>

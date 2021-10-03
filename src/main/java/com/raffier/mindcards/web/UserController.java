@@ -3,6 +3,7 @@ package com.raffier.mindcards.web;
 import com.raffier.mindcards.AppConfig;
 import com.raffier.mindcards.model.LoginSubmission;
 import com.raffier.mindcards.model.table.User;
+import com.raffier.mindcards.service.RepositoryService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -33,7 +34,7 @@ public class UserController {
     public ModelAndView loginSubmit(@ModelAttribute("submission") LoginSubmission submission, @RequestParam(name="return",defaultValue="") String returnUrl, HttpSession session, HttpServletRequest request, BindingResult result) {
         ModelAndView mv = ControllerUtil.getGenericMV(session);
 
-        User user = User.getUserByLogin(AppConfig.getDatabase(),submission.getEmail(),submission.getPassword());
+        User user = RepositoryService.getUserRepository().getByLogin(submission.getEmail(), submission.getPassword());//User.getUserByLogin(AppConfig.getDatabase(),submission.getEmail(),submission.getPassword());
         if (user != null) {
             session.setAttribute("userId", user.getUserId());
             return new ModelAndView("redirect:"+returnUrl);
