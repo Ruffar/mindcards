@@ -90,18 +90,4 @@ public class InfocardRepository extends EntityRepository<Infocard,Integer> {
         }
     }
 
-    public Image getImage(int infocardId) {
-        try {
-            PreparedStatement statement = database.getConnection().prepareStatement("SELECT Image.imageId, Image.imagePath FROM Infocard, Image WHERE infocardId = ? AND Infocard.imageId = Image.imageId");
-            statement.setInt(1,infocardId);
-            ResultSet result = statement.executeQuery();
-            if (result.next()) {
-                return new Image(result.getInt("imageId"),result.getString("imagePath"));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
 }

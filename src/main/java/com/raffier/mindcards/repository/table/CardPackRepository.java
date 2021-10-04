@@ -79,20 +79,6 @@ public class CardPackRepository extends EntityRepository<CardPack,Integer> {
         }
     }
 
-    public Image getImage(int packId) {
-        try {
-            PreparedStatement statement = database.getConnection().prepareStatement("SELECT Image.imageId, Image.imagePath FROM CardPack, Image WHERE packId = ? AND CardPack.imageId = Image.imageId");
-            statement.setInt(1,packId);
-            ResultSet result = statement.executeQuery();
-            if (result.next()) {
-                return new Image(result.getInt("imageId"),result.getString("imagePath"));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
     public List<Tag> getTags(int packId) {
         List<Tag> outList = new ArrayList<>();
         try {

@@ -42,6 +42,62 @@ public class ImageRepository extends EntityRepository<Image, Integer> {
         return null;
     }
 
+    public Image getFromMindcard(int mindcardId) {
+        try {
+            PreparedStatement statement = database.getConnection().prepareStatement("SELECT Image.imageId, Image.imagePath FROM Mindcard, Image WHERE mindcardId = ? AND Mindcard.imageId = Image.imageId");
+            statement.setInt(1,mindcardId);
+            ResultSet result = statement.executeQuery();
+            if (result.next()) {
+                return new Image(result.getInt("imageId"),result.getString("imagePath"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public Image getFromInfocard(int infocardId) {
+        try {
+            PreparedStatement statement = database.getConnection().prepareStatement("SELECT Image.imageId, Image.imagePath FROM Infocard, Image WHERE infocardId = ? AND Infocard.imageId = Image.imageId");
+            statement.setInt(1,infocardId);
+            ResultSet result = statement.executeQuery();
+            if (result.next()) {
+                return new Image(result.getInt("imageId"),result.getString("imagePath"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public Image getFromCardGroup(int cardGroupId) {
+        try {
+            PreparedStatement statement = database.getConnection().prepareStatement("SELECT Image.imageId, Image.imagePath FROM CardGroup, Image WHERE cardGroupId = ? AND CardGroup.imageId = Image.imageId");
+            statement.setInt(1,cardGroupId);
+            ResultSet result = statement.executeQuery();
+            if (result.next()) {
+                return new Image(result.getInt("imageId"),result.getString("imagePath"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public Image getFromCardPack(int packId) {
+        try {
+            PreparedStatement statement = database.getConnection().prepareStatement("SELECT Image.imageId, Image.imagePath FROM CardPack, Image WHERE packId = ? AND CardPack.imageId = Image.imageId");
+            statement.setInt(1,packId);
+            ResultSet result = statement.executeQuery();
+            if (result.next()) {
+                return new Image(result.getInt("imageId"),result.getString("imagePath"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     public <S extends Image> Image add(S entity) {
         try (PreparedStatement stmnt = database.getConnection().prepareStatement("INSERT INTO Image (imagePath) VALUES (?)")) {
             stmnt.setString(1,entity.getImagePath());

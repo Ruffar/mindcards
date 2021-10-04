@@ -76,18 +76,4 @@ public class MindcardRepository extends EntityRepository<Mindcard,Integer> {
         }
     }
 
-    public Image getImage(int mindcardId) {
-        try {
-            PreparedStatement statement = database.getConnection().prepareStatement("SELECT Image.imageId, Image.imagePath FROM Mindcard, Image WHERE mindcardId = ? AND Mindcard.imageId = Image.imageId");
-            statement.setInt(1,mindcardId);
-            ResultSet result = statement.executeQuery();
-            if (result.next()) {
-                return new Image(result.getInt("imageId"),result.getString("imagePath"));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
 }

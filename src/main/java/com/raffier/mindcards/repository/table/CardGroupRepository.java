@@ -74,18 +74,4 @@ public class CardGroupRepository extends EntityRepository<CardGroup,Integer> {
         }
     }
 
-    public Image getImage(int packId) {
-        try {
-            PreparedStatement statement = database.getConnection().prepareStatement("SELECT Image.imageId, Image.imagePath FROM CardGroup, Image WHERE cardGroupId = ? AND CardGroup.imageId = Image.imageId");
-            statement.setInt(1,packId);
-            ResultSet result = statement.executeQuery();
-            if (result.next()) {
-                return new Image(result.getInt("imageId"),result.getString("imagePath"));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return null;
-    }
-
 }
