@@ -1,13 +1,16 @@
 package com.raffier.mindcards.model.table;
 
-public abstract class EntityTable {
+public abstract class EntityTable<ID> {
 
-    //protected final AppDatabase database;
     protected final String tableName;
 
     protected EntityTable(String tableName) {
-        //this.database = database;
         this.tableName = tableName;
     }
+
+    public abstract ID getPrimaryKey();
+    public String getTableName() { return this.tableName; }
+
+    public abstract void setPrimaryKey(ID newId);
 
 }

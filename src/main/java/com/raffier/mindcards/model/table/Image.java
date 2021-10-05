@@ -4,7 +4,7 @@ import com.raffier.mindcards.repository.AppDatabase;
 
 import java.sql.*;
 
-public class Image extends EntityTable {
+public class Image extends EntityTable<Integer> {
 
     //Database columns
     private int imageId;
@@ -20,9 +20,11 @@ public class Image extends EntityTable {
         this.imagePath = imagePath;
     }
 
+    public Integer getPrimaryKey() { return getImageId(); }
     public int getImageId() { return imageId; }
     public String getImagePath() { return imagePath; }
 
+    public void setPrimaryKey(Integer primaryKey) { setImageId(primaryKey); }
     public void setImageId(int imageId) { this.imageId = imageId; }
     public void setImagePath(String imagePath) { this.imagePath = imagePath; }
 

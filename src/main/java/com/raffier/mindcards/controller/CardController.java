@@ -1,18 +1,16 @@
-package com.raffier.mindcards.web;
+package com.raffier.mindcards.controller;
 
-import com.raffier.mindcards.AppConfig;
 import com.raffier.mindcards.errorHandling.EntityNotFoundException;
 import com.raffier.mindcards.model.CardElement;
-import com.raffier.mindcards.model.table.CardGroup;
-import com.raffier.mindcards.model.table.CardPack;
 import com.raffier.mindcards.model.table.Infocard;
 import com.raffier.mindcards.model.table.Mindcard;
-import com.raffier.mindcards.service.RepositoryService;
+import com.raffier.mindcards.model.table.User;
+import com.raffier.mindcards.service.CardService;
+import com.raffier.mindcards.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
-import org.springframework.web.servlet.View;
 
 import javax.servlet.http.HttpSession;
 import java.util.ArrayList;
@@ -20,6 +18,9 @@ import java.util.List;
 
 @Controller
 public class CardController {
+
+    @Autowired
+    CardService cardService;
 
     /*@GetMapping(value="pack/{packId}")
     public ModelAndView packView(@PathVariable int packId, HttpSession session) {
@@ -39,26 +40,16 @@ public class CardController {
     }*/
 
     @GetMapping(value="pack/{packId}/card/{mindcardId}")
-    public ModelAndView mindcardView(@PathVariable int packId, @PathVariable int mindcardId, HttpSession session) {
+    public ModelAndView mindcardView(@ModelAttribute("user") User user, @PathVariable int packId, @PathVariable int mindcardId, HttpSession session) {
 
-        ModelAndView mv = ControllerUtil.getGenericMV(session);
+        ModelAndView mv = new ModelAndView("cards/mindcard");
 
-        Mindcard card = RepositoryService.getMindcardRepository().getById(mindcardId);//Mindcard.getMindcard(AppConfig.getDatabase(), mindcardId);
-        if (card == null) throw new EntityNotFoundException("Mindcard", mindcardId);
+        CardElement mindcardElement = cardService.getMindcardElement(mindcardId);
+        List<CardElement> infoElements = cardService.getInfocardElements(mindcardId);
 
-        List<Infocard> infocards = RepositoryService.getInfocardRepository().getFromMindcard(mindcardId);
-        System.out.println(infocards.size());
-        List<CardElement> infoElements = new ArrayList<>();
-        for (Infocard i: infocards) {
-            CardElement element = RepositoryService.getElement(i);
-            infoElements.add(element);
-            System.out.println(element.getDescription());
-        }
-
-        mv.addObject("mindcard",RepositoryService.getElement(card));
+        mv.addObject("mindcard",mindcardElement);
         mv.addObject("infocards",infoElements);
 
-        mv.setViewName("cards/mindcard");
         return mv;
     }
 

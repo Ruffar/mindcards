@@ -1,26 +1,29 @@
-package com.raffier.mindcards.web;
+package com.raffier.mindcards.controller;
 
-import com.raffier.mindcards.AppConfig;
 import com.raffier.mindcards.model.LoginSubmission;
 import com.raffier.mindcards.model.table.User;
-import com.raffier.mindcards.service.RepositoryService;
+import com.raffier.mindcards.service.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 @Controller
+@SessionAttributes("user")
 public class UserController {
 
-    @GetMapping(value="login")
-    public ModelAndView loginPage(HttpSession session) {
-        ModelAndView mv = ControllerUtil.getGenericMV(session);
+    @Autowired
+    private UserService userService;
 
-        User user = ControllerUtil.getSessionUser(session);
+    @GetMapping(value="login")
+    public ModelAndView loginPage(@ModelAttribute("user") User user, HttpSession session) {
+        ModelAndView mv = new ModelAndView("login");
+
         if (user != null) {
             return new ModelAndView("redirect:profile");
         }
@@ -32,39 +35,45 @@ public class UserController {
 
     @PostMapping(value="login")
     public ModelAndView loginSubmit(@ModelAttribute("submission") LoginSubmission submission, @RequestParam(name="return",defaultValue="") String returnUrl, HttpSession session, HttpServletRequest request, BindingResult result) {
-        ModelAndView mv = ControllerUtil.getGenericMV(session);
+        ModelAndView mv = new ModelAndView("login");
 
-        User user = RepositoryService.getUserRepository().getByLogin(submission.getEmail(), submission.getPassword());//User.getUserByLogin(AppConfig.getDatabase(),submission.getEmail(),submission.getPassword());
+        User user = userService.userLogin(submission);
         if (user != null) {
-            session.setAttribute("userId", user.getUserId());
+            session.setAttribute("user", user);
             return new ModelAndView("redirect:"+returnUrl);
         }
         else {
             mv.addObject("invalid",true);
-            mv.setViewName("login");
             return mv;
         }
 
     }
 
     @GetMapping(value="profile")
-    public String profile(HttpSession session, Model model) {
+    public ModelAndView profile(@ModelAttribute("user") User user, HttpSession session) {
+        ModelAndView mv = new ModelAndView("profilePage");
 
-        User user = ControllerUtil.getSessionUser(session);
         if (user == null) {
-            return "redirect:/login";
+            mv.setViewName("redirect:/login");
+            return mv;
         }
 
-        model.addAttribute("user",user);
-        return "profilePage";
+        mv.addObject("user",user);
+        return mv;
     }
 
     @GetMapping(value="logout")
-    public String logout(HttpSession session, Model model) {
+    public ModelAndView logout(HttpSession session, SessionStatus status, HttpServletRequest request) {
 
-        session.setAttribute("userId", null);
+        status.setComplete();
+        session.removeAttribute("user");
 
-        return "redirect:/home";
+        return new ModelAndView("redirect:"+request.getHeader("Referer"));
+    }
+
+    @ModelAttribute("user")
+    public User getUser(HttpSession session) {
+        return (User)session.getAttribute("user");
     }
 
 }

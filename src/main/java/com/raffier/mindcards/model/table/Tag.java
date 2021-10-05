@@ -4,7 +4,7 @@ import com.raffier.mindcards.repository.AppDatabase;
 
 import java.sql.*;
 
-public class Tag extends EntityTable {
+public class Tag extends EntityTable<Integer> {
 
     //Database columns
     private int tagId;
@@ -20,7 +20,12 @@ public class Tag extends EntityTable {
         this.tagName = tagName;
     }
 
+    public Integer getPrimaryKey() { return getTagId(); }
     public int getTagId() { return tagId; }
     public String getTagName() { return tagName; }
+
+    public void setPrimaryKey(Integer primaryKey) { setTagId(primaryKey); }
+    public void setTagId(int tagId) { this.tagId = tagId; }
+    public void setTagName(String tagName) { this.tagName = tagName; }
 
 }

@@ -46,31 +46,6 @@ public class AppDatabase {
         return genericConnection;
 
     }
-    
-    public void executeSqlStatement(String sqlStatement) {
-        //Connection conn = getConnection();
-        try (Statement statement = genericConnection.createStatement()) {
-            statement.executeUpdate(sqlStatement);
-            ResultSet dbm = genericConnection.getMetaData().getTables(null,null,"Mindcard",null);
-            if (dbm.next()) { System.out.println("ymeme"); }
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-        }
-    }
-
-    public ResultSet executeSqlQuery(String sqlStatement) {
-        //Connection conn = getConnection();
-        try (Statement statement = genericConnection.createStatement()) {
-            ResultSet cool = statement.executeQuery(sqlStatement);
-            while (cool.next()) {
-                System.out.println(cool.getString("title"));
-            }
-            return statement.executeQuery(sqlStatement);
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-            return null;
-        }
-    }
              
     //Create tables
     private void createMindcardTable() {

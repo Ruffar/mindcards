@@ -13,9 +13,9 @@
         <a href="#contact">Contact</a>
         <a href="#about">About</a>
         <div class="navbar-right">
-            <a th:unless="${user}" th:href="@{/login(return=${#httpServletRequest.requestURI})}" th:classappend="${module == 'login'} ? 'active' : ''">Login</a>
-            <th:block th:if="${user}">
-                <a th:href="@{/profile}" th:classappend="${module == 'profile'} ? 'active' : ''" th:text="${user} ? ${user.username} : 'Profile'">Profile</a>
+            <a th:unless="${session.user}" th:href="@{/login(return=${#httpServletRequest.requestURI})}" th:classappend="${module == 'login'} ? 'active' : ''">Login</a>
+            <th:block th:if="${session.user}">
+                <a th:href="@{/profile}" th:classappend="${module == 'profile'} ? 'active' : ''" th:text="${session.user} ? ${session.user.username} : 'Profile'">Profile</a>
                 <a th:href="@{/logout}" class="logout">Logout</a>
             </th:block>
         </div>

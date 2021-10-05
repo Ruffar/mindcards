@@ -1,4 +1,4 @@
-package com.raffier.mindcards.web;
+package com.raffier.mindcards.controller;
 
 import com.raffier.mindcards.errorHandling.AppError;
 import com.raffier.mindcards.errorHandling.EntityNotFoundException;
@@ -18,7 +18,7 @@ public class AppExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(RuntimeException.class)
     private ModelAndView handleRuntimeException(RuntimeException e) {
-        return errorPage( new AppError(HttpStatus.BAD_REQUEST, e) );
+        return errorPage( new AppError(HttpStatus.BAD_REQUEST, e.getMessage()) );
     }
 
     private ModelAndView errorPage(AppError error) {

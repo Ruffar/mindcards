@@ -4,7 +4,7 @@ import com.raffier.mindcards.repository.AppDatabase;
 
 import java.sql.*;
 
-public class User extends EntityTable {
+public class User extends EntityTable<Integer> {
 
     //Database columns
     private int userId;
@@ -14,6 +14,10 @@ public class User extends EntityTable {
     private String email;
     private boolean isDeveloper;
     private boolean studyHelp;
+
+    public User() {
+        super("user");
+    }
 
     public User(int userId) {
         super("User");
@@ -29,6 +33,7 @@ public class User extends EntityTable {
         this.studyHelp = studyHelp;
     }
 
+    public Integer getPrimaryKey() { return getUserId(); }
     public int getUserId() { return userId; }
     public String getUsername() { return username; }
     public String getPassword() { return password; }
@@ -36,6 +41,7 @@ public class User extends EntityTable {
     public boolean isDeveloper() { return isDeveloper; }
     public boolean isUsingStudyHelp() { return studyHelp; }
 
+    public void setPrimaryKey(Integer primaryKey) { setUserId(primaryKey);}
     public void setUserId(int userId) { this.userId = userId; }
     public void setUsername(String username) { this.username = username; }
     public void setPassword(String password) { this.password = password; }

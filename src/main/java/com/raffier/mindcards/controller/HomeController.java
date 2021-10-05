@@ -1,10 +1,9 @@
-package com.raffier.mindcards.web;
+package com.raffier.mindcards.controller;
 
-import com.raffier.mindcards.AppConfig;
-import com.raffier.mindcards.model.table.User;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpSession;
 
@@ -17,9 +16,8 @@ public class HomeController {
     }
 
     @GetMapping("home")
-    public String home(HttpSession session, Model model) {
-        ControllerUtil.setSessionUser(session, model);
-        return "home";
+    public ModelAndView home(HttpSession session, Model model) {
+        return new ModelAndView("home");
     }
 
 }
