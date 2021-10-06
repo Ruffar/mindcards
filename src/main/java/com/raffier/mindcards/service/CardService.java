@@ -32,12 +32,12 @@ public class CardService {
     }
 
     public <S extends CardTable> CardElement getCardElement(S card) {
-        String title = (card instanceof TitledCardTable) ? ((TitledCardTable) card).getTitle() : "";
+        String title = (card instanceof TitledCardTable) ? ((TitledCardTable) card).getTitle() : null;
 
         Image image = imageRepository.getFromCard(card);
         String imagePath = image != null ? image.getImagePath() : "";
 
-        return new CardElement(title,imagePath,card.getDescription());
+        return new CardElement(card.getPrimaryKey(),title,imagePath,card.getDescription());
     }
 
     public CardElement getMindcardElement(int mindcardId) {
@@ -54,6 +54,31 @@ public class CardService {
             infoElements.add(element);
         }
         return infoElements;
+    }
+
+    public boolean isUserMindcardOwner(User user, int mindcardId) {
+        if (user == null) return false;
+        Mindcard card = mindcardRepository.getById(mindcardId);
+        CardPack cardPack = cardPackRepository.getById(card.getPackId());
+        return cardPack.getOwnerId() == user.getUserId();
+    }
+
+    public void updateMindcard(CardElement element, int mindcardId) {
+        System.out.println(element);
+        Mindcard mindcard = mindcardRepository.getById(mindcardId);
+        mindcard.setTitle(element.getTitle());
+        mindcard.setDescription(element.getDescription());
+        mindcardRepository.save(mindcard);
+    }
+
+    public void updateInfocard(CardElement element, int infocardId) {
+        Infocard infocard = infocardRepository.getById(infocardId);
+        infocard.setDescription(element.getDescription());
+        infocardRepository.save(infocard);
+    }
+
+    public int getInfocardMindcardId(int infocardId) {
+        return mindcardRepository.getFromInfocard(infocardId).getMindcardId();
     }
 
 }

@@ -1,6 +1,7 @@
 package com.raffier.mindcards.model.table;
 
 import com.raffier.mindcards.repository.AppDatabase;
+import org.springframework.context.annotation.Scope;
 
 import java.sql.*;
 

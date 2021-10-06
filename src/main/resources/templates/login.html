@@ -15,7 +15,7 @@
 
 <body>
 
-<div th:insert="~{fragments/pageLayout :: navbar('login')}"></div>
+<th:block th:insert="~{fragments/pageLayout :: navbar('login')}"></th:block>
 
 <div align="center">
   <h1>User Login</h1>
@@ -27,7 +27,9 @@
     <label>Password:</label>
     <input type="password" th:field="*{password}" /><br/>
 
-    <label th:if="${invalid}" style="color: #f77">Invalid e-mail or password...</label><br/>
+    <label th:if="${loginError?.invalidLogin}" style="color: #f77">Invalid e-mail or password...<br/></label>
+    <label th:if="${loginError?.wrongEmailFormat}" style="color: #f77">E-Mail must be in the form "name@mailservice"<br/></label>
+    <label th:if="${loginError?.wrongPasswordFormat}" style="color: #f77">Password must have at least one number, lowercase alphabet, and uppercase alphabet each and be at least 8 characters<br/></label>
 
     <button type="submit">Login</button>
   </form>

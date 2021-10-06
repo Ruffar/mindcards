@@ -43,7 +43,7 @@ public class UserController {
             return new ModelAndView("redirect:"+returnUrl);
         }
         else {
-            mv.addObject("invalid",true);
+            mv.addObject("loginError",userService.getLoginError(submission));
             return mv;
         }
 

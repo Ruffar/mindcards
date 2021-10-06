@@ -1,8 +1,6 @@
 package com.raffier.mindcards.repository.table;
 
-import com.raffier.mindcards.model.table.CardPack;
-import com.raffier.mindcards.model.table.Image;
-import com.raffier.mindcards.model.table.Tag;
+import com.raffier.mindcards.model.table.*;
 import com.raffier.mindcards.repository.AppDatabase;
 import com.raffier.mindcards.repository.table.EntityRepository;
 
@@ -79,7 +77,7 @@ public class CardPackRepository extends EntityRepository<CardPack,Integer> {
         }
     }
 
-    public List<Tag> getTags(int packId) {
+    /*public List<Tag> getTags(int packId) {
         List<Tag> outList = new ArrayList<>();
         try {
             PreparedStatement statement = database.getConnection().prepareStatement("SELECT Tag.tagId, Tag.tagName FROM Tag, PackTag WHERE PackTag.packId=? AND Tag.tagId=PackTag.tagId");
@@ -92,6 +90,6 @@ public class CardPackRepository extends EntityRepository<CardPack,Integer> {
             e.printStackTrace();
         }
         return outList;
-    }
+    }*/
 
 }

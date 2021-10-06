@@ -15,7 +15,7 @@
 
 <body>
 
-<div th:insert="~{fragments/pageLayout :: navbar('')}"></div>
+<th:block th:insert="~{fragments/pageLayout :: navbar('')}"></th:block>
 
 <div th:replace="~{error/generic :: error(title='Card Error',message='Card not found...')}"></div>
 

@@ -1,6 +1,7 @@
 package com.raffier.mindcards.repository.table;
 
 import com.raffier.mindcards.model.table.Image;
+import com.raffier.mindcards.model.table.Infocard;
 import com.raffier.mindcards.model.table.Mindcard;
 import com.raffier.mindcards.repository.AppDatabase;
 
@@ -36,6 +37,20 @@ public class MindcardRepository extends EntityRepository<Mindcard,Integer> {
             } else {
                 //throw new RuntimeException("Mindcard with ID "+mindcardId+" cannot be found...");
                 System.out.println("Mindcard with ID "+id+" cannot be found.");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public Mindcard getFromInfocard(int infocardId) {
+        try {
+            PreparedStatement statement = database.getConnection().prepareStatement("SELECT mindcardId, packId, title, imageId, description FROM Mindcard, Infocard WHERE infocardId = ? AND Infocard.mindcardId = Mindcard.mindcardId");
+            statement.setInt(1,infocardId);
+            ResultSet result = statement.executeQuery();
+            if (result.next()) {
+                return new Mindcard(result.getInt("mindcardId"),result.getInt("packId"),result.getString("title"),result.getInt("imageId"),result.getString("description"));
             }
         } catch (SQLException e) {
             e.printStackTrace();

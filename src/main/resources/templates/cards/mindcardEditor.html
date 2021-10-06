@@ -17,14 +17,18 @@
 
 <th:block th:insert="~{fragments/pageLayout :: navbar('')}"></th:block>
 
-<div th:replace="~{fragments/card :: card(isMain=${true},cardElement=${mindcard})}"></div>
+<form th:action="@{/mindcard(id=${mindcard.cardId})}" method="post" th:object="${mindcard}">
+<div th:replace="~{fragments/card :: cardEditor(isMain=${true},cardElement=${mindcard},hasTitle=${true})}"></div>
+</form>
 
 <hr>
 
 <div style="text-align: center;">
     <div class="infocard-grid">
         <th:block th:each="infocard: ${infocards}">
-            <div th:replace="~{fragments/card :: card(isMain=${false},cardElement=${infocard})}" style="flex: 0 0 auto;"></div>
+            <form th:action="@{/updateInfocard(id=${infocard.cardId})}" method="post" th:object="${infocard}">
+            <div th:replace="~{fragments/card :: cardEditor(isMain=${false},cardElement=${infocard},hasTitle=${false})}" style="flex: 0 0 auto;"></div>
+            </form>
         </th:block>
     </div>
 </div>
