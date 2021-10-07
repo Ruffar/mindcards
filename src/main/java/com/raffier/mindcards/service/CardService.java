@@ -1,7 +1,7 @@
 package com.raffier.mindcards.service;
 
 import com.raffier.mindcards.errorHandling.EntityNotFoundException;
-import com.raffier.mindcards.model.CardElement;
+import com.raffier.mindcards.model.card.CardElement;
 import com.raffier.mindcards.model.table.*;
 import com.raffier.mindcards.repository.AppDatabase;
 import com.raffier.mindcards.repository.table.*;

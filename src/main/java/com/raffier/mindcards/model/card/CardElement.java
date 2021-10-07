@@ -1,4 +1,4 @@
-package com.raffier.mindcards.model;
+package com.raffier.mindcards.model.card;
 
 public class CardElement {
 

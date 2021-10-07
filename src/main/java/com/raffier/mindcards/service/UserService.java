@@ -1,18 +1,12 @@
 package com.raffier.mindcards.service;
 
-import com.raffier.mindcards.model.CardElement;
-import com.raffier.mindcards.model.LoginFormError;
-import com.raffier.mindcards.model.LoginSubmission;
+import com.raffier.mindcards.model.login.LoginFormError;
+import com.raffier.mindcards.model.login.LoginSubmission;
 import com.raffier.mindcards.model.table.*;
 import com.raffier.mindcards.repository.AppDatabase;
 import com.raffier.mindcards.repository.table.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.web.servlet.ModelAndView;
-
-import javax.servlet.http.HttpSession;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 @Service
 public class UserService {

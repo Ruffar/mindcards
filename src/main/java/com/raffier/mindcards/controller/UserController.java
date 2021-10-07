@@ -1,6 +1,6 @@
 package com.raffier.mindcards.controller;
 
-import com.raffier.mindcards.model.LoginSubmission;
+import com.raffier.mindcards.model.login.LoginSubmission;
 import com.raffier.mindcards.model.table.User;
 import com.raffier.mindcards.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,20 +1,14 @@
 package com.raffier.mindcards.controller;
 
-import com.raffier.mindcards.errorHandling.EntityNotFoundException;
-import com.raffier.mindcards.model.CardElement;
-import com.raffier.mindcards.model.table.Infocard;
-import com.raffier.mindcards.model.table.Mindcard;
+import com.raffier.mindcards.model.card.CardElement;
 import com.raffier.mindcards.model.table.User;
 import com.raffier.mindcards.service.CardService;
-import com.raffier.mindcards.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpSession;
-import java.util.ArrayList;
 import java.util.List;
 
 @Controller

@@ -1,4 +1,4 @@
-package com.raffier.mindcards.model;
+package com.raffier.mindcards.model.login;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.lang.Nullable;
