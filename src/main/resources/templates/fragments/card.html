@@ -7,22 +7,33 @@
 
 <body>
 
-<div th:fragment="card(isMain,cardElement)" class="card" th:classappend="${isMain} ? 'card-main' : ''" style="margin: auto;">
-    <img th:if="${cardElement.imagePath != null && cardElement.imagePath != ''}" th:src="@{${cardElement.imagePath}}" class="cardimg">
-    <div class="cardtext" th:classappend="${cardElement.imagePath != null && cardElement.imagePath != ''} ? 'cardtext-right' : 'cardtext-full'">
-        <h4 th:if="${cardElement.title != null && cardElement.title != ''}" th:text="${cardElement.title}"><b> MindcardTitle </b></h4>
-        <p th:utext="${cardElement.description}"> Description </p>
+<th:block th:fragment="card(cardElement,cardType)" th:with="isMain=${isMain} ?: ${false}, isOwner=${isOwner} ?: ${false}">
+    <div class="card" th:classappend="${isMain} ? 'card-main' : ''" style="margin: auto;">
+        <p hidden class="cardType" th:text="${cardType}"></p>
+        <p hidden class="cardId" th:text="${cardElement.cardObject.getPrimaryKey()}"></p>
+        <p hidden class="imageId" th:text="${cardElement.image} ? ${cardElement.image.imageId} : 0"></p>
+        <img th:if="${cardElement.image != null && cardElement.image.imagePath != ''}" th:src="@{${cardElement.image.imagePath}}" class="cardimg">
+        <div class="cardtext" th:classappend="${cardElement.image != null && cardElement.image.imagePath != ''} ? 'cardtext-right' : 'cardtext-full'">
+            <h4 th:if="${cardElement.cardObject instanceof T(com.raffier.mindcards.model.table.TitledCardTable)}" class="title" th:text="${cardElement.cardObject.title}"><b> MindcardTitle </b></h4>
+            <p class="description" th:utext="${cardElement.cardObject.description}"> Description </p>
+        </div>
+        <button th:if="${isOwner}" class="editCardButton">Edit</button>
     </div>
-</div>
+</th:block>
 
-<div th:fragment="cardEditor(isMain,cardElement,hasTitle)" class="card" th:classappend="${isMain} ? 'card-main' : ''" style="margin: auto;">
-    <img th:if="${cardElement.imagePath != null && cardElement.imagePath != ''}" th:src="@{${cardElement.imagePath}}" class="cardimg">
-    <div class="cardtext" th:classappend="${cardElement.imagePath != null && cardElement.imagePath != ''} ? 'cardtext-right' : 'cardtext-full'">
-        <input th:if="${cardElement.title != null && hasTitle}" type="text" th:value="*{title}" th:name="title" th:id="title" /><br/>
-        <input type="text" th:value="*{description}" th:name="description" th:id="description" style="width: 50%; height: 80%;" /><br/>
+<th:block th:fragment="cardEditor(cardElement,cardType)" th:with="isMain=${isMain} ?: ${false}">
+    <div class="card" th:classappend="${isMain} ? 'card-main' : ''" style="margin: auto;">
+        <p hidden class="cardType" th:text="${cardType}"></p>
+        <p hidden class="cardId" th:text="${cardElement.cardObject.getPrimaryKey()}"></p>
+        <p hidden class="imageId" th:text="${cardElement.image} ? ${cardElement.image.imageId} : 0"></p>
+        <img th:if="${cardElement.image != null && cardElement.image.imagePath != ''}" th:src="@{${cardElement.image.imagePath}}" class="cardimg">
+        <div class="cardtext" th:classappend="${cardElement.image != null && cardElement.image.imagePath != ''} ? 'cardtext-right' : 'cardtext-full'">
+            <input th:if="${cardElement.cardObject instanceof T(com.raffier.mindcards.model.table.TitledCardTable)}" class="title" type="text" th:value="${cardElement.cardObject.title}" /><br/>
+            <input class="description" type="text" th:value="${cardElement.cardObject.description}" style="width: 50%; height: 80%;" /><br/>
+        </div>
+        <button class="saveCardButton">Save</button>
     </div>
-    <button type="submit">Save</button>
-</div>
+</th:block>
 
 </body>
 </html>

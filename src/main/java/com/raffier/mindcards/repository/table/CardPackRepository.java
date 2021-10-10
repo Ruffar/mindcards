@@ -44,6 +44,20 @@ public class CardPackRepository extends EntityRepository<CardPack,Integer> {
         return null;
     }
 
+    public CardPack getFromMindcard(int mindcardId) {
+        try {
+            PreparedStatement statement = database.getConnection().prepareStatement("SELECT CardPack.packId, CardPack.ownerId, CardPack.title, CardPack.imageId, CardPack.description FROM CardPack, Mindcard WHERE mindcardId = ? AND Mindcard.packId = CardPack.packId");
+            statement.setInt(1,mindcardId);
+            ResultSet result = statement.executeQuery();
+            if (result.next()) {
+                return new CardPack(result.getInt("packId"),result.getInt("ownerId"),result.getString("title"),result.getInt("imageId"),result.getString("description"));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     public <S extends CardPack> CardPack add(S entity) {
         try (PreparedStatement stmnt = database.getConnection().prepareStatement("INSERT INTO CardPack (ownerId, title, imageId, description) VALUES (?,?,?,?)")) {
             stmnt.setInt(1,entity.getOwnerId());

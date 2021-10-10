@@ -46,7 +46,7 @@ public class MindcardRepository extends EntityRepository<Mindcard,Integer> {
 
     public Mindcard getFromInfocard(int infocardId) {
         try {
-            PreparedStatement statement = database.getConnection().prepareStatement("SELECT mindcardId, packId, title, imageId, description FROM Mindcard, Infocard WHERE infocardId = ? AND Infocard.mindcardId = Mindcard.mindcardId");
+            PreparedStatement statement = database.getConnection().prepareStatement("SELECT Mindcard.mindcardId, Mindcard.packId, Mindcard.title, Mindcard.imageId, Mindcard.description FROM Mindcard, Infocard WHERE infocardId = ? AND Infocard.mindcardId = Mindcard.mindcardId");
             statement.setInt(1,infocardId);
             ResultSet result = statement.executeQuery();
             if (result.next()) {

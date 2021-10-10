@@ -1,10 +1,13 @@
 package com.raffier.mindcards.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.raffier.mindcards.model.card.CardElement;
-import com.raffier.mindcards.model.table.User;
+import com.raffier.mindcards.model.card.MindcardElements;
+import com.raffier.mindcards.model.table.*;
 import com.raffier.mindcards.service.CardService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -17,6 +20,8 @@ public class CardController {
 
     @Autowired
     CardService cardService;
+    @Autowired
+    ObjectMapper objectMapper;
 
     /*@GetMapping(value="pack/{packId}")
     public ModelAndView packView(@PathVariable int packId, HttpSession session) {
@@ -35,44 +40,68 @@ public class CardController {
         return mv;
     }*/
 
-    @GetMapping(value="mindcard")
-    public ModelAndView mindcardView(@ModelAttribute("user") User user, @RequestParam(name="id",defaultValue="0") int mindcardId, @RequestParam(name="edit",defaultValue="false") boolean isEditing) {
+    @GetMapping(value="mindcard/{mindcardId}")
+    public ModelAndView mindcardView(@ModelAttribute("user") User user, @PathVariable int mindcardId, @RequestParam(name="edit",defaultValue="false") boolean isEditing) {
         ModelAndView mv = new ModelAndView("cards/mindcard");
 
-        CardElement mindcardElement = cardService.getMindcardElement(mindcardId);
-        List<CardElement> infoElements = cardService.getInfocardElements(mindcardId);
+        MindcardElements cardElements = cardService.getMindcardElements(mindcardId);
 
         boolean isOwner = cardService.isUserMindcardOwner(user,mindcardId);
-        mv.addObject("owned",isOwner);
+        mv.addObject("isOwner",isOwner);
 
-        mv.addObject("mindcard",mindcardElement);
-        mv.addObject("infocards",infoElements);
+        mv.addObject("cardElements",cardElements);
 
         if (isEditing && isOwner) { mv.setViewName("cards/mindcardEditor"); }
         return mv;
     }
 
-    @PostMapping(value="mindcard")
-    public ModelAndView updateMindcard(@ModelAttribute CardElement mindcardElement, @RequestParam(name="id") int mindcardId) {
-        ModelAndView mv = new ModelAndView("redirect:/mindcard?id="+mindcardId);
+    @PostMapping("saveCard")
+    public String saveCard(@ModelAttribute User user, @RequestParam boolean isMain, @RequestParam String cardType, @RequestParam int cardId, @RequestParam int imageId, @RequestParam(defaultValue = "") String title, @RequestParam String description, Model model) {
 
-        System.out.println(mindcardElement);
-        //if (cardService.isUserMindcardOwner(user,mindcardId)) {
-            cardService.updateMindcard(mindcardElement,mindcardId);
-        //}
+        boolean isOwner = false;
 
-        return mv;
-    }
-
-    @PostMapping(value="updateInfocard")
-    public ModelAndView updateInfocard(@ModelAttribute("infocard") CardElement infocardElement, @ModelAttribute("user") User user, @RequestParam(name="id") int infocardId) {
-        ModelAndView mv = new ModelAndView("redirect:/mindcard?id="+cardService.getInfocardMindcardId(infocardId));
-
-        if (cardService.isUserMindcardOwner(user,infocardId)) {
-            cardService.updateMindcard(infocardElement,infocardId);
+        CardElement<?> cardElement = new CardElement<>();
+        switch(cardType) {
+            case "mindcard" :
+                if (cardService.isUserMindcardOwner(user, cardId)) {
+                    isOwner = true;
+                    cardService.updateMindcard(cardId, title, imageId, description);
+                }
+                cardElement = cardService.getMindcardElement(cardId);
+                break;
+            case "infocard":
+                if (cardService.isUserInfocardOwner(user, cardId)) {
+                    isOwner = true;
+                    cardService.updateInfocard(cardId, imageId, description);
+                }
+                cardElement = cardService.getInfocardElement(cardId);
+                break;
         }
 
-        return mv;
+        System.out.println(cardElement.getCardObject().getDescription());
+
+        model.addAttribute("cardElement",cardElement);
+
+        return "fragments/card :: card(isMain=${'"+isMain+"'},isOwner=${'"+isOwner+"'},cardElement=${cardElement},cardType='"+cardType+"')";
+    }
+
+    @GetMapping("getCardEditor")
+    public String getCardEditor(@RequestParam boolean isMain, @RequestParam String cardType, @RequestParam int cardId, @RequestParam int imageId, @RequestParam(defaultValue = "") String title, @RequestParam String description, Model model) {
+
+
+        CardElement<?> cardElement = new CardElement<>();
+        switch(cardType) {
+            case "mindcard" :
+                cardElement = cardService.getMindcardElement(cardId);
+                break;
+            case "infocard":
+                cardElement = cardService.getInfocardElement(cardId);
+                break;
+        }
+
+        model.addAttribute("cardElement",cardElement);
+
+        return "fragments/card :: cardEditor(isMain=${'"+isMain+"'},cardElement=${cardElement},cardType='"+cardType+"')";
     }
 
     /*@GetMapping(value="pack/{packId}/group/{cardGroupId}")

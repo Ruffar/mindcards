@@ -5,7 +5,7 @@ public abstract class CardTable extends EntityTable<Integer> {
     //Database columns
     protected int primaryId;
 
-    protected int imageId;
+    protected Integer imageId;
     protected String description;
 
     //Other data

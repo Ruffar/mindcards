@@ -1,27 +1,29 @@
 package com.raffier.mindcards.model.card;
 
-public class CardElement {
+import com.raffier.mindcards.model.table.CardTable;
+import com.raffier.mindcards.model.table.Image;
+import com.raffier.mindcards.model.table.TitledCardTable;
 
-    private int cardId;
-    private String title;
-    private String imagePath;
-    private String description;
+import java.io.Serializable;
 
-    public CardElement(int cardId, String title, String imagePath, String description) {
-        this.cardId = cardId;
-        this.title = title;
-        this.imagePath = imagePath;
-        this.description = description;
+public class CardElement<T extends CardTable> implements Serializable {
+
+    private T cardObject;
+    private Image image;
+
+    public CardElement() {}
+
+    public CardElement(T cardObject, Image image) {
+        this.cardObject = cardObject;
+        this.image = image;
     }
 
-    public int getCardId() { return this.cardId; }
-    public String getTitle() { return this.title; }
-    public String getImagePath() { return this.imagePath; }
-    public String getDescription() { return description; }
+    public boolean hasTitle() { return (cardObject instanceof TitledCardTable); }
 
-    public void setCardId(int cardId) { this.cardId = cardId; }
-    public void setTitle(String title) { this.title = title; }
-    public void setImagePath(String imagePath) { this.imagePath = imagePath; }
-    public void setDescription(String description) { this.description = description; }
+    public T getCardObject() { return this.cardObject; }
+    public Image getImage() { return this.image; }
+
+    public void setCardObject(T card) { this.cardObject = card; }
+    public void setImage(Image image) { this.image = image; }
 
 }

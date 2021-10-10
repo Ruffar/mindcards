@@ -1,0 +1,63 @@
+$(document).on("click",".editCardButton",function(event){
+
+    var cardDiv = $(this).parent();
+    var cardData = getCardData(cardDiv);
+
+    $.ajax({
+    type: "GET",
+    url: "/getCardEditor",
+    data: cardData,
+    success: function(data){
+      cardDiv.replaceWith(data);
+    }
+  });
+
+});
+
+$(document).on("click",".saveCardButton",function(event){
+
+  var cardDiv = $(this).parent();
+  var cardData = getCardEditorData(cardDiv);
+
+  $.ajax({
+    type: "POST",
+    url: "/saveCard",
+    data: cardData,
+    success: function(data){
+      cardDiv.replaceWith(data);
+    }
+  });
+
+});
+
+function getCardData(cardElement) {
+    var isMain = cardElement[0].classList.contains("card-main");
+
+    var cardType = cardElement.find(".cardType").text();
+    var cardId = cardElement.find(".cardId").text();
+
+    var imageId = cardElement.find(".imageId").text();
+
+    var cardText = cardElement.find(".cardtext");
+    var titleElement = cardText.find(".title");
+    var title = (titleElement != null) ? titleElement.text() : "";
+  var description = cardText.find(".description").text();
+
+  return { isMain : isMain, cardType : cardType, cardId : cardId, imageId : imageId, title : title, description : description }
+}
+
+function getCardEditorData(cardElement) {
+    var isMain = cardElement[0].classList.contains("card-main");
+
+    var cardType = cardElement.find(".cardType").text();
+    var cardId = cardElement.find(".cardId").text();
+
+    var imageId = cardElement.find(".imageId").text();
+
+    var cardText = cardElement.find(".cardtext");
+    var titleElement = cardText.find(".title");
+    var title = (titleElement != null) ? titleElement.val() : "";
+  var description = cardText.find(".description").val();
+
+  return { isMain : isMain, cardType : cardType, cardId : cardId, imageId : imageId, title : title, description : description }
+}

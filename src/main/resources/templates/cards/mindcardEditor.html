@@ -10,27 +10,28 @@
     </style>
 
     <meta charset="UTF-8">
-    <title th:text="${mindcard.title}">Mindcard</title>
+    <title th:text="${cardElements.mindcard.title}">Mindcard</title>
 </head>
 
 <body>
 
-<th:block th:insert="~{fragments/pageLayout :: navbar('')}"></th:block>
+    <th:block th:insert="~{fragments/pageLayout :: navbar('')}"></th:block>
 
-<form th:action="@{/mindcard(id=${mindcard.cardId})}" method="post" th:object="${mindcard}">
-<div th:replace="~{fragments/card :: cardEditor(isMain=${true},cardElement=${mindcard},hasTitle=${true})}"></div>
-</form>
+    <form th:action="@{/saveMindcard(id=${cardElements.mindcard.cardId})}" method="post" th:object="${cardElements}">
+        <div th:replace="~{fragments/card :: cardEditor(isMain=${true},cardElement=${cardElements.mindcard},fieldName='mindcard')}"></div>
 
-<hr>
+        <hr>
 
-<div style="text-align: center;">
-    <div class="infocard-grid">
-        <th:block th:each="infocard: ${infocards}">
-            <form th:action="@{/updateInfocard(id=${infocard.cardId})}" method="post" th:object="${infocard}">
-            <div th:replace="~{fragments/card :: cardEditor(isMain=${false},cardElement=${infocard},hasTitle=${false})}" style="flex: 0 0 auto;"></div>
-            </form>
-        </th:block>
-    </div>
-</div>
+        <div style="text-align: center;">
+            <div class="infocard-grid">
+                <th:block th:each="infocard,stat : ${cardElements.infocards}">
+                    <div th:replace="~{fragments/card :: cardEditor(isMain=${false},cardElement=${infocard},fieldName='infocards[__${stat.index}__]')}" style="flex: 0 0 auto;"></div>
+                </th:block>
+            </div>
+        </div>
+
+        <button type="submit" class="saveButton" >Save</button>
+
+    </form>
 
 </body>

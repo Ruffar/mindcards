@@ -18,8 +18,9 @@ public class ImageRepository extends EntityRepository<Image, Integer> {
     }
 
     public <S extends Image> void save(S entity) {
-        try (PreparedStatement statement = database.getConnection().prepareStatement("UPDATE Image SET imagePath=? WHERE imageId=?")) {
-            statement.setString(1, entity.getImagePath());
+        try (PreparedStatement statement = database.getConnection().prepareStatement("UPDATE Image SET name=?, imagePath=? WHERE imageId=?")) {
+            statement.setString(1, entity.getName());
+            statement.setString(2, entity.getImagePath());
             statement.setInt(2,entity.getImageId());
             statement.executeUpdate();
         } catch (SQLException e) {
@@ -28,11 +29,11 @@ public class ImageRepository extends EntityRepository<Image, Integer> {
     }
 
     public Image getById(Integer id) {
-        try (PreparedStatement stmnt = database.getConnection().prepareStatement("SELECT imagePath FROM Image WHERE imageId=?")) {
+        try (PreparedStatement stmnt = database.getConnection().prepareStatement("SELECT name, imagePath FROM Image WHERE imageId=?")) {
             stmnt.setInt(1,id);
             ResultSet results = stmnt.executeQuery();
             if (results.next()) {
-                return new Image(id,results.getString("imagePath"));
+                return new Image(id,results.getString("name"),results.getString("imagePath"));
             } else {
                 System.out.println("Image with ID "+id+" cannot be found.");
             }
@@ -45,11 +46,11 @@ public class ImageRepository extends EntityRepository<Image, Integer> {
 
     public <S extends CardTable> Image getFromCard(S card) {
         try {
-            PreparedStatement statement = database.getConnection().prepareStatement("SELECT Image.imageId, Image.imagePath FROM "+card.getTableName()+", Image WHERE "+card.getPrimaryKeyName()+" = ? AND "+card.getTableName()+".imageId = Image.imageId");
+            PreparedStatement statement = database.getConnection().prepareStatement("SELECT Image.imageId, Image.name, Image.imagePath FROM "+card.getTableName()+", Image WHERE "+card.getPrimaryKeyName()+" = ? AND "+card.getTableName()+".imageId = Image.imageId");
             statement.setInt(1,card.getPrimaryKey());
             ResultSet result = statement.executeQuery();
             if (result.next()) {
-                return new Image(result.getInt("imageId"),result.getString("imagePath"));
+                return new Image(result.getInt("imageId"),result.getString("name"),result.getString("imagePath"));
             }
         } catch (SQLException e) {
             e.printStackTrace();
@@ -58,8 +59,9 @@ public class ImageRepository extends EntityRepository<Image, Integer> {
     }
 
     public <S extends Image> Image add(S entity) {
-        try (PreparedStatement stmnt = database.getConnection().prepareStatement("INSERT INTO Image (imagePath) VALUES (?)")) {
-            stmnt.setString(1,entity.getImagePath());
+        try (PreparedStatement stmnt = database.getConnection().prepareStatement("INSERT INTO Image (name,imagePath) VALUES (?,?)")) {
+            stmnt.setString(1,entity.getName());
+            stmnt.setString(2,entity.getImagePath());
             stmnt.executeUpdate();
             ResultSet generatedIds = stmnt.getGeneratedKeys();
             if (generatedIds.next()) {

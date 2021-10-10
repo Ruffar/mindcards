@@ -50,3 +50,12 @@ img {
     grid-gap: 16px;
     padding: 16px;
 }
+
+.editCardButton {
+    color: #f2f2f2;
+}
+
+.saveButton {
+    position: sticky;
+    bottom: 0;
+}

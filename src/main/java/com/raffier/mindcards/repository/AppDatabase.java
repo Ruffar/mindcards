@@ -128,8 +128,9 @@ public class AppDatabase {
         try (Statement statement = genericConnection.createStatement()) {
             statement.executeUpdate("CREATE TABLE IF NOT EXISTS Image" +
                     "(imageId INTEGER PRIMARY KEY AUTOINCREMENT," +
+                    "name TEXT," +
                     "imagePath TEXT )");
-            statement.executeUpdate("INSERT OR REPLACE INTO Image VALUES (0,'DeletedImage')");
+            statement.executeUpdate("INSERT OR REPLACE INTO Image VALUES (0,'DeletedImage','')");
         } catch (SQLException e) {
             e.printStackTrace();
         }
