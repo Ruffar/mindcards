@@ -19,12 +19,18 @@ $(document).on("click",".saveCardButton",function(event){
   var cardDiv = $(this).parent();
   var cardData = getCardEditorData(cardDiv);
 
+  var cardMain = cardData.isMain;
+  var cardTitle = cardData.title;
+
   $.ajax({
     type: "POST",
     url: "/saveCard",
     data: cardData,
     success: function(data){
       cardDiv.replaceWith(data);
+      if (cardMain) {
+        $(document).attr("title",cardTitle)
+      }
     }
   });
 

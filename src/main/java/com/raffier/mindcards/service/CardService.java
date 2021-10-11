@@ -17,6 +17,9 @@ public class CardService {
 
     private AppDatabase database;
 
+    @Autowired
+    MarkdownService markdownService;
+
     private final MindcardRepository mindcardRepository;
     private final InfocardRepository infocardRepository;
     private final CardGroupRepository cardGroupRepository;
@@ -24,7 +27,7 @@ public class CardService {
     private final ImageRepository imageRepository;
 
     @Autowired
-    public CardService(AppDatabase appDatabase) {
+    private CardService(AppDatabase appDatabase) {
         mindcardRepository = new MindcardRepository(appDatabase);
         infocardRepository = new InfocardRepository(appDatabase);
         cardGroupRepository = new CardGroupRepository(appDatabase);

@@ -1,6 +1,7 @@
 @import "navbar.css";
 
 .card {
+    position: relative;
     width: 516px;
     height: 250px;
     box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
@@ -51,11 +52,26 @@ img {
     padding: 16px;
 }
 
-.editCardButton {
-    color: #f2f2f2;
+button {
+    width: 50px;
+    height: 50px;
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+    transition: 0.3s;
+    border-radius: 5px;
+    background-color: #444;
+    margin: 0 auto;
 }
 
-.saveButton {
-    position: sticky;
+.editCardButton {
+    color: #f2f2f2;
+    position: absolute;
+    left: 0;
+    bottom: 0;
+}
+
+.saveCardButton {
+    color: #f2f2f2;
+    position: absolute;
+    left: 0;
     bottom: 0;
 }
