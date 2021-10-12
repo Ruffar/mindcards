@@ -28,6 +28,8 @@ $(document).on("click",".saveCardButton",function(event){
     data: cardData,
     success: function(data){
       cardDiv.replaceWith(data);
+      var desc = cardDiv.find(".cardText").find(".description");
+      desc.html("poop");
       if (cardMain) {
         $(document).attr("title",cardTitle)
       }

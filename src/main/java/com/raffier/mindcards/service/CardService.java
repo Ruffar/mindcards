@@ -6,6 +6,7 @@ import com.raffier.mindcards.model.card.MindcardElements;
 import com.raffier.mindcards.model.table.*;
 import com.raffier.mindcards.repository.AppDatabase;
 import com.raffier.mindcards.repository.table.*;
+import com.raffier.mindcards.service.markdown.MarkdownService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
