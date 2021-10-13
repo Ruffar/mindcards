@@ -52,8 +52,9 @@ public class CardService {
     public <S extends CardTable> CardElement<S> getCardElement(S card) {
         Image image = imageRepository.getFromCard(card);
         String imagePath = image != null ? image.getImagePath() : "";
+        String unescapedDesc = markdownService.parsePlaintext(card.getDescription());
 
-        return new CardElement<S>(card, image);
+        return new CardElement<S>(card, image, unescapedDesc);
     }
 
     public CardElement<Mindcard> getMindcardElement(int cardId) {

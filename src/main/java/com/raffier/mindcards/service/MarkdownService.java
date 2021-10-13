@@ -1,11 +1,19 @@
 package com.raffier.mindcards.service;
 
+import com.raffier.mindcards.service.markdown.BoldParser;
+import com.raffier.mindcards.service.markdown.ItalicParser;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
 
 @Service
 public class MarkdownService {
+
+    @Autowired
+    ItalicParser italicParser;
+    @Autowired
+    BoldParser boldParser;
 
     Set<CharacterEntityMapping> characterMappings;
 
@@ -16,47 +24,25 @@ public class MarkdownService {
     private void initializeMappings() {
         characterMappings = new HashSet<CharacterEntityMapping>();
         //Reserved HTML characters
+        //Order matters
+        characterMappings.add(new CharacterEntityMapping("&", "&amp;"));
         characterMappings.add(new CharacterEntityMapping("<", "&lt;"));
         characterMappings.add(new CharacterEntityMapping(">", "&gt;"));
-        characterMappings.add(new CharacterEntityMapping("&", "&amp;"));
         characterMappings.add(new CharacterEntityMapping("\"", "&quot;")); // \" refers to the quotation marks character which can't be written normally
         characterMappings.add(new CharacterEntityMapping("'", "&apos;"));
-        //Markdown characters
-        characterMappings.add(new MarkdownEntityMapping("**", "<b>","</b>"));
     }
 
     public String parsePlaintext(String plaintext) {
-        StringBuilder output = new StringBuilder();
+        String output = plaintext; //Create a copy of the plaintext
 
-        Stack<MarkdownEntityMapping> markdownQueue = new Stack<>();
-
-        for (int i = 0; i < plaintext.length(); i++) {
-
-            String plainString = plaintext.substring(i,i+2); //end parameter of substring is exclusive, gets the next 2 characters
-
-            boolean plainMapped = false;
-            String resultString = "";
-            for (CharacterEntityMapping mapping : characterMappings) {
-                if (mapping.canMapToPlain(plainString.substring(0,1)) || mapping.canMapToPlain(plainString)) { // checks whether the first character of the plain string maps then if both
-                    if (mapping instanceof MarkdownEntityMapping) {
-                        if (markdownQueue.peek() == mapping) {
-                            resultString = ((MarkdownEntityMapping) mapping).getEntityString(true);
-                            markdownQueue.pop();
-                        } else {
-                            resultString = mapping.getEntityString();
-                            markdownQueue.push((MarkdownEntityMapping) mapping);
-                        }
-                    } else {
-                        resultString = mapping.getEntityString();
-                    }
-                    plainMapped = true;
-                }
-            }
-            resultString = plainString;
-
+        for (CharacterEntityMapping mapping : characterMappings) {
+            output = output.replaceAll(mapping.getPlain(),mapping.getEntityString());
         }
 
-        return output.toString();
+        output = boldParser.parseText(output);
+        output = italicParser.parseText(output);
+
+        return output;
     }
 
     private static class CharacterEntityMapping {
@@ -74,21 +60,6 @@ public class MarkdownService {
 
         public String getPlain() { return plaintext; }
         public String getEntityString() { return entityString; }
-
-    }
-
-    private static class MarkdownEntityMapping extends CharacterEntityMapping {
-
-        private final String closingString;
-
-        private MarkdownEntityMapping(String plaintext, String entityString, String closingString) {
-            super(plaintext, entityString);
-            this.closingString = closingString;
-        }
-
-        public boolean canMapToPlain(String string) { return super.canMapToPlain(string) || string.equals(closingString); }
-
-        public String getEntityString(boolean closing) { return closing ? closingString : getEntityString(); }
 
     }
 
