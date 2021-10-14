@@ -15,7 +15,8 @@
         <img th:if="${cardElement.image != null && cardElement.image.imagePath != ''}" th:src="@{${cardElement.image.imagePath}}" class="cardimg">
         <div class="cardtext" th:classappend="${cardElement.image != null && cardElement.image.imagePath != ''} ? 'cardtext-right' : 'cardtext-full'">
             <h4 th:if="${cardElement.cardObject instanceof T(com.raffier.mindcards.model.table.TitledCardTable)}" class="title" th:text="${cardElement.cardObject.title}"><b> MindcardTitle </b></h4>
-            <p class="description" th:utext="${cardElement.cardObject.description}"> Description </p>
+            <p hidden class="description" th:text="${cardElement.cardObject.description}"> Description </p>
+            <p class="unescapedDesc" th:utext="${cardElement.unescapedDesc}"> Description </p>
         </div>
         <button th:if="${isOwner}" class="editCardButton">Edit</button>
     </div>

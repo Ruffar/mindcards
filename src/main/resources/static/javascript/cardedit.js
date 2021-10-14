@@ -1,6 +1,6 @@
 $(document).on("click",".editCardButton",function(event){
 
-    var cardDiv = $(this).parent();
+    var cardDiv = $(this).parents(".card");
     var cardData = getCardData(cardDiv);
 
     $.ajax({
@@ -16,7 +16,7 @@ $(document).on("click",".editCardButton",function(event){
 
 $(document).on("click",".saveCardButton",function(event){
 
-  var cardDiv = $(this).parent();
+  var cardDiv = $(this).parents(".card");
   var cardData = getCardEditorData(cardDiv);
 
   var cardMain = cardData.isMain;

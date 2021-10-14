@@ -1,5 +1,8 @@
 package com.raffier.mindcards.service.markdown;
 
+import com.raffier.mindcards.service.markdown.BoldParser;
+import com.raffier.mindcards.service.markdown.ItalicParser;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -7,7 +10,10 @@ import java.util.*;
 @Service
 public class MarkdownService {
 
-    private final int longestPlain = 2;
+    @Autowired
+    ItalicParser italicParser;
+    @Autowired
+    BoldParser boldParser;
 
     Set<CharacterEntityMapping> characterMappings;
 
@@ -18,59 +24,43 @@ public class MarkdownService {
     private void initializeMappings() {
         characterMappings = new HashSet<CharacterEntityMapping>();
         //Reserved HTML characters
+        //Order matters
+        characterMappings.add(new CharacterEntityMapping("&", "&amp;"));
         characterMappings.add(new CharacterEntityMapping("<", "&lt;"));
         characterMappings.add(new CharacterEntityMapping(">", "&gt;"));
-        characterMappings.add(new CharacterEntityMapping("&", "&amp;"));
         characterMappings.add(new CharacterEntityMapping("\"", "&quot;")); // \" refers to the quotation marks character which can't be written normally
         characterMappings.add(new CharacterEntityMapping("'", "&apos;"));
-        //Markdown characters
-        characterMappings.add(new MarkdownEntityMapping("**", "<b>","</b>"));
-        characterMappings.add(new MarkdownEntityMapping("*", "<em>","</em>"));
     }
 
     public String parsePlaintext(String plaintext) {
-        StringBuilder output = new StringBuilder();
+        String output = plaintext; //Create a copy of the plaintext
 
-        Stack<MarkdownEntityMapping> markdownQueue = new Stack<>();
-
-        int i = 0;
-        while (i < plaintext.length()) {
-
-            String plainString = plaintext.substring(i,i+longestPlain); //The plain string being parsed which also includes extra characters
-
-            //Find a mapping that matches
-            CharacterEntityMapping matchingMap = null;
-            for (CharacterEntityMapping mapping : characterMappings) {
-                String entityPlain = mapping.getPlain();
-                int entityPlainLength = entityPlain.length();
-                if (plainString.substring(0,entityPlainLength).equals(entityPlain) && (matchingMap == null || mapping.getPlain().length() > entityPlainLength)) {
-                    //Checks whether the first letters of a substring matches the mapping plain string
-                    //if there is already a matching map, check whether the new mapping's plain string length is longer
-                    //Example: Mapping (*) is already found but Mapping (**) can also be applied
-                    matchingMap = mapping;
-                }
-            }
-            //Get resulting string and handle markdown
-            int plainLength = 1;
-            String resultString = plainString.substring(0,1);
-            if (matchingMap != null) {
-                plainLength = matchingMap.getPlain().length();
-                resultString = matchingMap.getEntityString();
-
-                if (matchingMap instanceof MarkdownEntityMapping) {
-                    if (markdownQueue.peek() == matchingMap) {
-                        resultString = ( (MarkdownEntityMapping)matchingMap ).getClosingString();
-                        markdownQueue.pop();
-                    }
-                    else { markdownQueue.add( (MarkdownEntityMapping)matchingMap ); }
-                }
-            }
-            //Add result to output and increment i to the next un-parsed character
-            output.append(resultString);
-            i += plainLength;
+        for (CharacterEntityMapping mapping : characterMappings) {
+            output = output.replaceAll(mapping.getPlain(),mapping.getEntityString());
         }
 
-        return output.toString();
+        output = boldParser.parseText(output);
+        output = italicParser.parseText(output);
+
+        return output;
+    }
+
+    private static class CharacterEntityMapping {
+
+        private final String plaintext;
+        private final String entityString;
+
+        private CharacterEntityMapping(String plaintext, String entityString) {
+            this.plaintext = plaintext;
+            this.entityString = entityString;
+        }
+
+        public boolean canMapToEntity(String string) { return string.equals(plaintext); }
+        public boolean canMapToPlain(String string) { return string.equals(entityString); }
+
+        public String getPlain() { return plaintext; }
+        public String getEntityString() { return entityString; }
+
     }
 
 }
