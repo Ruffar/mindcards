@@ -1,4 +1,4 @@
-package com.raffier.mindcards.service;
+package com.raffier.mindcards.service.markdown;
 
 import com.raffier.mindcards.service.markdown.BoldParser;
 import com.raffier.mindcards.service.markdown.ItalicParser;
