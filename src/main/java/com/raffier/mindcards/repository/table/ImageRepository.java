@@ -1,5 +1,6 @@
 package com.raffier.mindcards.repository.table;
 
+import com.raffier.mindcards.errorHandling.EntityNotFoundException;
 import com.raffier.mindcards.model.table.CardTable;
 import com.raffier.mindcards.model.table.Image;
 import com.raffier.mindcards.model.table.Infocard;
@@ -16,6 +17,8 @@ public class ImageRepository extends EntityRepository<Image, Integer> {
     public ImageRepository(AppDatabase database) {
         super(database);
     }
+
+    private void throwEntityNotFound(Integer id) { throw new EntityNotFoundException("Image", id); }
 
     public <S extends Image> void save(S entity) {
         try (PreparedStatement statement = database.getConnection().prepareStatement("UPDATE Image SET name=?, imagePath=? WHERE imageId=?")) {
@@ -40,7 +43,7 @@ public class ImageRepository extends EntityRepository<Image, Integer> {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
+        throwEntityNotFound(id);
         return null;
     }
 
@@ -55,6 +58,7 @@ public class ImageRepository extends EntityRepository<Image, Integer> {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        throwEntityNotFound(card.getImageId());
         return null;
     }
 

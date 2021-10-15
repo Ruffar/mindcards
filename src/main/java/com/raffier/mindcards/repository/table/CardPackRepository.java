@@ -1,5 +1,6 @@
 package com.raffier.mindcards.repository.table;
 
+import com.raffier.mindcards.errorHandling.EntityNotFoundException;
 import com.raffier.mindcards.model.table.*;
 import com.raffier.mindcards.repository.AppDatabase;
 import com.raffier.mindcards.repository.table.EntityRepository;
@@ -15,6 +16,8 @@ public class CardPackRepository extends EntityRepository<CardPack,Integer> {
     public CardPackRepository(AppDatabase database) {
         super(database);
     }
+
+    private void throwEntityNotFound(Integer id) { throw new EntityNotFoundException("Card Pack", id); }
 
     public <S extends CardPack> void save(S entity) {
         try (PreparedStatement statement = database.getConnection().prepareStatement("UPDATE CardPack SET ownerId=?, title=?, imageId=?, description=? WHERE packId=?")) {
@@ -41,6 +44,7 @@ public class CardPackRepository extends EntityRepository<CardPack,Integer> {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        throwEntityNotFound(id);
         return null;
     }
 
@@ -55,6 +59,7 @@ public class CardPackRepository extends EntityRepository<CardPack,Integer> {
         } catch (SQLException e) {
             e.printStackTrace();
         }
+        throwEntityNotFound(null);
         return null;
     }
 
