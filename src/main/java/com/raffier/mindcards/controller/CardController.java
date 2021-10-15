@@ -4,7 +4,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.raffier.mindcards.model.card.CardElement;
 import com.raffier.mindcards.model.card.MindcardElements;
 import com.raffier.mindcards.model.table.*;
+import com.raffier.mindcards.service.CardModelService;
 import com.raffier.mindcards.service.CardService;
+import javafx.util.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -12,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpSession;
+import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -21,7 +24,7 @@ public class CardController {
     @Autowired
     CardService cardService;
     @Autowired
-    ObjectMapper objectMapper;
+    CardModelService cardModelService;
 
     /*@GetMapping(value="pack/{packId}")
     public ModelAndView packView(@PathVariable int packId, HttpSession session) {
@@ -41,17 +44,22 @@ public class CardController {
     }*/
 
     @GetMapping(value="mindcard/{mindcardId}")
-    public ModelAndView mindcardView(@ModelAttribute("user") User user, @PathVariable int mindcardId, @RequestParam(name="edit",defaultValue="false") boolean isEditing) {
+    public ModelAndView mindcardView(@ModelAttribute("user") User user, @PathVariable int mindcardId) {
         ModelAndView mv = new ModelAndView("cards/mindcard");
 
-        MindcardElements cardElements = cardService.getMindcardElements(mindcardId);
+        CardElement<Mindcard> mindcard = cardModelService.getCardElement(cardService.getMindcardImage(mindcardId));
+        List<Pair<Infocard,Image>> infoPairList = cardService.getInfocardsFromMindcard(mindcardId);
+        List<CardElement<Infocard>> infoList = new ArrayList<>();
+        for (Pair<Infocard,Image> pair : infoPairList) {
+            infoList.add(cardModelService.getCardElement(pair));
+        }
 
         boolean isOwner = cardService.isUserMindcardOwner(user,mindcardId);
         mv.addObject("isOwner",isOwner);
 
-        mv.addObject("cardElements",cardElements);
+        mv.addObject("mindcard",mindcard);
+        mv.addObject("infocards",infoList);
 
-        if (isEditing && isOwner) { mv.setViewName("cards/mindcardEditor"); }
         return mv;
     }
 
@@ -78,7 +86,23 @@ public class CardController {
                 break;
         }
 
-        System.out.println(cardElement.getCardObject().getDescription());
+        model.addAttribute("cardElement",cardElement);
+
+        return "fragments/card :: card(isMain=${'"+isMain+"'},isOwner=${'"+isOwner+"'},cardElement=${cardElement},cardType='"+cardType+"')";
+    }
+
+    @GetMapping("getCardElement")
+    public String getCardElement(@RequestParam boolean isMain, @RequestParam String cardType, @RequestParam int cardId, @RequestParam int imageId, @RequestParam(defaultValue = "") String title, @RequestParam String description, Model model) {
+
+        CardElement<?> cardElement = new CardElement<>();
+        switch(cardType) {
+            case "mindcard" :
+                cardElement = cardModelService.getCardElement(cardService.getMindcardImage(cardId));
+                break;
+            case "infocard":
+                cardElement = cardModelService.getCardElement(cardService.getInfocardImage(cardId));
+                break;
+        }
 
         model.addAttribute("cardElement",cardElement);
 
@@ -88,14 +112,13 @@ public class CardController {
     @GetMapping("getCardEditor")
     public String getCardEditor(@RequestParam boolean isMain, @RequestParam String cardType, @RequestParam int cardId, @RequestParam int imageId, @RequestParam(defaultValue = "") String title, @RequestParam String description, Model model) {
 
-
         CardElement<?> cardElement = new CardElement<>();
         switch(cardType) {
             case "mindcard" :
-                cardElement = cardService.getMindcardElement(cardId);
+                cardElement = cardModelService.getCardElement(cardService.getMindcardImage(cardId));
                 break;
             case "infocard":
-                cardElement = cardService.getInfocardElement(cardId);
+                cardElement = cardModelService.getCardElement(cardService.getInfocardImage(cardId));
                 break;
         }
 

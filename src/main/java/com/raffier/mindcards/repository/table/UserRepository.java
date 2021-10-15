@@ -1,5 +1,6 @@
 package com.raffier.mindcards.repository.table;
 
+import com.raffier.mindcards.errorHandling.EntityNotFoundException;
 import com.raffier.mindcards.model.table.User;
 import com.raffier.mindcards.repository.AppDatabase;
 
@@ -12,6 +13,8 @@ public class UserRepository extends EntityRepository<User,Integer> {
     public UserRepository(AppDatabase database) {
         super(database);
     }
+
+    private void throwEntityNotFound(Integer id) { throw new EntityNotFoundException("User", id); }
 
     public <S extends User> void save(S entity) {
         try (PreparedStatement statement = database.getConnection().prepareStatement("UPDATE User SET username=?,password=?,email=?,isDeveloper=? WHERE userId=?")) {
@@ -40,7 +43,7 @@ public class UserRepository extends EntityRepository<User,Integer> {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
+        throwEntityNotFound(id);
         return null;
     }
 
