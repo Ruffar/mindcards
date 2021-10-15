@@ -40,14 +40,27 @@ public class CardService {
     //Get card with image
     public Pair<Mindcard,Image> getMindcardImage(int cardId) {
         Mindcard card = mindcardRepository.getById(cardId);
-        Image image = imageRepository.getFromCard(card);
+        int imageId = card.getImageId();
+        Image image = imageId != 0 ? imageRepository.getFromCard(card) : null;
         return new Pair<>(card,image);
     }
 
     public Pair<Infocard,Image> getInfocardImage(int cardId) {
         Infocard card = infocardRepository.getById(cardId);
-        Image image = imageRepository.getFromCard(card);
+        int imageId = card.getImageId();
+        Image image = imageId != 0 ? imageRepository.getFromCard(card) : null;
         return new Pair<>(card,image);
+    }
+
+    public List<Pair<Infocard,Image>> getInfocardsFromMindcard(int mindcardId) {
+        List<Infocard> infocards = infocardRepository.getFromMindcard(mindcardId);
+        List<Pair<Infocard,Image>> infoPairs = new ArrayList<>();
+        for (Infocard i: infocards) {
+            int imageId = i.getImageId();
+            Image image = imageId != 0 ? imageRepository.getFromCard(i) : null;
+            infoPairs.add(new Pair<>(i,image));
+        }
+        return infoPairs;
     }
 
     //Update cards
@@ -66,21 +79,6 @@ public class CardService {
         infocardRepository.save(card);
     }
 
-    public MindcardElements getMindcardElements(int mindcardId) {
-        Mindcard mindcard = mindcardRepository.getById(mindcardId);
-        if (mindcard == null) throw new EntityNotFoundException("Mindcard", mindcardId);
-        CardElement<Mindcard> mindcardElement = getCardElement(mindcard);
-
-        List<Infocard> infocards = infocardRepository.getFromMindcard(mindcardId);
-        List<CardElement<Infocard>> infoElements = new ArrayList<>();
-        for (Infocard i: infocards) {
-            CardElement<Infocard> element = getCardElement(i);
-            infoElements.add(element);
-        }
-
-        return new MindcardElements(mindcardElement, infoElements);
-    }
-
     public boolean isUserMindcardOwner(User user, int cardId) {
         if (user == null) return false;
         CardPack pack = cardPackRepository.getFromMindcard(cardId);
@@ -93,6 +91,8 @@ public class CardService {
         CardPack pack = cardPackRepository.getFromMindcard(card.getMindcardId());
         return pack.getOwnerId() == user.getUserId();
     }
+
+    public boolean isUserCardOwner(User user,)
 
     public int getInfocardMindcardId(int infocardId) {
         return mindcardRepository.getFromInfocard(infocardId).getMindcardId();

@@ -11,20 +11,20 @@
     </style>
 
     <meta charset="UTF-8">
-    <title th:text="${cardElements.mindcard.cardObject.title}">Mindcard</title>
+    <title th:text="${mindcard.cardObject.title}">Mindcard</title>
 </head>
 
 <body>
 
 <th:block th:insert="~{fragments/pageLayout :: navbar('')}"></th:block>
 
-<div th:replace="~{fragments/card :: card(isMain=${true},cardElement=${cardElements.mindcard},cardType='mindcard')}"></div>
+<div th:replace="~{fragments/card :: card(isMain=${true},cardElement=${mindcard},cardType='mindcard')}"></div>
 
 <hr>
 
 <div style="text-align: center;">
     <div class="infocard-grid">
-        <th:block th:each="infocard: ${cardElements.infocards}">
+        <th:block th:each="infocard: ${infocards}">
             <div th:replace="~{fragments/card :: card(isMain=${false},cardElement=${infocard},cardType='infocard')}" style="flex: 0 0 auto;"></div>
         </th:block>
     </div>

@@ -15,24 +15,14 @@ public class CardModelService {
 
     @Autowired
     MarkdownService markdownService;
-    @Autowired
-    CardService cardService;
 
     //Card elements
-    public <S extends CardTable> CardElement<S> getCardElement(Pair<S,Image> card) {
-        Image image = card;
-        String imagePath = image != null ? image.getImagePath() : "";
+    public <S extends CardTable> CardElement<S> getCardElement(Pair<S,Image> cardPair) {
+        S card = cardPair.getKey();
+        Image image = cardPair.getValue();
         String unescapedDesc = markdownService.parsePlaintext(card.getDescription());
 
         return new CardElement<S>(card, image, unescapedDesc);
-    }
-
-    public CardElement<Mindcard> getMindcardElement(CardTable cardId) {
-        return getCardElement(getMindcardEntity(cardId));
-    }
-
-    public CardElement<Infocard> getInfocardElement(int cardId) {
-        return getCardElement(getInfocardEntity(cardId));
     }
 
 }
