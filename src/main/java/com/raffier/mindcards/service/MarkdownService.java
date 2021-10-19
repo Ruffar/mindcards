@@ -1,5 +1,7 @@
 package com.raffier.mindcards.service;
 
+import com.raffier.mindcards.errorHandling.InvalidHyperlinkException;
+import com.raffier.mindcards.model.table.CardTable;
 import com.raffier.mindcards.service.CardService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -24,9 +26,9 @@ public class MarkdownService {
         output = parseUnderline(output);
         output = parseStrikethrough(output);
         output = parseBlockquote(output);
-
-        //output = parseHyperlink(output);
         output = parseHorizontalRule(output);
+
+        output = parseHyperlink(output);
 
         output = parseBulletList(output);
         output = parseNumberList(output);
@@ -95,7 +97,6 @@ public class MarkdownService {
         while(matcher.find()) {
             String betweenText = plainText.substring(lastEnd, matcher.start());
 
-            System.out.println(betweenText);
             //If the string starts with a number list then open a list
             if ((!betweenText.matches("\\R") && lastEnd != matcher.start()) || lastEnd == 0) {
                 if (lastEnd > 0) result.append("</ol>");
@@ -111,7 +112,35 @@ public class MarkdownService {
     }
 
     private String parseHyperlink(String plainText) {
-        return plainText;
+        Pattern pattern = Pattern.compile("\\[(.+?)]\\((.+?)\\)");
+        Matcher matcher = pattern.matcher(plainText);
+        StringBuilder result = new StringBuilder();
+        int lastEnd = 0;
+        while (matcher.find()) {
+            result.append(plainText, lastEnd, matcher.start());
+
+            String cardPath = matcher.group(2);
+            String[] cardPathVariables = cardPath.split("/");
+            if (cardPathVariables.length == 2 && cardPathVariables[0].matches("mindcard|group|pack") && cardPathVariables[1].matches("[0-9]+")) {
+
+                CardType cardType = CardType.getCardTypeFromString(cardPathVariables[0]);
+                int cardId = Integer.parseInt(cardPathVariables[1]);
+
+                if (cardService.cardExists(cardType,cardId)) {
+                    String hyperlinkUrl = cardPath;
+                    if (hyperlinkUrl.charAt(0) != '/') hyperlinkUrl = "/" + hyperlinkUrl;
+                    result.append("<a href=\"").append(hyperlinkUrl).append("\">").append(matcher.group(1)).append("</a>");
+                }
+
+            } else {
+                throw new InvalidHyperlinkException(cardPath);
+            }
+
+            lastEnd = matcher.end();
+        }
+        result.append(plainText.substring(lastEnd)); //append any leftover text after the final match
+
+        return result.toString();
     }
 
 }

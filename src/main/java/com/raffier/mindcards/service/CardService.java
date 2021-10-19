@@ -100,6 +100,33 @@ public class CardService {
         }
     }
 
+    //Exist
+    public boolean infocardExists(int cardId) {
+        return infocardRepository.getById(cardId) != null;
+    }
+
+    public boolean mindcardExists(int cardId) {
+        return mindcardRepository.getById(cardId) != null;
+    }
+
+    public boolean cardGroupExists(int cardId) {
+        return cardGroupRepository.getById(cardId) != null;
+    }
+
+    public boolean cardPackExists(int cardId) {
+        return cardPackRepository.getById(cardId) != null;
+    }
+
+    public boolean cardExists(CardType cardType, int cardId) {
+        return switch (cardType) {
+            case INFOCARD -> infocardRepository.getById(cardId) != null;
+            case MINDCARD -> mindcardRepository.getById(cardId) != null;
+            case CARDGROUP -> cardGroupRepository.getById(cardId) != null;
+            case CARDPACK -> cardPackRepository.getById(cardId) != null;
+            default -> false;
+        };
+    }
+
     public int getInfocardMindcardId(int infocardId) {
         return mindcardRepository.getFromInfocard(infocardId).getMindcardId();
     }
