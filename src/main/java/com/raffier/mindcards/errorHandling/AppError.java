@@ -4,7 +4,7 @@ import org.springframework.http.HttpStatus;
 
 public class AppError {
 
-    private HttpStatus status;
+    private final HttpStatus status;
     private String message;
 
     public AppError(HttpStatus status) {

@@ -37,9 +37,6 @@ public class MindcardRepository extends EntityRepository<Mindcard,Integer> {
             ResultSet results = stmnt.executeQuery();
             if (results.next()) {
                 return new Mindcard(id,results.getInt("packId"),results.getString("title"),results.getInt("imageId"),results.getString("description"));
-            } else {
-                //throw new RuntimeException("Mindcard with ID "+mindcardId+" cannot be found...");
-                System.out.println("Mindcard with ID "+id+" cannot be found.");
             }
         } catch (SQLException e) {
             e.printStackTrace();

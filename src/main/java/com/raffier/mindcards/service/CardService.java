@@ -1,13 +1,9 @@
 package com.raffier.mindcards.service;
 
-import com.raffier.mindcards.errorHandling.EntityNotFoundException;
-import com.raffier.mindcards.model.card.CardElement;
-import com.raffier.mindcards.model.card.MindcardElements;
+import com.raffier.mindcards.model.card.CardImagePair;
 import com.raffier.mindcards.model.table.*;
 import com.raffier.mindcards.repository.AppDatabase;
 import com.raffier.mindcards.repository.table.*;
-import com.raffier.mindcards.service.markdown.MarkdownService;
-import javafx.util.Pair;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -38,27 +34,36 @@ public class CardService {
     }
 
     //Get card with image
-    public Pair<Mindcard,Image> getMindcardImage(int cardId) {
-        Mindcard card = mindcardRepository.getById(cardId);
+    private <T extends CardTable> CardImagePair<T> getCardImagePair(T card) {
         int imageId = card.getImageId();
         Image image = imageId != 0 ? imageRepository.getFromCard(card) : null;
-        return new Pair<>(card,image);
+        return new CardImagePair<>(card,image);
     }
 
-    public Pair<Infocard,Image> getInfocardImage(int cardId) {
-        Infocard card = infocardRepository.getById(cardId);
-        int imageId = card.getImageId();
-        Image image = imageId != 0 ? imageRepository.getFromCard(card) : null;
-        return new Pair<>(card,image);
+    public CardImagePair<Infocard> getInfocardImagePair(int cardId) {
+        return getCardImagePair(infocardRepository.getById(cardId));
     }
 
-    public List<Pair<Infocard,Image>> getInfocardsFromMindcard(int mindcardId) {
+    public CardImagePair<Mindcard> getMindcardImagePair(int cardId) {
+        return getCardImagePair(mindcardRepository.getById(cardId));
+    }
+
+    public CardImagePair<CardGroup> getCardGroupImagePair(int cardId) {
+        return getCardImagePair(cardGroupRepository.getById(cardId));
+    }
+
+    public CardImagePair<CardPack> getCardPackImagePair(int cardId) {
+        return getCardImagePair(cardPackRepository.getById(cardId));
+    }
+
+    //
+    public List<CardImagePair<Infocard>> getInfocardsFromMindcard(int mindcardId) {
         List<Infocard> infocards = infocardRepository.getFromMindcard(mindcardId);
-        List<Pair<Infocard,Image>> infoPairs = new ArrayList<>();
+        List<CardImagePair<Infocard>> infoPairs = new ArrayList<>();
         for (Infocard i: infocards) {
             int imageId = i.getImageId();
             Image image = imageId != 0 ? imageRepository.getFromCard(i) : null;
-            infoPairs.add(new Pair<>(i,image));
+            infoPairs.add(new CardImagePair<>(i,image));
         }
         return infoPairs;
     }
@@ -79,20 +84,21 @@ public class CardService {
         infocardRepository.save(card);
     }
 
-    public boolean isUserMindcardOwner(User user, int cardId) {
-        if (user == null) return false;
-        CardPack pack = cardPackRepository.getFromMindcard(cardId);
-        return pack.getOwnerId() == user.getUserId();
+    public boolean isUserCardOwner(CardType cardType, User user, int cardId) {
+        switch(cardType) {
+            case INFOCARD:
+                return isUserCardOwner(CardType.MINDCARD,user,infocardRepository.getById(cardId).getMindcardId());
+            case MINDCARD:
+                return isUserCardOwner(CardType.CARDPACK,user,mindcardRepository.getById(cardId).getPackId());
+            case CARDGROUP:
+                return isUserCardOwner(CardType.CARDPACK,user,cardGroupRepository.getById(cardId).getPackId());
+            case CARDPACK:
+                if (user == null) return false;
+                return cardPackRepository.getById(cardId).getOwnerId() == user.getUserId();
+            default:
+                return false;
+        }
     }
-
-    public boolean isUserInfocardOwner(User user, int cardId) {
-        if (user == null) return false;
-        Mindcard card = mindcardRepository.getFromInfocard(cardId);
-        CardPack pack = cardPackRepository.getFromMindcard(card.getMindcardId());
-        return pack.getOwnerId() == user.getUserId();
-    }
-
-    public boolean isUserCardOwner(User user,)
 
     public int getInfocardMindcardId(int infocardId) {
         return mindcardRepository.getFromInfocard(infocardId).getMindcardId();

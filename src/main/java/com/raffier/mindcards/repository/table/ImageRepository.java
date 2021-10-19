@@ -19,6 +19,7 @@ public class ImageRepository extends EntityRepository<Image, Integer> {
     }
 
     private void throwEntityNotFound(Integer id) { throw new EntityNotFoundException("Image", id); }
+    private void throwEntityNotFound(String path) { throw new EntityNotFoundException("Image", "path", "\""+path+"\""); }
 
     public <S extends Image> void save(S entity) {
         try (PreparedStatement statement = database.getConnection().prepareStatement("UPDATE Image SET name=?, imagePath=? WHERE imageId=?")) {
@@ -37,13 +38,25 @@ public class ImageRepository extends EntityRepository<Image, Integer> {
             ResultSet results = stmnt.executeQuery();
             if (results.next()) {
                 return new Image(id,results.getString("name"),results.getString("imagePath"));
-            } else {
-                System.out.println("Image with ID "+id+" cannot be found.");
             }
         } catch (SQLException e) {
             e.printStackTrace();
         }
         throwEntityNotFound(id);
+        return null;
+    }
+
+    public Image getByPath(String path) {
+        try (PreparedStatement stmnt = database.getConnection().prepareStatement("SELECT imageId, name, imagePath FROM Image WHERE imagePath=?")) {
+            stmnt.setString(1,path);
+            ResultSet results = stmnt.executeQuery();
+            if (results.next()) {
+                return new Image(results.getInt("imageId"),results.getString("name"),path);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        throwEntityNotFound(path);
         return null;
     }
 

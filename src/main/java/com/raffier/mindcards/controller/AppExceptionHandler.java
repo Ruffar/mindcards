@@ -2,7 +2,9 @@ package com.raffier.mindcards.controller;
 
 import com.raffier.mindcards.errorHandling.AppError;
 import com.raffier.mindcards.errorHandling.EntityNotFoundException;
+import com.raffier.mindcards.errorHandling.UnauthorisedAccessException;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.ModelAndView;
@@ -10,6 +12,12 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 @ControllerAdvice
 public class AppExceptionHandler extends ResponseEntityExceptionHandler {
+
+
+    @ExceptionHandler(UnauthorisedAccessException.class)
+    private ModelAndView handleUnauthorisedAccess(UnauthorisedAccessException e) {
+        return errorPage( new AppError(HttpStatus.FORBIDDEN, e.getMessage()) );
+    }
 
     @ExceptionHandler(EntityNotFoundException.class)
     private ModelAndView handleEntityNotFoundException(EntityNotFoundException e) {
@@ -29,6 +37,10 @@ public class AppExceptionHandler extends ResponseEntityExceptionHandler {
         mv.addObject("error",error);
 
         return mv;
+    }
+
+    private ResponseEntity<?> buildResponseEntity(AppError error) {
+        return new ResponseEntity<>(error,error.getStatus());
     }
 
 }

@@ -37,8 +37,6 @@ public class UserRepository extends EntityRepository<User,Integer> {
                 return new User(id,results.getString("username"),
                         results.getString("password"), results.getString("email"),
                         results.getBoolean("isDeveloper"));
-            } else {
-                System.out.println("User with ID "+id+" cannot be found.");
             }
         } catch (SQLException e) {
             e.printStackTrace();

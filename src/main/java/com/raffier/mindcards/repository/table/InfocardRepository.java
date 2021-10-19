@@ -37,8 +37,6 @@ public class InfocardRepository extends EntityRepository<Infocard,Integer> {
             ResultSet results = stmnt.executeQuery();
             if (results.next()) {
                 return new Infocard(id,results.getInt("mindcardId"),results.getInt("imageId"),results.getString("description"));
-            } else {
-                System.out.println("Infocard with ID "+id+" cannot be found.");
             }
         } catch (SQLException e) {
             e.printStackTrace();

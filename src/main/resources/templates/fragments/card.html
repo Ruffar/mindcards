@@ -8,31 +8,34 @@
 <body>
 
 <th:block th:fragment="card(cardElement,cardType)" th:with="isMain=${isMain} ?: ${false}, isOwner=${isOwner} ?: ${false}">
-    <div class="card" th:classappend="${isMain} ? 'card-main' : ''" style="margin: auto;">
-        <p hidden class="cardType" th:text="${cardType}"></p>
-        <p hidden class="cardId" th:text="${cardElement.cardObject.getPrimaryKey()}"></p>
+    <div class="card" th:classappend="|${isMain ? 'card-main' : ''} ${cardType}|" style="margin: auto;">
+        <p hidden class="cardId" th:text="${cardElement.card.getPrimaryKey()}"></p>
         <p hidden class="imageId" th:text="${cardElement.image} ? ${cardElement.image.imageId} : 0"></p>
-        <img th:if="${cardElement.image != null && cardElement.image.imagePath != ''}" th:src="@{${cardElement.image.imagePath}}" class="cardimg">
-        <div class="cardtext" th:classappend="${cardElement.image != null && cardElement.image.imagePath != ''} ? 'cardtext-right' : 'cardtext-full'">
-            <h4 th:if="${cardElement.cardObject instanceof T(com.raffier.mindcards.model.table.TitledCardTable)}" class="title" th:text="${cardElement.cardObject.title}"><b> MindcardTitle </b></h4>
-            <p hidden class="description" th:text="${cardElement.cardObject.description}"> Description </p>
-            <p class="unescapedDesc" th:utext="${cardElement.unescapedDesc}"> Description </p>
+        <div class="card-decoration">
+            <div th:if="${cardElement.image != null && cardElement.image.imagePath != ''}" class="imgcontainer" th:style="|background-image: url(@{${cardElement.image.imagePath}})|"></div>
+        </div>
+        <div class="cardtext">
+            <h3 th:if="${cardElement.card instanceof T(com.raffier.mindcards.model.table.TitledCardTable)}" class="title" th:text="${cardElement.card.title}"><b> MindcardTitle </b></h3>
+            <p hidden class="description" th:text="${cardElement.card.description}"> Description </p>
+            <div class="unescapedDesc" th:utext="${cardElement.unescapedDesc}"> Description </div>
         </div>
         <button th:if="${isOwner}" class="editCardButton">Edit</button>
     </div>
 </th:block>
 
 <th:block th:fragment="cardEditor(cardElement,cardType)" th:with="isMain=${isMain} ?: ${false}">
-    <div class="card" th:classappend="${isMain} ? 'card-main' : ''" style="margin: auto;">
-        <p hidden class="cardType" th:text="${cardType}"></p>
-        <p hidden class="cardId" th:text="${cardElement.cardObject.getPrimaryKey()}"></p>
+    <div class="card" th:classappend="|${isMain ? 'card-main' : ''} ${cardType}|" style="margin: auto;">
+        <p hidden class="cardId" th:text="${cardElement.card.getPrimaryKey()}"></p>
         <p hidden class="imageId" th:text="${cardElement.image} ? ${cardElement.image.imageId} : 0"></p>
-        <img th:if="${cardElement.image != null && cardElement.image.imagePath != ''}" th:src="@{${cardElement.image.imagePath}}" class="cardimg">
-        <div class="cardtext" th:classappend="${cardElement.image != null && cardElement.image.imagePath != ''} ? 'cardtext-right' : 'cardtext-full'">
-            <input th:if="${cardElement.cardObject instanceof T(com.raffier.mindcards.model.table.TitledCardTable)}" class="title" type="text" th:value="${cardElement.cardObject.title}" /><br/>
-            <input class="description" type="text" th:value="${cardElement.cardObject.description}" style="width: 50%; height: 80%;" /><br/>
+        <div class="card-decoration">
+            <div th:if="${cardElement.image != null && cardElement.image.imagePath != ''}" class="imgcontainer" th:style="|background-image: url(@{${cardElement.image.imagePath}})|"></div>
+        </div>
+        <div class="cardtext">
+            <input th:if="${cardElement.card instanceof T(com.raffier.mindcards.model.table.TitledCardTable)}" class="title" type="text" th:value="${cardElement.card.title}" /><br/>
+            <textarea class="description" th:rows="${isMain} ? 20 : 12" th:text="${cardElement.card.description}" ></textarea><br/>
         </div>
         <button class="saveCardButton">Save</button>
+        <button class="cancelEditCardButton">Cancel</button>
     </div>
 </th:block>
 

@@ -6,6 +6,10 @@ public class EntityNotFoundException extends RuntimeException {
         super(tableName+" with ID "+id.toString()+" cannot be found...");
     }
 
+    public EntityNotFoundException(String tableName, String selector, Object id) {
+        super(tableName+" with "+selector+" "+id.toString()+" cannot be found...");
+    }
+
     protected EntityNotFoundException(String message) { super(message); }
 
 }

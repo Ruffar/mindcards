@@ -38,8 +38,6 @@ public class CardPackRepository extends EntityRepository<CardPack,Integer> {
             ResultSet results = stmnt.executeQuery();
             if (results.next()) {
                 return new CardPack(id,results.getInt("ownerId"),results.getString("title"),results.getInt("imageId"),results.getString("description"));
-            } else {
-                System.out.println("Card Pack with ID "+id+" cannot be found.");
             }
         } catch (SQLException e) {
             e.printStackTrace();

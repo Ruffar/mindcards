@@ -35,8 +35,6 @@ public class CardGroupRepository extends EntityRepository<CardGroup,Integer> {
             ResultSet results = stmnt.executeQuery();
             if (results.next()) {
                 return new CardGroup(id,results.getInt("packId"),results.getString("title"),results.getInt("imageId"),results.getString("description"));
-            } else {
-                System.out.println("Card Group with ID "+id+" cannot be found.");
             }
         } catch (SQLException e) {
             e.printStackTrace();

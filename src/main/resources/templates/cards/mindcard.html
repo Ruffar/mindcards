@@ -11,7 +11,7 @@
     </style>
 
     <meta charset="UTF-8">
-    <title th:text="${mindcard.cardObject.title}">Mindcard</title>
+    <title th:text="${mindcard.card.title}">Mindcard</title>
 </head>
 
 <body>
@@ -30,7 +30,6 @@
     </div>
 </div>
 
-<script th:src="@{/javascript/markdown.js}"></script>
 <script th:src="@{/javascript/cardedit.js}" th:inline="javascript"></script>
 
 </body>
