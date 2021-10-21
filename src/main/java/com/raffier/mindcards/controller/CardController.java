@@ -66,13 +66,13 @@ public class CardController {
     }
 
     @PostMapping("saveCard")
-    public String saveCard(@ModelAttribute User user, @RequestParam(defaultValue="false") boolean isMain, @RequestParam String cardType, @RequestParam int cardId, @RequestParam int imageId, @RequestParam(defaultValue = "") String title, @RequestParam String description, Model model) {
+    public String saveCard(@ModelAttribute User user, @RequestParam(defaultValue="false") boolean fromAjax, @RequestParam(defaultValue="false") boolean isMain, @RequestParam String cardType, @RequestParam int cardId, @RequestParam int imageId, @RequestParam(defaultValue = "") String title, @RequestParam String description, Model model) {
 
         CardElement<?> cardElement = new CardElement<>();
         CardType cardTypeEnum = CardType.getCardTypeFromString(cardType);
         boolean isOwner = cardService.isUserCardOwner(cardTypeEnum, user, cardId);
 
-        if (isOwner) {
+        if (isOwner && cardModelService.isDescriptionValid(description)) {
             switch (cardTypeEnum) {
                 case MINDCARD:
                     cardService.updateMindcard(cardId, title, imageId, description);

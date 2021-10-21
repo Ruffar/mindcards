@@ -22,4 +22,9 @@ public class CardModelService {
         return new CardElement<>(card, image, unescapedDesc);
     }
 
+    public boolean isDescriptionValid(String description) {
+        markdownService.parsePlaintext(description); //If an error occurs during parsing, then the description is not valid
+        return true;
+    }
+
 }

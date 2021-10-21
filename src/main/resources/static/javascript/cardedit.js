@@ -32,8 +32,8 @@ $(document).on("click",".saveCardButton",function(event){
         $(document).attr("title",cardTitle)
       }
     },
-    error: function() {
-      getCardElement(cardDiv, cardMain, cardData.cardType, cardData.cardId);
+    error: function(data) {
+      console.log(data);
     }
   });
 

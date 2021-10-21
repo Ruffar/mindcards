@@ -2,6 +2,7 @@ package com.raffier.mindcards.controller;
 
 import com.raffier.mindcards.errorHandling.AppError;
 import com.raffier.mindcards.errorHandling.EntityNotFoundException;
+import com.raffier.mindcards.errorHandling.InvalidHyperlinkException;
 import com.raffier.mindcards.errorHandling.UnauthorisedAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -10,9 +11,23 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import javax.servlet.http.HttpServletRequest;
+
 @ControllerAdvice
 public class AppExceptionHandler extends ResponseEntityExceptionHandler {
 
+    private boolean isXMLRequest(HttpServletRequest request) {
+        return request.getHeader("X-Requested-With").equals("XMLHttpRequest");
+    }
+
+    @ExceptionHandler(InvalidHyperlinkException.class)
+    private ModelAndView handleInvalidHyperlink(InvalidHyperlinkException e, HttpServletRequest request) {
+        if (isXMLRequest(request)) {
+
+        } else {
+            return errorPage(new AppError(HttpStatus.NOT_ACCEPTABLE, e.getMessage()));
+        }
+    }
 
     @ExceptionHandler(UnauthorisedAccessException.class)
     private ModelAndView handleUnauthorisedAccess(UnauthorisedAccessException e) {

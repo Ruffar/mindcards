@@ -118,13 +118,18 @@ public class CardService {
     }
 
     public boolean cardExists(CardType cardType, int cardId) {
-        return switch (cardType) {
-            case INFOCARD -> infocardRepository.getById(cardId) != null;
-            case MINDCARD -> mindcardRepository.getById(cardId) != null;
-            case CARDGROUP -> cardGroupRepository.getById(cardId) != null;
-            case CARDPACK -> cardPackRepository.getById(cardId) != null;
-            default -> false;
-        };
+        switch (cardType) {
+            case INFOCARD:
+                return infocardRepository.getById(cardId) != null;
+            case MINDCARD:
+                return mindcardRepository.getById(cardId) != null;
+            case CARDGROUP:
+                return cardGroupRepository.getById(cardId) != null;
+            case CARDPACK:
+                return cardPackRepository.getById(cardId) != null;
+            default:
+                return false;
+        }
     }
 
     public int getInfocardMindcardId(int infocardId) {
