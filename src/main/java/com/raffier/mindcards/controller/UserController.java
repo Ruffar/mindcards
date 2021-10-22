@@ -5,8 +5,11 @@ import com.raffier.mindcards.model.login.LoginSubmission;
 import com.raffier.mindcards.model.table.User;
 import com.raffier.mindcards.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.support.SessionStatus;
 import org.springframework.web.servlet.ModelAndView;
@@ -29,22 +32,22 @@ public class UserController {
             return new ModelAndView("redirect:profile");
         }
 
-        mv.addObject("submission", new LoginSubmission());
+        //mv.addObject("submission", new LoginSubmission());
         mv.setViewName("login");
         return mv;
     }
 
     @PostMapping(value="login")
-    public ModelAndView loginSubmit(@RequestParam String email, @RequestParam String password, @RequestParam(name="return",defaultValue="") String returnUrl, HttpSession session, HttpServletRequest request, BindingResult result) {
+    public ResponseEntity<?> loginSubmit(@RequestParam String email, @RequestParam String password, HttpSession session) {
         ModelAndView mv = new ModelAndView("login");
 
         User user = userService.userLogin(email, password);
         if (user != null) {
             session.setAttribute("user", user);
-            return new ModelAndView("redirect:"+returnUrl);
+            return new ResponseEntity<>(HttpStatus.OK);
         }
 
-        throw new UnauthorisedAccessException();
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
     }
 

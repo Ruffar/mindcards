@@ -3,12 +3,17 @@ package com.raffier.mindcards.model.login;
 import org.springframework.context.annotation.Bean;
 import org.springframework.lang.Nullable;
 
-public class LoginSubmission {
+import java.io.Serializable;
+
+public class LoginSubmission implements Serializable {
 
     private String email;
     private String password;
 
-    public LoginSubmission() {}
+    public LoginSubmission(String email, String password) {
+        this.email = email;
+        this.password = password;
+    }
 
     public String getEmail() {
         return this.email;

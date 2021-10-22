@@ -1,13 +1,11 @@
 package com.raffier.mindcards.controller;
 
-import com.raffier.mindcards.errorHandling.AppError;
-import com.raffier.mindcards.errorHandling.EntityNotFoundException;
-import com.raffier.mindcards.errorHandling.InvalidHyperlinkException;
-import com.raffier.mindcards.errorHandling.UnauthorisedAccessException;
+import com.raffier.mindcards.errorHandling.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
@@ -24,7 +22,12 @@ public class AppExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(UnauthorisedAccessException.class)
     private Object handleUnauthorisedAccess(UnauthorisedAccessException e, HttpServletRequest request) {
-        return buildResponse(request, new AppError(HttpStatus.FORBIDDEN, e.getMessage()) );
+        return buildResponse(request, new AppError(HttpStatus.UNAUTHORIZED, e.getMessage()) );
+    }
+
+    @ExceptionHandler(FormFieldException.class)
+    private Object handleFormFieldException(FormFieldException e, HttpServletRequest request) {
+        return buildResponse(request, new AppError(HttpStatus.NOT_ACCEPTABLE, e.getMessage()) );
     }
 
     @ExceptionHandler(EntityNotFoundException.class)
@@ -39,12 +42,13 @@ public class AppExceptionHandler extends ResponseEntityExceptionHandler {
 
     //Building responses
     private boolean isXMLRequest(HttpServletRequest request) {
-        return request.getHeader("X-Requested-With").equals("XMLHttpRequest");
+        String requestedWith = request.getHeader("X-Requested-With");
+        return requestedWith != null && requestedWith.equals("XMLHttpRequest");
     }
 
     private Object buildResponse(HttpServletRequest request, AppError error) {
         if (isXMLRequest(request)) {
-            return new ResponseEntity<>(error,error.getStatus());
+            return new ResponseEntity<AppError>(error,error.getStatus());
         } else {
             ModelAndView mv = new ModelAndView();
             mv.setStatus(error.getStatus());

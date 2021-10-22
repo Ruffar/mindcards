@@ -61,7 +61,7 @@ public class UserRepository extends EntityRepository<User,Integer> {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        throw new UnauthorisedAccessException();
+        throw new EntityNotFoundException("Cannot find user with matching email or password");
         //return null;
     }
 

@@ -1,5 +1,6 @@
 package com.raffier.mindcards.service;
 
+import com.raffier.mindcards.errorHandling.FormFieldException;
 import com.raffier.mindcards.errorHandling.UnauthorisedAccessException;
 import com.raffier.mindcards.model.login.LoginFormError;
 import com.raffier.mindcards.model.login.LoginSubmission;
@@ -22,8 +23,8 @@ public class UserService {
     }
 
     public User userLogin(String email, String password) {
-        if (isCorrectEmailFormat(email)) throw new UnauthorisedAccessException();
-        if (isCorrectPasswordFormat(password)) throw new UnauthorisedAccessException();
+        if (!isCorrectEmailFormat(email)) throw new FormFieldException("E-Mail must be in the format \"name@mail\"");
+        if (!isCorrectPasswordFormat(password)) throw new FormFieldException("Password must have at least one number, lowercase alphabet, and uppercase alphabet and be at least 8 characters");//throw new FormFieldException("Password must have at least 8 characters and an uppercase, a lowercase letter, and a number");
         return userRepository.getByLogin(email, password);
     }
 
