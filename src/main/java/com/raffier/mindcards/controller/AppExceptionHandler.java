@@ -16,46 +16,44 @@ import javax.servlet.http.HttpServletRequest;
 @ControllerAdvice
 public class AppExceptionHandler extends ResponseEntityExceptionHandler {
 
+    //Exceptions
+    @ExceptionHandler(InvalidHyperlinkException.class)
+    private Object handleInvalidHyperlink(InvalidHyperlinkException e, HttpServletRequest request) {
+        return buildResponse(request, new AppError(HttpStatus.NOT_ACCEPTABLE, e.getMessage()));
+    }
+
+    @ExceptionHandler(UnauthorisedAccessException.class)
+    private Object handleUnauthorisedAccess(UnauthorisedAccessException e, HttpServletRequest request) {
+        return buildResponse(request, new AppError(HttpStatus.FORBIDDEN, e.getMessage()) );
+    }
+
+    @ExceptionHandler(EntityNotFoundException.class)
+    private Object handleEntityNotFoundException(EntityNotFoundException e, HttpServletRequest request) {
+        return buildResponse(request, new AppError(HttpStatus.NOT_FOUND, e.getMessage()) );
+    }
+
+    @ExceptionHandler(RuntimeException.class)
+    private Object handleRuntimeException(RuntimeException e, HttpServletRequest request) {
+        return buildResponse(request, new AppError(HttpStatus.BAD_REQUEST, e.getMessage()) );
+    }
+
+    //Building responses
     private boolean isXMLRequest(HttpServletRequest request) {
         return request.getHeader("X-Requested-With").equals("XMLHttpRequest");
     }
 
-    @ExceptionHandler(InvalidHyperlinkException.class)
-    private ModelAndView handleInvalidHyperlink(InvalidHyperlinkException e, HttpServletRequest request) {
+    private Object buildResponse(HttpServletRequest request, AppError error) {
         if (isXMLRequest(request)) {
-
+            return new ResponseEntity<>(error,error.getStatus());
         } else {
-            return errorPage(new AppError(HttpStatus.NOT_ACCEPTABLE, e.getMessage()));
+            ModelAndView mv = new ModelAndView();
+            mv.setStatus(error.getStatus());
+            mv.setViewName("error/generic");
+
+            mv.addObject("error",error);
+
+            return mv;
         }
-    }
-
-    @ExceptionHandler(UnauthorisedAccessException.class)
-    private ModelAndView handleUnauthorisedAccess(UnauthorisedAccessException e) {
-        return errorPage( new AppError(HttpStatus.FORBIDDEN, e.getMessage()) );
-    }
-
-    @ExceptionHandler(EntityNotFoundException.class)
-    private ModelAndView handleEntityNotFoundException(EntityNotFoundException e) {
-        return errorPage( new AppError(HttpStatus.NOT_FOUND, e.getMessage()) );
-    }
-
-    @ExceptionHandler(RuntimeException.class)
-    private ModelAndView handleRuntimeException(RuntimeException e) {
-        return errorPage( new AppError(HttpStatus.BAD_REQUEST, e.getMessage()) );
-    }
-
-    private ModelAndView errorPage(AppError error) {
-        ModelAndView mv = new ModelAndView();
-        mv.setStatus(error.getStatus());
-        mv.setViewName("error/generic");
-
-        mv.addObject("error",error);
-
-        return mv;
-    }
-
-    private ResponseEntity<?> buildResponseEntity(AppError error) {
-        return new ResponseEntity<>(error,error.getStatus());
     }
 
 }

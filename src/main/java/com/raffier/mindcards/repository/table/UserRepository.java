@@ -1,6 +1,7 @@
 package com.raffier.mindcards.repository.table;
 
 import com.raffier.mindcards.errorHandling.EntityNotFoundException;
+import com.raffier.mindcards.errorHandling.UnauthorisedAccessException;
 import com.raffier.mindcards.model.table.User;
 import com.raffier.mindcards.repository.AppDatabase;
 
@@ -60,8 +61,8 @@ public class UserRepository extends EntityRepository<User,Integer> {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-
-        return null;
+        throw new UnauthorisedAccessException();
+        //return null;
     }
 
     public <S extends User> User add(S entity) {

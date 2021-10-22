@@ -1,5 +1,6 @@
 package com.raffier.mindcards.controller;
 
+import com.raffier.mindcards.errorHandling.UnauthorisedAccessException;
 import com.raffier.mindcards.model.login.LoginSubmission;
 import com.raffier.mindcards.model.table.User;
 import com.raffier.mindcards.service.UserService;
@@ -34,18 +35,16 @@ public class UserController {
     }
 
     @PostMapping(value="login")
-    public ModelAndView loginSubmit(@ModelAttribute("submission") LoginSubmission submission, @RequestParam(name="return",defaultValue="") String returnUrl, HttpSession session, HttpServletRequest request, BindingResult result) {
+    public ModelAndView loginSubmit(@RequestParam String email, @RequestParam String password, @RequestParam(name="return",defaultValue="") String returnUrl, HttpSession session, HttpServletRequest request, BindingResult result) {
         ModelAndView mv = new ModelAndView("login");
 
-        User user = userService.userLogin(submission);
+        User user = userService.userLogin(email, password);
         if (user != null) {
             session.setAttribute("user", user);
             return new ModelAndView("redirect:"+returnUrl);
         }
-        else {
-            mv.addObject("loginError",userService.getLoginError(submission));
-            return mv;
-        }
+
+        throw new UnauthorisedAccessException();
 
     }
 
