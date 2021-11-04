@@ -1,27 +1,29 @@
-package com.raffier.mindcards.errorHandling;
+package com.raffier.mindcards.model;
 
 import org.springframework.http.HttpStatus;
 
-public class AppError {
+import java.io.Serializable;
+
+public class AppResponse implements Serializable {
 
     private final HttpStatus status;
     private String message;
 
-    public AppError(HttpStatus status) {
+    public AppResponse(HttpStatus status) {
         this.status = status;
     }
 
-    public AppError(HttpStatus status, String message) {
+    public AppResponse(HttpStatus status, String message) {
         this(status);
         this.message = message;
     }
 
-    public AppError(HttpStatus status, Throwable e) {
+    public AppResponse(HttpStatus status, Throwable e) {
         this(status);
         this.message = "Unexpected Error...";
     }
 
-    public AppError(HttpStatus status, Throwable e, String message) {
+    public AppResponse(HttpStatus status, Throwable e, String message) {
         this(status, message);
     }
 

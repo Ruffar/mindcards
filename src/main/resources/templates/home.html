@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org/">
 <head>
-    <link rel="stylesheet" th:href="@{/css/navbar.css}"/>
+    <link rel="stylesheet" th:href="@{/css/main.css}"/>
 
     <style>
         body {
@@ -17,7 +17,9 @@
 
     <th:block th:insert="~{fragments/pageLayout :: navbar('home')}"></th:block>
 
-    <p> Home </p>
+    <div class="maincontainer">
+        <p> Home </p>
+    </div>
 
 </body>
 </html>

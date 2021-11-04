@@ -1,11 +1,10 @@
 package com.raffier.mindcards.controller;
 
+import com.raffier.mindcards.errorHandling.InvalidCardTypeException;
 import com.raffier.mindcards.errorHandling.UnauthorisedAccessException;
 import com.raffier.mindcards.model.card.CardElement;
-import com.raffier.mindcards.model.card.CardImagePair;
 import com.raffier.mindcards.model.table.*;
-import com.raffier.mindcards.service.CardModelService;
-import com.raffier.mindcards.service.CardService;
+import com.raffier.mindcards.service.CardUpdateService;
 import com.raffier.mindcards.service.CardType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -13,10 +12,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpSession;
-import java.util.ArrayList;
 import java.util.List;
 
 @Controller
@@ -24,41 +23,51 @@ import java.util.List;
 public class CardController {
 
     @Autowired
-    CardService cardService;
-    @Autowired
-    CardModelService cardModelService;
+    CardUpdateService cardUpdateService;
 
-    /*@GetMapping(value="pack/{packId}")
-    public ModelAndView packView(@PathVariable int packId, HttpSession session) {
+    @GetMapping(value="deck/{deckId}")
+    public ModelAndView deckView(@ModelAttribute("user") User user, @PathVariable int deckId, ModelAndView mv) {
+        mv.setViewName("cards/deck");
 
-        ModelAndView mv = ControllerUtil.getGenericMV(session);
+        CardElement<Deck> deck = cardUpdateService.getDeckElement( deckId );
 
-        CardPack pack = CardPack.getCardPack(AppConfig.getDatabase(), packId);
-        if (pack == null) throw new EntityNotFoundException("Card Pack", packId);
+        boolean isOwner = cardUpdateService.isUserCardOwner(CardType.DECK,user,deckId);
+        mv.addObject("isOwner",isOwner);
 
-        //List<Infocard> infocards = card.getInfocards();
+        mv.addObject("deck",deck);
 
-        mv.addObject("pack",pack);
-        //mv.addObject("infocards",infocards);
-
-        mv.setViewName("cards/pack");
         return mv;
-    }*/
+    }
+
+    @GetMapping(value="group/{cardGroupId}")
+    public ModelAndView groupView(@ModelAttribute("user") User user, @PathVariable int cardGroupId, ModelAndView mv) {
+        mv.setViewName("cards/group");
+
+        CardElement<CardGroup> group = cardUpdateService.getCardGroupElement(cardGroupId);
+
+        CardElement<Deck> deck = cardUpdateService.getDeckElement( group.getCard().getDeckId() );
+
+        boolean isOwner = cardUpdateService.isUserCardOwner(CardType.CARDGROUP,user,cardGroupId);
+        mv.addObject("isOwner",isOwner);
+
+        mv.addObject("deck",deck);
+        mv.addObject("group",group);
+
+        return mv;
+    }
 
     @GetMapping(value="mindcard/{mindcardId}")
     public ModelAndView mindcardView(@ModelAttribute("user") User user, @PathVariable int mindcardId, ModelAndView mv) {
         mv.setViewName("cards/mindcard");
 
-        CardElement<Mindcard> mindcard = cardModelService.getCardElement(cardService.getMindcardImagePair(mindcardId));
-        List<CardImagePair<Infocard>> infoPairList = cardService.getInfocardsFromMindcard(mindcardId);
-        List<CardElement<Infocard>> infoList = new ArrayList<>();
-        for (CardImagePair<Infocard> pair : infoPairList) {
-            infoList.add(cardModelService.getCardElement(pair));
-        }
+        CardElement<Mindcard> mindcard = cardUpdateService.getMindcardElement(mindcardId);
+        List<CardElement<Infocard>> infoList = cardUpdateService.getInfocardsFromMindcard(mindcardId);
+        CardElement<Deck> deck = cardUpdateService.getDeckElement( mindcard.getCard().getDeckId() );
 
-        boolean isOwner = cardService.isUserCardOwner(CardType.MINDCARD,user,mindcardId);
+        boolean isOwner = cardUpdateService.isUserCardOwner(CardType.MINDCARD,user,mindcardId);
         mv.addObject("isOwner",isOwner);
 
+        mv.addObject("deck",deck);
         mv.addObject("mindcard",mindcard);
         mv.addObject("infocards",infoList);
 
@@ -66,95 +75,131 @@ public class CardController {
     }
 
     @PostMapping("saveCard")
-    public String saveCard(@ModelAttribute User user, @RequestParam(defaultValue="false") boolean isMain, @RequestParam String cardType, @RequestParam int cardId, @RequestParam int imageId, @RequestParam(defaultValue = "") String title, @RequestParam String description, Model model) {
+    public ResponseEntity<CardElement<?>> saveCard(@ModelAttribute User user, @RequestParam String cardType, @RequestParam int cardId, @RequestParam MultipartFile image, @RequestParam(defaultValue = "") String title, @RequestParam String description, Model model) {
 
-        CardElement<?> cardElement = new CardElement<>();
         CardType cardTypeEnum = CardType.getCardTypeFromString(cardType);
-        boolean isOwner = cardService.isUserCardOwner(cardTypeEnum, user, cardId);
+        boolean isOwner = cardUpdateService.isUserCardOwner(cardTypeEnum, user, cardId);
 
-        if (isOwner && cardModelService.isDescriptionValid(description)) {
+        CardElement<?> cardElement;
+        if (isOwner && cardUpdateService.areHyperlinksValid(description)) {
             switch (cardTypeEnum) {
                 case MINDCARD:
-                    cardService.updateMindcard(cardId, title, imageId, description);
+                    cardUpdateService.updateMindcard(cardId, title, image, description);
+                    cardElement = cardUpdateService.getMindcardElement(cardId);
                     break;
                 case INFOCARD:
-                    cardService.updateInfocard(cardId, imageId, description);
+                    cardUpdateService.updateInfocard(cardId, image, description);
+                    cardElement = cardUpdateService.getInfocardElement(cardId);
                     break;
+                default:
+                    throw new InvalidCardTypeException(cardTypeEnum);
             }
         } else {
             throw new UnauthorisedAccessException();
         }
 
-        return getCardElement(user, isMain, cardType, cardId, model);
+        return new ResponseEntity<>(cardElement, HttpStatus.ACCEPTED);
     }
 
-    @GetMapping("getCardElement")
-    public String getCardElement(@ModelAttribute User user, @RequestParam(defaultValue="false") boolean isMain, @RequestParam String cardType, @RequestParam int cardId, Model model) {
+    @PostMapping("deleteCard")
+    public ResponseEntity<?> deleteCard(@ModelAttribute User user, @RequestParam String cardType, @RequestParam int cardId, Model model) {
 
-        CardElement<?> cardElement = new CardElement<>();
         CardType cardTypeEnum = CardType.getCardTypeFromString(cardType);
-        boolean isOwner = cardService.isUserCardOwner(cardTypeEnum, user, cardId);
+        boolean isOwner = cardUpdateService.isUserCardOwner(cardTypeEnum, user, cardId);
 
-        switch(cardTypeEnum) {
-            case MINDCARD:
-                cardElement = cardModelService.getCardElement(cardService.getMindcardImagePair(cardId));
-                break;
-            case INFOCARD:
-                cardElement = cardModelService.getCardElement(cardService.getInfocardImagePair(cardId));
-                break;
-        }
-
-        model.addAttribute("isMain",isMain);
-        model.addAttribute("isOwner",isOwner);
-        model.addAttribute("cardElement",cardElement);
-        model.addAttribute("cardType",cardType);
-
-        return "fragments/card :: card(isMain=${isMain},isOwner=${isOwner},cardElement=${cardElement},cardType=${cardType})";
-    }
-
-    @GetMapping("getCardEditor")
-    public String getCardEditor(@ModelAttribute User user, @RequestParam(defaultValue="false") boolean isMain, @RequestParam String cardType, @RequestParam int cardId, @RequestParam int imageId, @RequestParam(defaultValue = "") String title, @RequestParam String description, Model model) {
-
-        CardElement<?> cardElement = new CardElement<>();
-        CardType cardTypeEnum = CardType.getCardTypeFromString(cardType);
-        if (!cardService.isUserCardOwner(cardTypeEnum, user, cardId)) {
+        if (isOwner) {
+            switch (cardTypeEnum) {
+                case MINDCARD:
+                    cardUpdateService.deleteMindcard(cardId);
+                    break;
+                case INFOCARD:
+                    cardUpdateService.deleteInfocard(cardId);
+                    break;
+                case CARDGROUP:
+                    cardUpdateService.deleteCardGroup(cardId);
+                    break;
+                case DECK:
+                    cardUpdateService.deleteDeck(cardId);
+                    break;
+                default:
+                    throw new InvalidCardTypeException(cardTypeEnum);
+            }
+        } else {
             throw new UnauthorisedAccessException();
         }
 
-        switch(CardType.getCardTypeFromString(cardType)) {
-            case MINDCARD:
-                cardElement = cardModelService.getCardElement(cardService.getMindcardImagePair(cardId));
-                break;
-            case INFOCARD:
-                cardElement = cardModelService.getCardElement(cardService.getInfocardImagePair(cardId));
-                break;
-        }
-
-        model.addAttribute("isMain",isMain);
-        model.addAttribute("cardElement",cardElement);
-        model.addAttribute("cardType",cardType);
-
-        //System.out.println(cardElement.getImage().getImagePath());
-
-        return "fragments/card :: cardEditor(isMain=${isMain},cardElement=${cardElement},cardType=${cardType})";
+        return ResponseEntity.ok(null);
     }
 
-    /*@GetMapping(value="pack/{packId}/group/{cardGroupId}")
-    public ModelAndView groupView(@PathVariable int packId, @PathVariable int cardGroupId, HttpSession session) {
+    @PostMapping("addCard")
+    public ResponseEntity<CardElement<?>> addCard(@ModelAttribute User user, @RequestParam String cardType, @RequestParam int parentCardId, @RequestParam MultipartFile image, @RequestParam(defaultValue = "") String title, @RequestParam String description, Model model) {
 
-        ModelAndView mv = ControllerUtil.getGenericMV(session);
+        CardType cardTypeEnum = CardType.getCardTypeFromString(cardType);
+        boolean isOwner;
+        if (cardTypeEnum == CardType.DECK) {
+            isOwner = true;
+        } else {
+            CardType parentType = cardTypeEnum.getParentType();
+            isOwner = cardUpdateService.isUserCardOwner(parentType, user, parentCardId);
+        }
 
-        CardGroup group = CardGroup.getCardGroup(AppConfig.getDatabase(), cardGroupId);
-        if (group == null) throw new EntityNotFoundException("Card Group", cardGroupId);
+        CardElement<?> cardElement;
+        if (isOwner && cardUpdateService.areHyperlinksValid(description)) {
+            switch (cardTypeEnum) {
+                case MINDCARD:
+                    cardElement = cardUpdateService.getMindcardElement(
+                            cardUpdateService.addMindcard(parentCardId, title, image, description).getPrimaryKey()
+                    );
+                    break;
+                case INFOCARD:
+                    cardElement = cardUpdateService.getInfocardElement(
+                            cardUpdateService.addInfocard(parentCardId, image, description).getPrimaryKey()
+                    );
+                    break;
+                case CARDGROUP:
+                    cardElement = cardUpdateService.getCardGroupElement(
+                            cardUpdateService.addCardGroup(parentCardId, title, image, description).getPrimaryKey()
+                    );
+                    break;
+                case DECK:
+                    cardElement = cardUpdateService.getDeckElement(
+                            cardUpdateService.addDeck(user.getUserId(), title, image, description).getPrimaryKey()
+                    );
+                    break;
+                default:
+                    throw new InvalidCardTypeException(cardTypeEnum);
+            }
+        } else {
+            throw new UnauthorisedAccessException();
+        }
 
-        //List<Mindcard> mindcards = group.getCard();
+        return new ResponseEntity<>(cardElement, HttpStatus.ACCEPTED);
+    }
 
-        mv.addObject("group",group);
-        //mv.addObject("infocards",infocards);
+    @GetMapping("getCardElement")
+    public String getCardElement(@ModelAttribute User user, @RequestParam String cardType, @RequestParam int cardId, Model model) {
 
-        mv.setViewName("cards/group");
-        return mv;
-    }*/
+        CardType cardTypeEnum = CardType.getCardTypeFromString(cardType);
+        boolean isOwner = cardUpdateService.isUserCardOwner(cardTypeEnum, user, cardId);
+
+        CardElement<?> cardElement;
+        switch(cardTypeEnum) {
+            case MINDCARD:
+                cardElement = cardUpdateService.getMindcardElement(cardId);
+                break;
+            case INFOCARD:
+                cardElement = cardUpdateService.getInfocardElement(cardId);
+                break;
+            default:
+                throw new InvalidCardTypeException(cardTypeEnum);
+        }
+
+        model.addAttribute("isOwner",isOwner);
+        model.addAttribute("cardElement",cardElement);
+        model.addAttribute("cardType",cardType.toLowerCase());
+
+        return "fragments/card :: card(isOwner=${isOwner},cardElement=${cardElement},cardType=${cardType})";
+    }
 
     @ModelAttribute("user")
     public User getUser(HttpSession session) {

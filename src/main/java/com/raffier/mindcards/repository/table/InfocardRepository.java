@@ -4,6 +4,8 @@ import com.raffier.mindcards.errorHandling.EntityNotFoundException;
 import com.raffier.mindcards.model.table.Image;
 import com.raffier.mindcards.model.table.Infocard;
 import com.raffier.mindcards.repository.AppDatabase;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -11,85 +13,76 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+@Component
 public class InfocardRepository extends EntityRepository<Infocard,Integer> {
 
+    @Autowired
     public InfocardRepository(AppDatabase database) {
         super(database);
     }
 
-    private void throwEntityNotFound(Integer id) { throw new EntityNotFoundException("Infocard", id); }
+    protected void throwEntityNotFound(Integer id) { throw new EntityNotFoundException("Infocard", id); }
 
     public <S extends Infocard> void save(S entity) {
-        try (PreparedStatement statement = database.getConnection().prepareStatement("UPDATE Infocard SET mindcardId=?,imageId=?,description=? WHERE infocardId=?")) {
-            statement.setInt(1, entity.getMindcardId());
-            statement.setInt(2,entity.getImageId());
-            statement.setString(3,entity.getDescription());
-            statement.setInt(4,entity.getInfocardId());
-            statement.executeUpdate();
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        executeUpdate(
+                "UPDATE Infocard SET mindcardId=?,imageId=?,description=? WHERE infocardId=?",
+                (stmnt) -> {
+                    stmnt.setInt(1, entity.getMindcardId());
+                    stmnt.setInt(2, entity.getImageId());
+                    stmnt.setString(3, entity.getDescription());
+                    stmnt.setInt(4, entity.getInfocardId());
+                });
     }
 
     public Infocard getById(Integer id) {
-        try (PreparedStatement stmnt = database.getConnection().prepareStatement("SELECT mindcardId, imageId, description FROM Infocard WHERE infocardId=?")) {
-            stmnt.setInt(1,id);
-            ResultSet results = stmnt.executeQuery();
-            if (results.next()) {
-                return new Infocard(id,results.getInt("mindcardId"),results.getInt("imageId"),results.getString("description"));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        throwEntityNotFound(id);
-        return null;
+        return executeQuery(
+                "SELECT * FROM Infocard WHERE infocardId=?",
+                (stmnt) -> stmnt.setInt(1,id),
+
+                (results) -> {
+                    if (results.next()) {
+                        return new Infocard(id, results.getInt("mindcardId"), results.getInt("imageId"), results.getString("description"));
+                    }
+                    throwEntityNotFound(id);
+                    return null;
+                });
     }
 
     public List<Infocard> getFromMindcard(int mindcardId) {
-        List<Infocard> outList = new ArrayList<>();
-        try {
-            PreparedStatement statement = database.getConnection().prepareStatement("SELECT infocardId, imageId, description FROM Infocard WHERE mindcardId = ?");
-            statement.setInt(1,mindcardId);
-            ResultSet result = statement.executeQuery();
-            while (result.next()) {
-                outList.add(new Infocard(result.getInt("infocardId"),mindcardId,result.getInt("imageId"),result.getString("description")));
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return outList;
+        return executeQuery(
+                "SELECT infocardId, imageId, description FROM Infocard WHERE mindcardId = ?",
+                (stmnt) -> stmnt.setInt(1,mindcardId),
+
+                (results) -> {
+                    List<Infocard> outList = new ArrayList<>();
+                    while (results.next()) {
+                        outList.add(new Infocard(results.getInt("infocardId"), mindcardId, results.getInt("imageId"), results.getString("description")));
+                    }
+                    return outList;
+                });
     }
 
     public <S extends Infocard> Infocard add(S entity) {
-        try (PreparedStatement stmnt = database.getConnection().prepareStatement("INSERT INTO Infocard (mindcardId, imageId, description) VALUES (?,?,?)")) {
-            stmnt.setInt(1,entity.getMindcardId());
-            stmnt.setInt(2,entity.getImageId());
-            stmnt.setString(3,entity.getDescription());
-            stmnt.executeUpdate();
-            ResultSet generatedIds = stmnt.getGeneratedKeys();
-            if (generatedIds.next()) {
-                int newId = generatedIds.getInt(1);
-                System.out.println("Infocard with ID "+newId+" successfully created.");
-                return getById(newId);
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        return null;
+        int newId = executeUpdate(
+                "INSERT INTO Infocard (mindcardId, imageId, description) VALUES (?,?,?)",
+                (stmnt) -> {
+                    stmnt.setInt(1, entity.getMindcardId());
+                    stmnt.setInt(2, entity.getImageId());
+                    stmnt.setString(3, entity.getDescription());
+                });
+        System.out.println("Infocard with ID "+newId+" successfully created.");
+        return getById(newId);
     }
 
     public <S extends Infocard> void delete(S entity) {
-        deleteById(entity.getMindcardId());
+        deleteById(entity.getInfocardId());
     }
 
     public void deleteById(Integer id) {
-        try (PreparedStatement stmnt = database.getConnection().prepareStatement("DELETE FROM Infocard WHERE infocardId=?")) {
-            stmnt.setInt(1,id);
-            stmnt.executeUpdate();
-            System.out.println("Infocard with ID "+id+" successfully deleted.");
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
+        executeUpdate(
+                "DELETE FROM Infocard WHERE infocardId=?",
+                (stmnt) -> stmnt.setInt(1,id));
+        System.out.println("Infocard with ID "+id+" successfully deleted.");
     }
 
 }

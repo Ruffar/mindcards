@@ -1,29 +1,40 @@
 package com.raffier.mindcards.repository;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ResourceLoader;
+import org.springframework.stereotype.Component;
+
+import java.io.IOException;
 import java.sql.*;
 
+@Component
 public class AppDatabase {
 
-    private static final String dbFolderUrl = "jdbc:sqlite:src/main/resources/db/";
-
-    private final String dbPath;
+    private String dbPath;
     private final Connection genericConnection;
 
-    public AppDatabase(String dbName) {
+    @Autowired
+    public AppDatabase(ResourceLoader resourceLoader, @Value("${databasename}") String databaseName) {
 
-        this.dbPath = dbFolderUrl + dbName + ".db";
+        try {
+            this.dbPath = "jdbc:sqlite:"+resourceLoader.getResource("classpath:/db/").getURI().getPath() + databaseName + ".db";
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
         this.genericConnection = getConnection();
 
         createMindcardTable();
         createInfocardTable();
         createCardGroupTable();
         createGroupCardTable();
-        createCardPackTable();
+        createDeckTable();
         createImageTable();
         createTagTable();
-        createPackTagTable();
+        createDeckTagTable();
         createUserTable();
         createUserCardStatsTable();
+        createFavouriteTable();
     }
 
     public Connection getConnection() {
@@ -52,11 +63,11 @@ public class AppDatabase {
         try (Statement statement = genericConnection.createStatement()) {
             statement.executeUpdate("CREATE TABLE IF NOT EXISTS Mindcard" +
                     "(mindcardId INTEGER PRIMARY KEY AUTOINCREMENT," +
-                    "packId INTEGER NOT NULL," +
+                    "deckId INTEGER NOT NULL," +
                     "title TEXT," +
                     "imageId INTEGER," +
                     "description TEXT," +
-                    "FOREIGN KEY (packId) references CardPack(packId)," +
+                    "FOREIGN KEY (deckId) references Deck(deckId)," +
                     "FOREIGN KEY (imageId) references Image(imageId) )");
             statement.executeUpdate("INSERT OR REPLACE INTO Mindcard VALUES (0,0,'DeletedCard',0,'Card does not exist anymore.')");
         } catch (SQLException e) {
@@ -83,11 +94,11 @@ public class AppDatabase {
         try (Statement statement = genericConnection.createStatement()) {
             statement.executeUpdate("CREATE TABLE IF NOT EXISTS CardGroup" +
                     "(cardGroupId INTEGER PRIMARY KEY AUTOINCREMENT," +
-                    "packId INTEGER NOT NULL," +
+                    "deckId INTEGER NOT NULL," +
                     "title TEXT," +
                     "imageId INTEGER," +
                     "description TEXT," +
-                    "FOREIGN KEY (packId) references CardPack(packId)," +
+                    "FOREIGN KEY (deckId) references Deck(deckId)," +
                     "FOREIGN KEY (imageId) references Image(imageId) )");
             statement.executeUpdate("INSERT OR REPLACE INTO CardGroup VALUES (0,0,'DeletedGroup',0,'Group does not exist anymore.')");
         } catch (SQLException e) {
@@ -108,21 +119,23 @@ public class AppDatabase {
         }
         System.out.println("Group Card Table created successfully!");
     }
-    private void createCardPackTable() {
+    private void createDeckTable() {
         try (Statement statement = genericConnection.createStatement()) {
-            statement.executeUpdate("CREATE TABLE IF NOT EXISTS CardPack" +
-                    "(packId INTEGER PRIMARY KEY AUTOINCREMENT," +
+            statement.executeUpdate("CREATE TABLE IF NOT EXISTS Deck" +
+                    "(deckId INTEGER PRIMARY KEY AUTOINCREMENT," +
                     "ownerId INTEGER," +
                     "title TEXT," +
                     "imageId INTEGER," +
                     "description TEXT," +
+                    "isPrivate INTEGER Default 0," +
+                    "timeCreated REAL," +
                     "FOREIGN KEY (ownerId) references User(userId)," +
                     "FOREIGN KEY (imageId) references Image(imageId) )");
-            statement.executeUpdate("INSERT OR REPLACE INTO CardPack VALUES (0,'DeletedPack',0,'Pack does not exist anymore.',0)");
+            statement.executeUpdate("INSERT OR REPLACE INTO Deck VALUES (0,0,'DeletedDeck',0,'Deck does not exist anymore.',0,0)");
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        System.out.println("Card Pack Table created successfully!");
+        System.out.println("Deck Table created successfully!");
     }
     private void createImageTable() {
         try (Statement statement = genericConnection.createStatement()) {
@@ -147,18 +160,18 @@ public class AppDatabase {
         }
         System.out.println("Tag Table created successfully!");
     }
-    private void createPackTagTable() {
+    private void createDeckTagTable() {
         try (Statement statement = genericConnection.createStatement()) {
-            statement.executeUpdate("CREATE TABLE IF NOT EXISTS PackTag" +
-                    "(packId INTEGER NOT NULL," +
+            statement.executeUpdate("CREATE TABLE IF NOT EXISTS DeckTag" +
+                    "(deckId INTEGER NOT NULL," +
                     "tagId INTEGER NOT NULL," +
-                    "PRIMARY KEY (packId,tagId)," +
-                    "FOREIGN KEY (packId) references CardPack(packId)," +
+                    "PRIMARY KEY (deckId,tagId)," +
+                    "FOREIGN KEY (deckId) references Deck(deckId)," +
                     "FOREIGN KEY (tagId) references Tag(tagId) )");
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        System.out.println("Pack Tag Table created successfully!");
+        System.out.println("Deck Tag Table created successfully!");
     }
     private void createUserTable() {
         try (Statement statement = genericConnection.createStatement()) {
@@ -188,6 +201,19 @@ public class AppDatabase {
             e.printStackTrace();
         }
         System.out.println("User Card Stats Table created successfully!");
+    }
+    private void createFavouriteTable() {
+        try (Statement statement = genericConnection.createStatement()) {
+            statement.executeUpdate("CREATE TABLE IF NOT EXISTS Favourite" +
+                    "(deckId INTEGER NOT NULL," +
+                    "userId INTEGER NOT NULL," +
+                    "PRIMARY KEY (deckId,userId)," +
+                    "FOREIGN KEY (deckId) references Deck(deckId)," +
+                    "FOREIGN KEY (userId) references User(userId) )");
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        System.out.println("Favourite Table created successfully!");
     }
 
     

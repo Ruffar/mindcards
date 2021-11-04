@@ -1,27 +1,30 @@
 package com.raffier.mindcards.model.table;
 
+import com.raffier.mindcards.service.CardType;
+
 public class CardGroup extends TitledCardTable {
 
     //Database columns
-    private int packId;
+    private int deckId;
 
     public CardGroup(int cardGroupId) {
         super("CardGroup", "cardGroupId");
         this.primaryId = cardGroupId;
     }
 
-    public CardGroup(int cardGroupId, int packId, String title, int imageId, String description) {
+    public CardGroup(int cardGroupId, int deckId, String title, int imageId, String description) {
         this(cardGroupId);
-        this.packId = packId;
+        this.deckId = deckId;
         this.title = title;
         this.imageId = imageId;
         this.description = description;
     }
 
     public int getCardGroupId() { return this.primaryId; }
-    public int getPackId() { return this.packId; }
+    public int getDeckId() { return this.deckId; }
+    public CardType getCardType() { return CardType.CARDGROUP; }
 
     public void setCardGroupId(int cardGroupId) { this.primaryId = cardGroupId; }
-    public void setPackId(int packId) { this.packId = packId; }
+    public void setDeckId(int deckId) { this.deckId = deckId; }
 
 }

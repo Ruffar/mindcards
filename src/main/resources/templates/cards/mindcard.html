@@ -2,7 +2,7 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org/">
 <head>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
-    <link rel="stylesheet" th:href="@{/css/cards.css}"/>
+    <link rel="stylesheet" th:href="@{/css/main.css}"/>
 
     <style>
         body {
@@ -16,20 +16,29 @@
 
 <body>
 
-<th:block th:insert="~{fragments/pageLayout :: navbar('')}"></th:block>
+    <th:block th:insert="~{fragments/pageLayout :: navbar('')}"></th:block>
 
-<div th:replace="~{fragments/card :: card(isMain=${true},cardElement=${mindcard},cardType='mindcard')}"></div>
+    <div class="maincontainer">
 
-<hr>
+        <a id="parentButton" th:text="${deck.card.title}" th:href="@{/deck/__${deck.card.getPrimaryKey()}__}">Deck</a>
 
-<div style="text-align: center;">
-    <div class="infocard-grid">
-        <th:block th:each="infocard: ${infocards}">
-            <div th:replace="~{fragments/card :: card(isMain=${false},cardElement=${infocard},cardType='infocard')}" style="flex: 0 0 auto;"></div>
-        </th:block>
+        <div th:replace="~{fragments/card :: card(isMain=${true},cardElement=${mindcard},cardType='mindcard',cardWidth=${774})}"></div>
+
+        <hr>
+
+        <div style="text-align: center;">
+            <div class="infocard-grid">
+                <th:block th:each="infocard: ${infocards}">
+                    <div th:replace="~{fragments/card :: card(isMain=${false},cardElement=${infocard},cardType='infocard',cardWidth=${500})}" style="flex: 0 0 auto;"></div>
+                </th:block>
+                <th:block th:if="${isOwner}">
+                    <div th:replace="~{fragments/card :: cardAdder(parentElement=${mindcard},cardType='infocard',cardWidth=${500})}"></div>
+                </th:block>
+            </div>
+        </div>
     </div>
-</div>
 
-<script th:src="@{/javascript/cardedit.js}" th:inline="javascript"></script>
+    <script th:src="@{/javascript/cardedit.js}"></script>
+    <script th:src="@{/javascript/markdown.js}"></script>
 
 </body>

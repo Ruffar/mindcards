@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org/">
 <head>
-    <link rel="stylesheet" th:href="@{/css/navbar.css}"/>
+    <link rel="stylesheet" th:href="@{/css/main.css}"/>
 
     <style>
         body {
@@ -15,9 +15,11 @@
 
 <body>
 
-<th:block th:insert="~{fragments/pageLayout :: navbar('profile')}"></th:block>
+    <th:block th:insert="~{fragments/pageLayout :: navbar('profile')}"></th:block>
 
-<h3 th:text="${user} ? ${user.username} : 'Username'"> Username </h3>
+    <div class="maincontainer">
+        <h3 th:text="${user} ? ${user.username} : 'Username'"> Username </h3>
+    </div>
 
 </body>
 </html>

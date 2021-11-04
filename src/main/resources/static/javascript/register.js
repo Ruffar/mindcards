@@ -6,10 +6,11 @@ $("form").submit(function(event){
 
   $.ajax({
     type: "POST",
-    url: "/login",
+    url: "/register",
     data: {
-      email: submission[0].value,
-      password: submission[1].value
+      username: submission[0].value,
+      email: submission[1].value,
+      password: submission[2].value
     },
     success: function(response) {
       $(errorLabel).text("");

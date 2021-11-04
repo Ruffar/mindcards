@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org/">
+<head>
+    <link rel="stylesheet" th:href="@{/css/main.css}"/>
+
+    <style>
+        body {
+            background-color: #444;
+        }
+    </style>
+
+    <meta charset="UTF-8">
+    <title>Errorpopp</title>
+</head>
+
+<body>
+
+    <th:block th:insert="~{fragments/pageLayout :: navbar('')}"></th:block>
+
+    <div class="maincontainer">
+        <div th:fragment="error" th:with="status=${status} ?: (${error.status.value()}?:'Error'), message=${message} ?: (${error.message}?:'Error encountered...')" style="align-text: center;">
+            <h1 th:text="${status}">Error</h1>
+            <h3 th:text="${message}">Error encountered...</h3>
+        </div>
+    </div>
+
+</body>

@@ -6,19 +6,30 @@ import com.raffier.mindcards.model.table.TitledCardTable;
 
 import java.io.Serializable;
 
-public class CardElement<T extends CardTable> extends CardImagePair<T> implements Serializable {
+public class CardElement<T extends CardTable> implements Serializable {
 
-    private String unescapedDesc;
+    private final T card;
+    private final Image image;
 
-    public CardElement() {}
-
-    public CardElement(T cardObject, Image image, String unescapedDesc) {
-        super(cardObject, image);
-        this.unescapedDesc = unescapedDesc;
+    public CardElement(T card, Image image) {
+        this.card = card;
+        this.image = image;
     }
 
-    public String getUnescapedDesc() { return this.unescapedDesc; }
+    public T getCard() { return card; }
+    public Image getImage() { return image; }
 
-    public void setUnescapedDesc(String unescapedDesc) { this.unescapedDesc = unescapedDesc; }
+    public boolean hasTitle() { return card instanceof TitledCardTable; }
+
+    public String getDescription() { return card.getDescription(); }
+
+    public String getTitle() {
+        if (card instanceof TitledCardTable) {
+            return ((TitledCardTable) card).getTitle();
+        }
+        return null;
+    }
+
+    public String getImagePath() { return image != null ? image.getImagePath() : ""; }
 
 }

@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org/">
+<head>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+  <link rel="stylesheet" th:href="@{/css/main.css}"/>
+
+  <style>
+        body {
+            background-color: #444;
+        }
+    </style>
+
+  <meta charset="UTF-8">
+  <title>Mindcards Register</title>
+</head>
+
+<body>
+
+  <th:block th:insert="~{fragments/pageLayout :: navbar('login')}"></th:block>
+
+  <div class="maincontainer" align="center">
+    <h1>User Register</h1>
+    <form th:action="@{/login(return=${param.return ?: ''})}" method="post">
+
+      <label>Username:</label>
+      <input type="text" id="username" name="username" /><br/>
+
+      <label>E-mail:</label>
+      <input type="text" id="email" name="email" /><br/>
+
+      <label>Password:</label>
+      <input type="password" id="password" name="password" /><br/>
+
+      <label id="errorLabel" style="color: #f77"></label><br/>
+
+      <button type="submit">Register</button>
+    </form>
+  </div>
+
+  <script th:src="@{/javascript/register.js}" th:inline="javascript"></script>
+
+</body>
+</html>

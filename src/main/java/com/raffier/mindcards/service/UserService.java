@@ -13,19 +13,25 @@ import org.springframework.stereotype.Service;
 @Service
 public class UserService {
 
-    private AppDatabase appDatabase;
-
-    private final UserRepository userRepository;
-
     @Autowired
-    public UserService(AppDatabase appDatabase) {
-        userRepository = new UserRepository(appDatabase);
-    }
+    private UserRepository userRepository;
 
     public User userLogin(String email, String password) {
         if (!isCorrectEmailFormat(email)) throw new FormFieldException("E-Mail must be in the format \"name@mail\"");
         if (!isCorrectPasswordFormat(password)) throw new FormFieldException("Password must have at least one number, lowercase alphabet, and uppercase alphabet and be at least 8 characters");//throw new FormFieldException("Password must have at least 8 characters and an uppercase, a lowercase letter, and a number");
         return userRepository.getByLogin(email, password);
+    }
+
+    public User userRegister(String username, String email, String password) {
+        if (!isValidUsername(username)) throw new FormFieldException("Username must have at least 3 characters");
+        if (!isCorrectEmailFormat(email)) throw new FormFieldException("E-Mail must be in the format \"name@mail\"");
+        if (!isCorrectPasswordFormat(password)) throw new FormFieldException("Password must have at least one number, lowercase alphabet, and uppercase alphabet and be at least 8 characters");//throw new FormFieldException("Password must have at least 8 characters and an uppercase, a lowercase letter, and a number");
+        User newUser = new User(0,username,password,email,false); //User id does not matter as adding the entity will put it to a free id
+        return userRepository.add(newUser);
+    }
+
+    private boolean isValidUsername(String username) {
+        return username.matches("^.{3,}$");
     }
 
     private boolean isCorrectEmailFormat(String email) {
