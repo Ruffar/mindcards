@@ -2,10 +2,8 @@ package com.raffier.mindcards.service;
 
 import com.raffier.mindcards.errorHandling.EntityNotFoundException;
 import com.raffier.mindcards.model.card.CardElement;
-import com.raffier.mindcards.model.table.CardTable;
-import com.raffier.mindcards.model.table.Image;
-import com.raffier.mindcards.repository.table.EntityRepository;
-import com.raffier.mindcards.repository.table.ImageRepository;
+import com.raffier.mindcards.model.table.*;
+import com.raffier.mindcards.repository.table.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,7 +14,21 @@ import java.util.List;
 public class CardUtilityService {
 
     @Autowired
+    UserRepository userRepository;
+    @Autowired
     ImageRepository imageRepository;
+
+    @Autowired
+    InfocardRepository infocardRepository;
+    @Autowired
+    MindcardRepository mindcardRepository;
+    @Autowired
+    CardGroupRepository cardGroupRepository;
+    @Autowired
+    DeckRepository deckRepository;
+
+    @Autowired
+    FavouriteRepository favouriteRepository;
 
     public <T extends CardTable> Image getCardImage(T card) {
         if (card.getImageId() != null && card.getImageId() != 0) {
@@ -29,19 +41,38 @@ public class CardUtilityService {
         return null;
     }
 
-    public <T extends CardTable, S extends EntityRepository<T,Integer>> CardElement<T> getCardElement(int cardId, S repository) {
-        T card = repository.getById(cardId);
-        Image image = getCardImage(card);
-        return new CardElement<>(card,image);
+    //
+    //Ownership
+    public boolean isUserCardOwner(CardType cardType, User user, int cardId) {
+        switch(cardType) {
+            case INFOCARD:
+                return isUserCardOwner(CardType.MINDCARD,user,infocardRepository.getById(cardId).getMindcardId());
+            case MINDCARD:
+                return isUserCardOwner(CardType.DECK,user,mindcardRepository.getById(cardId).getDeckId());
+            case CARDGROUP:
+                return isUserCardOwner(CardType.DECK,user,cardGroupRepository.getById(cardId).getDeckId());
+            case DECK:
+                if (user == null) return false;
+                return deckRepository.getById(cardId).getOwnerId() == user.getUserId();
+            default:
+                return false;
+        }
     }
 
-    public  <T extends CardTable> List<CardElement<T>> getCardElementList(List<T> list) {
-        List<CardElement<T>> pairList = new ArrayList<>();
-        for (T i: list) {
-            Image image = getCardImage(i);
-            pairList.add(new CardElement<>(i,image));
+    //Existence
+    public <T extends EntityRepository<?,Integer>> boolean cardExists(CardType cardType, int cardId) {
+        switch (cardType) {
+            case INFOCARD:
+                return infocardRepository.getById(cardId) != null;
+            case MINDCARD:
+                return mindcardRepository.getById(cardId) != null;
+            case CARDGROUP:
+                return cardGroupRepository.getById(cardId) != null;
+            case DECK:
+                return deckRepository.getById(cardId) != null;
+            default:
+                return false;
         }
-        return pairList;
     }
 
 }

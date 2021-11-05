@@ -74,5 +74,31 @@
     </div>
 </th:block>
 
+
+
+<th:block th:fragment="browserCard(cardElement,cardType)" th:with="cardWidth=${cardWidth} ?: ${250}">
+    <div class="card" th:classappend="|${cardType}|" th:style="|margin: auto; width: ${cardWidth}px; height: ${cardWidth/2}px;|">
+
+        <div class="card-view">
+            <div class="card-decoration">
+                <div th:hidden="${cardElement.getImagePath() == ''}" class="imgcontainer" th:styleappend="${cardElement.getImagePath() != ''} ? 'background-image: url('+@{${cardElement.getImagePath()}}+')'"></div>
+            </div>
+            <div class="card-text">
+                <h3 th:unless="${cardType} == 'infocard'" class="title" th:text="${cardElement.getTitle()}"><b> MindcardTitle </b></h3>
+                <p hidden class="description" th:text="${cardElement.getDescription()}"> Description </p>
+                <div class="unescapedDesc"></div>
+            </div>
+            <div class="cornerButtons">
+                <div th:if="${cardType} == 'deck'">
+                    <img class="favouriteButton" th:src="${cardElement.isFavourited()} ? @{/images/asset/favourite.png} : @{/images/asset/favouriteEmpty.png}" style="float: left;"/>
+                    <span th:text="${cardElement.getFavourites()}"></span>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</th:block>
+
+
 </body>
 </html>

@@ -84,28 +84,6 @@ public class CardUpdateService {
 
     }
 
-    //Get card with image
-    public CardElement<Infocard> getInfocardElement(int cardId) {
-        return cardUtilityService.getCardElement(cardId,infocardRepository);
-    }
-    public CardElement<Mindcard> getMindcardElement(int cardId) {
-        return cardUtilityService.getCardElement(cardId,mindcardRepository);
-    }
-    public CardElement<CardGroup> getCardGroupElement(int cardId) {
-        return cardUtilityService.getCardElement(cardId,cardGroupRepository);
-    }
-    public CardElement<Deck> getDeckElement(int cardId) {
-        return cardUtilityService.getCardElement(cardId,deckRepository);
-    }
-
-    //Getting multiple cards
-    public List<CardElement<Infocard>> getInfocardsFromMindcard(int mindcardId) {
-        return cardUtilityService.getCardElementList(infocardRepository.getFromMindcard(mindcardId));
-    }
-    public List<CardElement<Mindcard>> getRandomMindcardsFromDeck(int deckId, int amount) {
-        return cardUtilityService.getCardElementList(mindcardRepository.getRandomFromDeck(deckId, amount));
-    }
-
     //Update card main information
     private <T extends CardTable> void updateCard(T card) {
         switch(card.getCardType()) {
@@ -183,55 +161,6 @@ public class CardUpdateService {
         deleteCard(cardId,deckRepository);
     }
 
-    //Ownership
-    public boolean isUserCardOwner(CardType cardType, User user, int cardId) {
-        switch(cardType) {
-            case INFOCARD:
-                return isUserCardOwner(CardType.MINDCARD,user,infocardRepository.getById(cardId).getMindcardId());
-            case MINDCARD:
-                return isUserCardOwner(CardType.DECK,user,mindcardRepository.getById(cardId).getDeckId());
-            case CARDGROUP:
-                return isUserCardOwner(CardType.DECK,user,cardGroupRepository.getById(cardId).getDeckId());
-            case DECK:
-                if (user == null) return false;
-                return deckRepository.getById(cardId).getOwnerId() == user.getUserId();
-            default:
-                return false;
-        }
-    }
-
-    //Exist
-    public boolean infocardExists(int cardId) {
-        return infocardRepository.getById(cardId) != null;
-    }
-
-    public boolean mindcardExists(int cardId) {
-        return mindcardRepository.getById(cardId) != null;
-    }
-
-    public boolean cardGroupExists(int cardId) {
-        return cardGroupRepository.getById(cardId) != null;
-    }
-
-    public boolean deckExists(int cardId) {
-        return deckRepository.getById(cardId) != null;
-    }
-
-    public <T extends EntityRepository<?,Integer>> boolean cardExists(CardType cardType, int cardId) {
-        switch (cardType) {
-            case INFOCARD:
-                return infocardRepository.getById(cardId) != null;
-            case MINDCARD:
-                return mindcardRepository.getById(cardId) != null;
-            case CARDGROUP:
-                return cardGroupRepository.getById(cardId) != null;
-            case DECK:
-                return deckRepository.getById(cardId) != null;
-            default:
-                return false;
-        }
-    }
-
     //Hyperlink is valid
     public boolean areHyperlinksValid(String plainText) {
         Pattern pattern = Pattern.compile("\\[(.+?)]\\((.+?)\\)");
@@ -245,7 +174,7 @@ public class CardUpdateService {
                 CardType cardType = CardType.getCardTypeFromString(cardPathVariables[0]);
                 int cardId = Integer.parseInt(cardPathVariables[1]);
 
-                if (!cardExists(cardType,cardId)) {
+                if (!cardUtilityService.cardExists(cardType,cardId)) {
                     throw new InvalidHyperlinkException(cardPath);
                 }
 

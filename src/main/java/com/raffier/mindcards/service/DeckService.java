@@ -28,12 +28,6 @@ public class DeckService {
     private DeckRepository deckRepository;
 
     //Favourites
-    public int getDeckFavourites(int deckId) {
-        if (deckRepository.getById(deckId) == null) return 0; //Will throw EntityNotFoundException if deck is not found; if not thrown, the function will return 0
-
-        return favouriteRepository.getTotalDeckFavourites(deckId);
-    }
-
     public void addFavourite(int deckId, int userId) {
         favouriteRepository.add(new Favourite(deckId, userId));
     }
