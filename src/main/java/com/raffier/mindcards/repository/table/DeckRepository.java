@@ -114,6 +114,23 @@ public class DeckRepository extends EntityRepository<Deck,Integer> {
                 });
     }
 
+    public List<Deck> getPopular(int amount, int offset) {
+        return executeQuery(
+                "SELECT Deck.*, COUNT(Favourite.deckId) as favCount FROM Deck, Favourite GROUP BY Favourite.deckId ORDER BY favCount DESC LIMIT ? OFFSET ?",
+                (stmnt) -> {
+                    stmnt.setInt(1,amount);
+                    stmnt.setInt(2,offset);
+                },
+
+                (results) -> {
+                    List<Deck> outList = new ArrayList<>();
+                    while (results.next()) {
+                        outList.add( new Deck(results.getInt("deckId"),results.getInt("ownerId"),results.getString("title"),results.getInt("imageId"),results.getString("description"),results.getBoolean("isPrivate"),results.getDate("timeCreated")) );
+                    }
+                    return outList;
+                });
+    }
+
     public List<Deck> getUserDecks(int userId) {
         return executeQuery(
                 "SELECT * FROM Deck WHERE Deck.ownerId = ?",

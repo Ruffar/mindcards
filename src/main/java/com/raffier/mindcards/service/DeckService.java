@@ -42,6 +42,16 @@ public class DeckService {
         favouriteRepository.delete(new Favourite(deckId, userId));
     }
 
+    //Sorting
+    //Pages start at 0
+    public List<CardElement<Deck>> getRandom(int amount) {
+        return cardUtilityService.getCardElementList(deckRepository.getRandom(amount));
+    }
+
+    public List<CardElement<Deck>> getPopular(int amount, int page) {
+        return cardUtilityService.getCardElementList(deckRepository.getPopular(amount,amount*page));
+    }
+
     //Deck Searching
     public List<CardElement<Deck>> searchDeck(String searchString) {
         return cardUtilityService.getCardElementList(deckRepository.search(searchString,10,10));

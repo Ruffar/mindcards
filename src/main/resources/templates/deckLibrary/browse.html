@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org/">
+<head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <link rel="stylesheet" th:href="@{/css/main.css}"/>
+
+    <style>
+        body {
+            background-color: #444;
+        }
+    </style>
+
+    <meta charset="UTF-8">
+    <title th:text="${mindcard.card.title}">Mindcard</title>
+</head>
+
+<body>
+
+    <th:block th:insert="~{fragments/pageLayout :: navbar('')}"></th:block>
+
+    <div class="maincontainer">
+
+        <div style="text-align: center;">
+            <div class="infocard-grid">
+                <th:block th:each="infocard: ${infocards}">
+                    <div th:replace="~{fragments/card :: card(isMain=${false},cardElement=${infocard},cardType='infocard',cardWidth=${500})}" style="flex: 0 0 auto;"></div>
+                </th:block>
+                <th:block th:if="${isOwner}">
+                    <div th:replace="~{fragments/card :: cardAdder(parentElement=${mindcard},cardType='infocard',cardWidth=${500})}"></div>
+                </th:block>
+            </div>
+        </div>
+    </div>
+
+    <script th:src="@{/javascript/cardedit.js}"></script>
+    <script th:src="@{/javascript/markdown.js}"></script>
+
+</body>
