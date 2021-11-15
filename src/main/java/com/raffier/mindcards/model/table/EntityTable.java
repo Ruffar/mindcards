@@ -11,6 +11,6 @@ public abstract class EntityTable<ID> {
     public abstract ID getPrimaryKey();
     public String getTableName() { return this.tableName; }
 
-    public abstract void setPrimaryKey(ID newId);
+    //Primary key should only be set at construction and couldn't be changed
 
 }

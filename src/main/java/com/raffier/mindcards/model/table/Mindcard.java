@@ -24,7 +24,6 @@ public class Mindcard extends TitledCardTable {
     public int getDeckId() { return this.deckId; }
     public CardType getCardType() { return CardType.MINDCARD; }
 
-    public void setMindcardId(int mindcardId) { this.primaryId = mindcardId; }
     public void setDeckId(int packId) { this.deckId = deckId; }
 
 }

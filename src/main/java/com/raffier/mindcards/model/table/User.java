@@ -39,8 +39,6 @@ public class User extends EntityTable<Integer> {
     public String getEmail() { return email; }
     public boolean isDeveloper() { return isDeveloper; }
 
-    public void setPrimaryKey(Integer primaryKey) { setUserId(primaryKey);}
-    public void setUserId(int userId) { this.userId = userId; }
     public void setUsername(String username) { this.username = username; }
     public void setPassword(String password) { this.password = password; }
     public void setEmail(String email) { this.email = email; }

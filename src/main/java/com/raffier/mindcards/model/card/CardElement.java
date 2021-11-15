@@ -12,19 +12,11 @@ public class CardElement<T extends CardTable> implements Serializable {
     private final Image image;
 
     private final boolean isOwned;
-    private final boolean isFavourited;
-    private final int totalFavourites;
 
-    public CardElement(T card, Image image, boolean isOwned, boolean isFavourited, int totalFavourites) {
+    public CardElement(T card, Image image, boolean isOwned) {
         this.card = card;
         this.image = image;
         this.isOwned = isOwned;
-        this.isFavourited = isFavourited;
-        this.totalFavourites = totalFavourites;
-    }
-
-    public CardElement(T card, Image image, boolean isOwned) {
-        this(card,image,isOwned,false,0);
     }
 
     public T getCard() { return card; }
@@ -45,7 +37,5 @@ public class CardElement<T extends CardTable> implements Serializable {
 
 
     public boolean isOwned() { return isOwned; }
-    public boolean isFavourited() { return isFavourited; }
-    public int getTotalFavourites() { return totalFavourites; }
 
 }

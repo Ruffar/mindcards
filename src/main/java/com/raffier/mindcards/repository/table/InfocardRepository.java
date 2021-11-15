@@ -1,8 +1,7 @@
 package com.raffier.mindcards.repository.table;
 
 import com.raffier.mindcards.errorHandling.EntityNotFoundException;
-import com.raffier.mindcards.model.table.Image;
-import com.raffier.mindcards.model.table.Infocard;
+import com.raffier.mindcards.model.table.*;
 import com.raffier.mindcards.repository.AppDatabase;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -14,7 +13,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component
-public class InfocardRepository extends EntityRepository<Infocard,Integer> {
+public class InfocardRepository extends CardRepository<Infocard> {
 
     @Autowired
     public InfocardRepository(AppDatabase database) {
@@ -23,7 +22,8 @@ public class InfocardRepository extends EntityRepository<Infocard,Integer> {
 
     protected void throwEntityNotFound(Integer id) { throw new EntityNotFoundException("Infocard", id); }
 
-    public <S extends Infocard> void save(S entity) {
+    // Updates //
+    public void save(Infocard entity) {
         executeUpdate(
                 "UPDATE Infocard SET mindcardId=?,imageId=?,description=? WHERE infocardId=?",
                 (stmnt) -> {
@@ -34,6 +34,30 @@ public class InfocardRepository extends EntityRepository<Infocard,Integer> {
                 });
     }
 
+    public Infocard add(Infocard entity) {
+        int newId = executeUpdate(
+                "INSERT INTO Infocard (mindcardId, imageId, description) VALUES (?,?,?)",
+                (stmnt) -> {
+                    stmnt.setInt(1, entity.getMindcardId());
+                    stmnt.setInt(2, entity.getImageId());
+                    stmnt.setString(3, entity.getDescription());
+                });
+        System.out.println("Infocard with ID "+newId+" successfully created.");
+        return getById(newId);
+    }
+
+    public void delete(Infocard entity) {
+        deleteById(entity.getInfocardId());
+    }
+
+    public void deleteById(Integer id) {
+        executeUpdate(
+                "DELETE FROM Infocard WHERE infocardId=?",
+                (stmnt) -> stmnt.setInt(1,id));
+        System.out.println("Infocard with ID "+id+" successfully deleted.");
+    }
+
+    // Queries //
     public Infocard getById(Integer id) {
         return executeQuery(
                 "SELECT * FROM Infocard WHERE infocardId=?",
@@ -62,27 +86,15 @@ public class InfocardRepository extends EntityRepository<Infocard,Integer> {
                 });
     }
 
-    public <S extends Infocard> Infocard add(S entity) {
-        int newId = executeUpdate(
-                "INSERT INTO Infocard (mindcardId, imageId, description) VALUES (?,?,?)",
+    public boolean isOwner(User user, int cardId) {
+        return executeQuery(
+                "SELECT Deck.* FROM Deck, Mindcard, Infocard WHERE infocardId=? AND Infocard.mindcardId=Mindcard.mindcardId AND Mindcard.deckId=Deck.deckId AND ownerId=?",
                 (stmnt) -> {
-                    stmnt.setInt(1, entity.getMindcardId());
-                    stmnt.setInt(2, entity.getImageId());
-                    stmnt.setString(3, entity.getDescription());
-                });
-        System.out.println("Infocard with ID "+newId+" successfully created.");
-        return getById(newId);
-    }
-
-    public <S extends Infocard> void delete(S entity) {
-        deleteById(entity.getInfocardId());
-    }
-
-    public void deleteById(Integer id) {
-        executeUpdate(
-                "DELETE FROM Infocard WHERE infocardId=?",
-                (stmnt) -> stmnt.setInt(1,id));
-        System.out.println("Infocard with ID "+id+" successfully deleted.");
+                    stmnt.setInt(1,cardId);
+                    stmnt.setInt(2,user.getUserId());
+                },
+                (ResultSet::next)
+        );
     }
 
 }

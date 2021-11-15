@@ -1,8 +1,10 @@
 package com.raffier.mindcards.controller;
 
 import com.raffier.mindcards.model.card.CardElement;
+import com.raffier.mindcards.model.card.DeckElement;
 import com.raffier.mindcards.model.table.Deck;
 import com.raffier.mindcards.model.table.User;
+import com.raffier.mindcards.service.CardElementService;
 import com.raffier.mindcards.service.DeckService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -20,34 +22,36 @@ public class DeckLibraryController {
 
     @Autowired
     DeckService deckService;
+    @Autowired
+    CardElementService cardElementService;
 
     @GetMapping(value="browse")
-    public ModelAndView browseView(ModelAndView mv) {
+    public ModelAndView browseView(@ModelAttribute User user, ModelAndView mv) {
         mv.setViewName("deckLibrary/browse");
 
-        mv.addObject("decks", deckService.getRandom(12));
+        mv.addObject("decks", cardElementService.getDeckRandom( user, 12 ));
 
         return mv;
     }
 
     @GetMapping(value="browse/search")
-    public ModelAndView searchView(@RequestParam(defaultValue = "") String searchTerm, ModelAndView mv) {
+    public ModelAndView searchView(@ModelAttribute User user, @RequestParam(defaultValue = "") String searchTerm, ModelAndView mv) {
         mv.setViewName("deckLibrary/search");
 
-        mv.addObject("decks", deckService.searchDeck(searchTerm));
+        mv.addObject("decks", cardElementService.searchDeck( user, searchTerm ));
 
         return mv;
     }
 
     //
     @GetMapping(value="getDeckRandom")
-    public ResponseEntity<List<CardElement<Deck>>> getRandom(@RequestParam("amount") int amount) {
-        return new ResponseEntity<>(deckService.getRandom(amount), HttpStatus.OK);
+    public ResponseEntity<List<DeckElement>> getRandom(@ModelAttribute User user, @RequestParam("amount") int amount) {
+        return new ResponseEntity<>(cardElementService.getDeckRandom( user, amount ), HttpStatus.OK);
     }
 
     @GetMapping(value="getDeckPopular")
-    public ResponseEntity<List<CardElement<Deck>>> getRandom(@RequestParam("amount") int amount, @RequestParam(name="page",defaultValue="0") int page) {
-        return new ResponseEntity<>(deckService.getPopular(amount,page), HttpStatus.OK);
+    public ResponseEntity<List<DeckElement>> getPopular (@ModelAttribute User user, @RequestParam("amount") int amount, @RequestParam(name="page",defaultValue="0") int page) {
+        return new ResponseEntity<>(cardElementService.getDeckPopular( user, amount, page ), HttpStatus.OK);
     }
 
     //

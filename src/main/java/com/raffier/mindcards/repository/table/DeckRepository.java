@@ -3,23 +3,17 @@ package com.raffier.mindcards.repository.table;
 import com.raffier.mindcards.errorHandling.EntityNotFoundException;
 import com.raffier.mindcards.model.table.*;
 import com.raffier.mindcards.repository.AppDatabase;
-import com.raffier.mindcards.repository.SQLConsumer;
-import com.raffier.mindcards.repository.SQLFunction;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.sql.Date;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.time.Instant;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
-import java.util.function.Function;
 
 @Component
-public class DeckRepository extends EntityRepository<Deck,Integer> {
+public class DeckRepository extends CardRepository<Deck> {
 
     @Autowired
     public DeckRepository(AppDatabase database) {
@@ -28,7 +22,8 @@ public class DeckRepository extends EntityRepository<Deck,Integer> {
 
     protected void throwEntityNotFound(Integer id) { throw new EntityNotFoundException("Deck", id); }
 
-    public <S extends Deck> void save(S entity) {
+    // Updates //
+    public void save(Deck entity) {
         executeUpdate(
                 "UPDATE Deck SET ownerId=?, title=?, imageId=?, description=?, isPrivate=?, timeCreated=? WHERE deckId=?",
                 (stmnt) -> {
@@ -42,6 +37,33 @@ public class DeckRepository extends EntityRepository<Deck,Integer> {
         });
     }
 
+    public Deck add(Deck entity) {
+        int newId = executeUpdate(
+                "INSERT INTO Deck (ownerId, title, imageId, description, isPrivate, timeCreated) VALUES (?,?,?,?,?,?)",
+                (stmnt) -> {
+                    stmnt.setInt(1,entity.getOwnerId());
+                    stmnt.setString(2,entity.getTitle());
+                    stmnt.setInt(3,entity.getImageId());
+                    stmnt.setString(4,entity.getDescription());
+                    stmnt.setBoolean(5, entity.isPrivate());
+                    stmnt.setDate(6, new Date(Instant.now().getEpochSecond())); //Set the deck's creation time to current time
+                });
+        System.out.println("Deck with ID "+newId+" successfully created.");
+        return getById(newId);
+    }
+
+    public void delete(Deck entity) {
+        deleteById(entity.getDeckId());
+    }
+
+    public void deleteById(Integer id) {
+        executeUpdate(
+                "DELETE FROM Deck WHERE deckId=?",
+                (stmnt) -> stmnt.setInt(1,id));
+        System.out.println("Deck with ID "+id+" successfully deleted.");
+    }
+
+    // Queries //
     public Deck getById(Integer id) {
         return executeQuery(
                 "SELECT * FROM Deck WHERE deckId=?",
@@ -54,6 +76,17 @@ public class DeckRepository extends EntityRepository<Deck,Integer> {
                     throwEntityNotFound(id);
                     return null;
                 });
+    }
+
+    public boolean isOwner(User user, int cardId) {
+        return executeQuery(
+                "SELECT Deck.* FROM Deck WHERE deckId=? AND ownerId=?",
+                (stmnt) -> {
+                    stmnt.setInt(1,cardId);
+                    stmnt.setInt(2,user.getUserId());
+                },
+                (ResultSet::next)
+        );
     }
 
     public List<Deck> search(String searchString, int amount, int offset) {
@@ -100,7 +133,7 @@ public class DeckRepository extends EntityRepository<Deck,Integer> {
 
     public List<Deck> getRandom(int amount) {
         return executeQuery(
-                "SELECT Deck.* FROM Deck ORDER BY RANDOM() LIMIT ?",
+                "SELECT * FROM Deck ORDER BY RANDOM() LIMIT ?",
                 (stmnt) -> {
                     stmnt.setInt(1,amount);
                 },
@@ -116,7 +149,7 @@ public class DeckRepository extends EntityRepository<Deck,Integer> {
 
     public List<Deck> getPopular(int amount, int offset) {
         return executeQuery(
-                "SELECT Deck.*, COUNT(Favourite.deckId) as favCount FROM Deck, Favourite GROUP BY Favourite.deckId ORDER BY favCount DESC LIMIT ? OFFSET ?",
+                "SELECT *, COUNT(Favourite.deckId) as favCount FROM Deck, Favourite GROUP BY Favourite.deckId ORDER BY favCount DESC LIMIT ? OFFSET ?",
                 (stmnt) -> {
                     stmnt.setInt(1,amount);
                     stmnt.setInt(2,offset);
@@ -161,32 +194,6 @@ public class DeckRepository extends EntityRepository<Deck,Integer> {
                     }
                     return outList;
                 });
-    }
-
-    public <S extends Deck> Deck add(S entity) {
-        int newId = executeUpdate(
-                "INSERT INTO Deck (ownerId, title, imageId, description, isPrivate, timeCreated) VALUES (?,?,?,?,?,?)",
-                (stmnt) -> {
-                    stmnt.setInt(1,entity.getOwnerId());
-                    stmnt.setString(2,entity.getTitle());
-                    stmnt.setInt(3,entity.getImageId());
-                    stmnt.setString(4,entity.getDescription());
-                    stmnt.setBoolean(5, entity.isPrivate());
-                    stmnt.setDate(6, new Date(Instant.now().getEpochSecond())); //Set the deck's creation time to current time
-                });
-        System.out.println("Deck with ID "+newId+" successfully created.");
-        return getById(newId);
-    }
-
-    public <S extends Deck> void delete(S entity) {
-        deleteById(entity.getDeckId());
-    }
-
-    public void deleteById(Integer id) {
-        executeUpdate(
-                "DELETE FROM Deck WHERE deckId=?",
-                (stmnt) -> stmnt.setInt(1,id));
-        System.out.println("Deck with ID "+id+" successfully deleted.");
     }
 
     /*public List<Tag> getTags(int deckId) {

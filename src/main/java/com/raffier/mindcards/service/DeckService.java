@@ -1,26 +1,16 @@
 package com.raffier.mindcards.service;
 
-import com.raffier.mindcards.model.card.CardElement;
-import com.raffier.mindcards.model.table.Deck;
 import com.raffier.mindcards.model.table.Favourite;
 import com.raffier.mindcards.repository.table.DeckRepository;
 import com.raffier.mindcards.repository.table.FavouriteRepository;
-import com.raffier.mindcards.repository.table.ImageRepository;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
-import java.time.Instant;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.TreeMap;
 
 @Service
 public class DeckService {
 
     @Autowired
-    CardUtilityService cardUtilityService;
+    private CardUtilityService cardUtilityService;
 
     @Autowired
     private FavouriteRepository favouriteRepository;
@@ -36,19 +26,13 @@ public class DeckService {
         favouriteRepository.delete(new Favourite(deckId, userId));
     }
 
-    //Sorting
-    //Pages start at 0
-    public List<CardElement<Deck>> getRandom(int amount) {
-        return cardUtilityService.getCardElementList(deckRepository.getRandom(amount));
+    public boolean hasUserFavourited(int deckId, int userId) {
+        return favouriteRepository.getById(new Favourite(deckId,userId)) != null;
     }
 
-    public List<CardElement<Deck>> getPopular(int amount, int page) {
-        return cardUtilityService.getCardElementList(deckRepository.getPopular(amount,amount*page));
+    public int getTotalFavourites(int deckId) {
+        return favouriteRepository.getTotalDeckFavourites(deckId);
     }
 
-    //Deck Searching
-    public List<CardElement<Deck>> searchDeck(String searchString) {
-        return cardUtilityService.getCardElementList(deckRepository.search(searchString,10,10));
-    }
 
 }

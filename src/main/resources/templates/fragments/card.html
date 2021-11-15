@@ -7,7 +7,7 @@
 
 <body>
 
-<th:block th:fragment="card(cardElement,cardType)" th:with="cardWidth=${cardWidth} ?: ${500}, isMain=${isMain} ?: ${false}, isOwner=${isOwner} ?: ${false}">
+<th:block th:fragment="card(cardElement,cardType)" th:with="cardWidth=${cardWidth} ?: ${500}, isMain=${isMain} ?: ${false}">
     <div class="card" th:classappend="|${isMain ? 'card-main ' : ''}${cardType}|" th:style="|margin: auto; width: ${cardWidth}px; height: ${cardWidth/2}px;|">
 
         <div class="card-view">
@@ -20,11 +20,11 @@
                 <div class="unescapedDesc"></div>
             </div>
             <div class="cornerButtons">
-                <button th:if="${isOwner}" class="editCardButton">Edit</button>
+                <button th:if="${cardElement.isOwned}" class="editCardButton">Edit</button>
             </div>
         </div>
 
-        <form hidden th:if="${isOwner}" class="card-editor" enctype="multipart/form-data">
+        <form hidden th:if="${cardElement.isOwned}" class="card-editor" enctype="multipart/form-data">
             <input type="hidden" name="cardType" th:value="${cardType}"/>
             <input type="hidden" name="cardId" th:value="${cardElement.getCard().getPrimaryKey()}"/>
             <div class="card-decoration">
@@ -76,9 +76,10 @@
 
 
 
-<th:block th:fragment="browserCard(cardElement,cardType)" th:with="cardWidth=${cardWidth} ?: ${250}">
-    <div class="card" th:classappend="|${cardType}|" th:style="|margin: auto; width: ${cardWidth}px; height: ${cardWidth/2}px;|">
+<th:block th:fragment="browserCard(cardElement,cardType)" th:with="cardWidth=${cardWidth} ?: ${300}">
+    <div class="card browserCard" th:classappend="|${cardType}|" th:style="|margin: auto; width: ${cardWidth}px; height: ${cardWidth/2}px;|">
 
+        <span class="cardLink" hidden th:text="|/${cardType}/${cardElement.getCard().getPrimaryKey()}|"></span>
         <div class="card-view">
             <div class="card-decoration">
                 <div th:hidden="${cardElement.getImagePath() == ''}" class="imgcontainer" th:styleappend="${cardElement.getImagePath() != ''} ? 'background-image: url('+@{${cardElement.getImagePath()}}+')'"></div>
@@ -90,8 +91,8 @@
             </div>
             <div class="cornerButtons">
                 <div th:if="${cardType} == 'deck'">
-                    <img class="favouriteButton" th:src="${cardElement.isFavourited()} ? @{/images/asset/favourite.png} : @{/images/asset/favouriteEmpty.png}" style="float: left;"/>
-                    <span th:text="${cardElement.getFavourites()}"></span>
+                    <img class="favouriteButton" th:src="${cardElement.isFavourited()} ? @{/images/asset/favourite.png} : @{/images/asset/favouriteEmpty.png}" th:style="|float: left; width: ${cardWidth/10}px; height: ${cardWidth/10}px;|"/>
+                    <span th:text="${cardElement.getTotalFavourites()}" style="float: left; color: #fff;"></span>
                 </div>
             </div>
         </div>

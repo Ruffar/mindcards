@@ -30,7 +30,6 @@ public abstract class CardTable extends EntityTable<Integer> {
     public String getDescription() { return this.description; }
     public abstract CardType getCardType();
 
-    public void setPrimaryKey(Integer primaryKey) { this.primaryId = primaryKey; }
     public void setImageId(Integer imageId) { this.imageId = imageId; }
     public void setDescription(String description) { this.description = description; }
 

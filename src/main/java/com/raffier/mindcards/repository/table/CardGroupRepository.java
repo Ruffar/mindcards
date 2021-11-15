@@ -4,6 +4,7 @@ import com.raffier.mindcards.errorHandling.EntityNotFoundException;
 import com.raffier.mindcards.model.table.CardGroup;
 import com.raffier.mindcards.model.table.Image;
 import com.raffier.mindcards.model.table.Mindcard;
+import com.raffier.mindcards.model.table.User;
 import com.raffier.mindcards.repository.AppDatabase;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -15,7 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component
-public class CardGroupRepository extends EntityRepository<CardGroup,Integer> {
+public class CardGroupRepository extends CardRepository<CardGroup> {
 
     @Autowired
     public CardGroupRepository(AppDatabase database) {
@@ -24,7 +25,8 @@ public class CardGroupRepository extends EntityRepository<CardGroup,Integer> {
 
     protected void throwEntityNotFound(Integer id) { throw new EntityNotFoundException("Card Group", id); }
 
-    public <S extends CardGroup> void save(S entity) {
+    // Updates //
+    public void save(CardGroup entity) {
         executeUpdate(
                 "UPDATE CardGroup SET deckId=?, title=?, imageId=?, description=? WHERE cardGroupId=?",
                 (stmnt) -> {
@@ -35,6 +37,31 @@ public class CardGroupRepository extends EntityRepository<CardGroup,Integer> {
                 });
     }
 
+    public CardGroup add(CardGroup entity) {
+        int newId = executeUpdate(
+                "INSERT INTO CardGroup (deckId, title, imageId, description) VALUES (?,?,?,?)",
+                (stmnt) -> {
+                    stmnt.setInt(1, entity.getDeckId());
+                    stmnt.setString(2, entity.getTitle());
+                    stmnt.setInt(3, entity.getImageId());
+                    stmnt.setString(4, entity.getDescription());
+                });
+        System.out.println("Card Group with ID "+newId+" successfully created.");
+        return getById(newId);
+    }
+
+    public void delete(CardGroup entity) {
+        deleteById(entity.getCardGroupId());
+    }
+
+    public void deleteById(Integer id) {
+        executeUpdate(
+                "DELETE FROM CardGroup WHERE cardGroupId=?",
+                (stmnt) -> stmnt.setInt(1, id));
+        System.out.println("Card Group with ID "+id+" successfully deleted.");
+    }
+
+    // Queries //
     public CardGroup getById(Integer id) {
         return executeQuery(
                 "SELECT * FROM CardGroup WHERE cardGroupId=?",
@@ -47,6 +74,17 @@ public class CardGroupRepository extends EntityRepository<CardGroup,Integer> {
                     throwEntityNotFound(id);
                     return null;
                 });
+    }
+
+    public boolean isOwner(User user, int cardId) {
+        return executeQuery(
+                "SELECT Deck.* FROM Deck, CardGroup WHERE cardGroupId=? AND CardGroup.deckId=Deck.deckId AND ownerId=?",
+                (stmnt) -> {
+                    stmnt.setInt(1,cardId);
+                    stmnt.setInt(2,user.getUserId());
+                },
+                (ResultSet::next)
+        );
     }
 
     public List<CardGroup> getRandomFromDeck(int deckId, int amount) {
@@ -65,30 +103,6 @@ public class CardGroupRepository extends EntityRepository<CardGroup,Integer> {
                     }
                     return outList;
                 });
-    }
-
-    public <S extends CardGroup> CardGroup add(S entity) {
-        int newId = executeUpdate(
-                "INSERT INTO CardGroup (deckId, title, imageId, description) VALUES (?,?,?,?)",
-                (stmnt) -> {
-                    stmnt.setInt(1, entity.getDeckId());
-                    stmnt.setString(2, entity.getTitle());
-                    stmnt.setInt(3, entity.getImageId());
-                    stmnt.setString(4, entity.getDescription());
-                });
-        System.out.println("Card Group with ID "+newId+" successfully created.");
-        return getById(newId);
-    }
-
-    public <S extends CardGroup> void delete(S entity) {
-        deleteById(entity.getCardGroupId());
-    }
-
-    public void deleteById(Integer id) {
-        executeUpdate(
-                "DELETE FROM CardGroup WHERE cardGroupId=?",
-                (stmnt) -> stmnt.setInt(1, id));
-        System.out.println("Card Group with ID "+id+" successfully deleted.");
     }
 
 }

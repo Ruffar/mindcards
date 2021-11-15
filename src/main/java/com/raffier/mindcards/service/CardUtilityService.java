@@ -1,6 +1,7 @@
 package com.raffier.mindcards.service;
 
 import com.raffier.mindcards.errorHandling.EntityNotFoundException;
+import com.raffier.mindcards.errorHandling.InvalidCardTypeException;
 import com.raffier.mindcards.model.card.CardElement;
 import com.raffier.mindcards.model.table.*;
 import com.raffier.mindcards.repository.table.*;
@@ -42,36 +43,34 @@ public class CardUtilityService {
     }
 
     //
-    //Ownership
-    public boolean isUserCardOwner(CardType cardType, User user, int cardId) {
-        switch(cardType) {
+    private CardRepository<?> getRepository(CardType cardType) {
+        switch (cardType) {
             case INFOCARD:
-                return isUserCardOwner(CardType.MINDCARD,user,infocardRepository.getById(cardId).getMindcardId());
+                return infocardRepository;
             case MINDCARD:
-                return isUserCardOwner(CardType.DECK,user,mindcardRepository.getById(cardId).getDeckId());
+                return mindcardRepository;
             case CARDGROUP:
-                return isUserCardOwner(CardType.DECK,user,cardGroupRepository.getById(cardId).getDeckId());
+                return cardGroupRepository;
             case DECK:
-                if (user == null) return false;
-                return deckRepository.getById(cardId).getOwnerId() == user.getUserId();
+                return deckRepository;
             default:
-                return false;
+                throw new InvalidCardTypeException(cardType);
         }
     }
 
+    //Ownership
+    public boolean isUserCardOwner(CardType cardType, User user, int cardId) {
+        if (user == null) return false;
+        return getRepository(cardType).isOwner(user,cardId);
+    }
+
     //Existence
-    public <T extends EntityRepository<?,Integer>> boolean cardExists(CardType cardType, int cardId) {
-        switch (cardType) {
-            case INFOCARD:
-                return infocardRepository.getById(cardId) != null;
-            case MINDCARD:
-                return mindcardRepository.getById(cardId) != null;
-            case CARDGROUP:
-                return cardGroupRepository.getById(cardId) != null;
-            case DECK:
-                return deckRepository.getById(cardId) != null;
-            default:
-                return false;
+    public boolean cardExists(CardType cardType, int cardId) {
+        //If a card does not exist, normally an entity not found exception is raised; however, we want to return false in this case
+        try {
+            return getRepository(cardType).getById(cardId) != null;
+        } catch (EntityNotFoundException e) {
+            return false;
         }
     }
 

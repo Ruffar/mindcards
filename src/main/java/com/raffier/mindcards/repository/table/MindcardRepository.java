@@ -4,6 +4,7 @@ import com.raffier.mindcards.errorHandling.EntityNotFoundException;
 import com.raffier.mindcards.model.table.Image;
 import com.raffier.mindcards.model.table.Infocard;
 import com.raffier.mindcards.model.table.Mindcard;
+import com.raffier.mindcards.model.table.User;
 import com.raffier.mindcards.repository.AppDatabase;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -16,7 +17,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Component
-public class MindcardRepository extends EntityRepository<Mindcard,Integer> {
+public class MindcardRepository extends CardRepository<Mindcard> {
 
     @Autowired
     public MindcardRepository(AppDatabase database) {
@@ -25,7 +26,8 @@ public class MindcardRepository extends EntityRepository<Mindcard,Integer> {
 
     protected void throwEntityNotFound(Integer id) { throw new EntityNotFoundException("Mindcard", id); }
 
-    public <S extends Mindcard> void save(S entity) {
+    // Updates //
+    public void save(Mindcard entity) {
         executeUpdate(
                 "UPDATE Mindcard SET deckId=?,title=?,imageId=?,description=? WHERE mindcardId=?",
                 (stmnt) -> {
@@ -37,6 +39,31 @@ public class MindcardRepository extends EntityRepository<Mindcard,Integer> {
                 });
     }
 
+    public Mindcard add(Mindcard entity) {
+        int newId = executeUpdate(
+                "INSERT INTO Mindcard (deckId, title, imageId, description) VALUES (?,?,?,?)",
+                (stmnt) -> {
+                    stmnt.setInt(1, entity.getDeckId());
+                    stmnt.setString(2, entity.getTitle());
+                    stmnt.setInt(3, entity.getImageId());
+                    stmnt.setString(4, entity.getDescription());
+                });
+        System.out.println("Mindcard with ID "+newId+" successfully created.");
+        return getById(newId);
+    }
+
+    public void delete(Mindcard entity) {
+        deleteById(entity.getMindcardId());
+    }
+
+    public void deleteById(Integer id) {
+        executeUpdate(
+                "DELETE FROM Mindcard WHERE mindcardId=?",
+                (stmnt) -> stmnt.setInt(1,id));
+        System.out.println("Mindcard with ID "+id+" successfully deleted.");
+    }
+
+    // Queries //
     public Mindcard getById(Integer id) {
         return executeQuery(
                 "SELECT * FROM Mindcard WHERE mindcardId=?",
@@ -68,28 +95,15 @@ public class MindcardRepository extends EntityRepository<Mindcard,Integer> {
                 });
     }
 
-    public <S extends Mindcard> Mindcard add(S entity) {
-        int newId = executeUpdate(
-                "INSERT INTO Mindcard (deckId, title, imageId, description) VALUES (?,?,?,?)",
+    public boolean isOwner(User user, int cardId) {
+        return executeQuery(
+                "SELECT Deck.* FROM Deck, Mindcard WHERE mindcardId=? AND Mindcard.deckId=Deck.deckId AND ownerId=?",
                 (stmnt) -> {
-                    stmnt.setInt(1, entity.getDeckId());
-                    stmnt.setString(2, entity.getTitle());
-                    stmnt.setInt(3, entity.getImageId());
-                    stmnt.setString(4, entity.getDescription());
-                });
-        System.out.println("Mindcard with ID "+newId+" successfully created.");
-        return getById(newId);
-    }
-
-    public <S extends Mindcard> void delete(S entity) {
-        deleteById(entity.getMindcardId());
-    }
-
-    public void deleteById(Integer id) {
-        executeUpdate(
-                "DELETE FROM Mindcard WHERE mindcardId=?",
-                (stmnt) -> stmnt.setInt(1,id));
-        System.out.println("Mindcard with ID "+id+" successfully deleted.");
+                    stmnt.setInt(1,cardId);
+                    stmnt.setInt(2,user.getUserId());
+                },
+                (ResultSet::next)
+        );
     }
 
 }

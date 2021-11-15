@@ -28,7 +28,4 @@ public class Infocard extends CardTable {
     public int getMindcardId() { return this.mindcardId; }
     public CardType getCardType() { return CardType.INFOCARD; }
 
-    public void setInfocardId(int infocardId) { this.primaryId = infocardId; }
-    public void setMindcardId(int mindcardId) { this.mindcardId = mindcardId; }
-
 }

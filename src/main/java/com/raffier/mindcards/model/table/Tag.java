@@ -24,7 +24,6 @@ public class Tag extends EntityTable<Integer> {
     public int getTagId() { return tagId; }
     public String getTagName() { return tagName; }
 
-    public void setPrimaryKey(Integer primaryKey) { setTagId(primaryKey); }
     public void setTagId(int tagId) { this.tagId = tagId; }
     public void setTagName(String tagName) { this.tagName = tagName; }
 

@@ -20,6 +20,7 @@ public abstract class EntityRepository<T, ID> {
         throw new EntityNotFoundException("Unknown table",id);
     }
 
+    // SQL Utility //
     /*
     Statement consumer should include any changes to the prepared statement's parameters (e.g. statement.setInt(1,323))
     Result function includes anything that should be done to the results of the query
@@ -50,14 +51,17 @@ public abstract class EntityRepository<T, ID> {
         return 0;
     }
 
-    public abstract <S extends T> void save(S entity);
+    // SQL Statements //
+    //Updates
+    public abstract void save(T entity);
 
-    public abstract T getById(ID id);
+    public abstract T add(T entity);
 
-    public abstract <S extends T> T add(S entity);
-
-    public abstract <S extends T> void delete(S entity);
+    public abstract void delete(T entity);
 
     public abstract void deleteById(ID id);
+
+    //Queries
+    public abstract T getById(ID id);
 
 }

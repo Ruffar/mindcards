@@ -31,6 +31,7 @@ public class Deck extends TitledCardTable {
         this.title = title;
         this.imageId = imageId;
         this.description = description;
+        this.isPrivate = isPrivate;
         this.timeCreated = timeCreated;
     }
 
@@ -40,8 +41,6 @@ public class Deck extends TitledCardTable {
     public Date getTimeCreated() { return this.timeCreated; }
     public CardType getCardType() { return CardType.DECK; }
 
-    public void setDeckId(int packId) { this.primaryId = packId; }
-    public void setOwnerId(int ownerId) { this.ownerId = ownerId; }
     public void setPrivate(boolean isPrivate) { this.isPrivate = isPrivate; }
 
 }

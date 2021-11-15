@@ -61,7 +61,7 @@ public class CardUpdateService {
 
         Image image = cardUtilityService.getCardImage(card);
         if (image == null && !file.isEmpty()) {
-            image = imageRepository.add( new Image(0,"","") );
+            image = imageRepository.add( new Image(0,"") );
             card.setImageId(image.getImageId());
             image.setImagePath("/images/card/"+image.getImageId() + ".png");
             imageRepository.save(image);

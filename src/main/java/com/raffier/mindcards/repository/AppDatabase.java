@@ -27,13 +27,10 @@ public class AppDatabase {
         createMindcardTable();
         createInfocardTable();
         createCardGroupTable();
-        createGroupCardTable();
+        createGroupMindcardTable();
         createDeckTable();
         createImageTable();
-        createTagTable();
-        createDeckTagTable();
         createUserTable();
-        createUserCardStatsTable();
         createFavouriteTable();
     }
 
@@ -106,9 +103,9 @@ public class AppDatabase {
         }
         System.out.println("Card Group Table created successfully!");
     }
-    private void createGroupCardTable() {
+    private void createGroupMindcardTable() {
         try (Statement statement = genericConnection.createStatement()) {
-            statement.executeUpdate("CREATE TABLE IF NOT EXISTS GroupCard" +
+            statement.executeUpdate("CREATE TABLE IF NOT EXISTS GroupMindcard" +
                     "(cardGroupId INTEGER NOT NULL," +
                     "mindcardId INTEGER NOT NULL," +
                     "PRIMARY KEY (cardGroupId,mindcardId)," +
@@ -117,7 +114,7 @@ public class AppDatabase {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-        System.out.println("Group Card Table created successfully!");
+        System.out.println("Group Mindcard Table created successfully!");
     }
     private void createDeckTable() {
         try (Statement statement = genericConnection.createStatement()) {
@@ -141,37 +138,12 @@ public class AppDatabase {
         try (Statement statement = genericConnection.createStatement()) {
             statement.executeUpdate("CREATE TABLE IF NOT EXISTS Image" +
                     "(imageId INTEGER PRIMARY KEY AUTOINCREMENT," +
-                    "name TEXT," +
                     "imagePath TEXT )");
-            statement.executeUpdate("INSERT OR REPLACE INTO Image VALUES (0,'DeletedImage','')");
+            statement.executeUpdate("INSERT OR REPLACE INTO Image VALUES (0,'')");
         } catch (SQLException e) {
             e.printStackTrace();
         }
         System.out.println("Image Table created successfully!");
-    }
-    private void createTagTable() {
-        try (Statement statement = genericConnection.createStatement()) {
-            statement.executeUpdate("CREATE TABLE IF NOT EXISTS Tag" +
-                    "(tagId INTEGER PRIMARY KEY AUTOINCREMENT," +
-                    "tagName TEXT )");
-            statement.executeUpdate("INSERT OR REPLACE INTO Tag VALUES (0,'DeletedTag')");
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        System.out.println("Tag Table created successfully!");
-    }
-    private void createDeckTagTable() {
-        try (Statement statement = genericConnection.createStatement()) {
-            statement.executeUpdate("CREATE TABLE IF NOT EXISTS DeckTag" +
-                    "(deckId INTEGER NOT NULL," +
-                    "tagId INTEGER NOT NULL," +
-                    "PRIMARY KEY (deckId,tagId)," +
-                    "FOREIGN KEY (deckId) references Deck(deckId)," +
-                    "FOREIGN KEY (tagId) references Tag(tagId) )");
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        System.out.println("Deck Tag Table created successfully!");
     }
     private void createUserTable() {
         try (Statement statement = genericConnection.createStatement()) {
@@ -187,20 +159,6 @@ public class AppDatabase {
             e.printStackTrace();
         }
         System.out.println("User Table created successfully!");
-    }
-    private void createUserCardStatsTable() {
-        try (Statement statement = genericConnection.createStatement()) {
-            statement.executeUpdate("CREATE TABLE IF NOT EXISTS UserCardStats" +
-                    "(userId INTEGER NOT NULL," +
-                    "mindcardId INTEGER NOT NULL," +
-                    "mastery INTEGER Default 0,"+
-                    "PRIMARY KEY (userId,mindcardId)," +
-                    "FOREIGN KEY (userId) references User(userId)," +
-                    "FOREIGN KEY (mindcardId) references Mindcard(mindcardId) )");
-        } catch (SQLException e) {
-            e.printStackTrace();
-        }
-        System.out.println("User Card Stats Table created successfully!");
     }
     private void createFavouriteTable() {
         try (Statement statement = genericConnection.createStatement()) {
