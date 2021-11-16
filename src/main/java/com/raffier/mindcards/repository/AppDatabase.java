@@ -12,52 +12,49 @@ import java.sql.*;
 public class AppDatabase {
 
     private String dbPath;
-    private final Connection genericConnection;
 
     @Autowired
     public AppDatabase(ResourceLoader resourceLoader, @Value("${databasename}") String databaseName) {
 
+        //Get database file from path
         try {
             this.dbPath = "jdbc:sqlite:"+resourceLoader.getResource("classpath:/db/").getURI().getPath() + databaseName + ".db";
         } catch (IOException e) {
             System.out.println(e.getMessage());
         }
-        this.genericConnection = getConnection();
 
-        createMindcardTable();
-        createInfocardTable();
-        createCardGroupTable();
-        createGroupMindcardTable();
-        createDeckTable();
-        createImageTable();
-        createUserTable();
-        createFavouriteTable();
+        Connection genericConnection = getConnection(); //temporary connection, also creates database if not created
+        createMindcardTable(genericConnection);
+        createInfocardTable(genericConnection);
+        createCardGroupTable(genericConnection);
+        createGroupMindcardTable(genericConnection);
+        createDeckTable(genericConnection);
+        createImageTable(genericConnection);
+        createUserTable(genericConnection);
+        createFavouriteTable(genericConnection);
     }
 
     public Connection getConnection() {
 
-        if (genericConnection == null) {
-            try {
-                Connection connection = DriverManager.getConnection(dbPath);
+        try {
+            Connection connection = DriverManager.getConnection(dbPath);
 
-                if (connection != null) {
-                    System.out.println("Database created successfully!");
-                }
-
-                return connection;
-
-            } catch (SQLException e) {
-                e.printStackTrace();
+            if (connection != null) {
+                System.out.println("Database connection created successfully!");
             }
-        }
 
-        return genericConnection;
+            return connection;
+
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+            return null;
+        }
 
     }
              
     //Create tables
-    private void createMindcardTable() {
-        try (Statement statement = genericConnection.createStatement()) {
+    private void createMindcardTable(Connection connection) {
+        try (Statement statement = connection.createStatement()) {
             statement.executeUpdate("CREATE TABLE IF NOT EXISTS Mindcard" +
                     "(mindcardId INTEGER PRIMARY KEY AUTOINCREMENT," +
                     "deckId INTEGER NOT NULL," +
@@ -72,8 +69,8 @@ public class AppDatabase {
         }
         System.out.println("Mindcard Table created successfully!");
     }
-    private void createInfocardTable() {
-        try (Statement statement = genericConnection.createStatement()) {
+    private void createInfocardTable(Connection connection) {
+        try (Statement statement = connection.createStatement()) {
             statement.executeUpdate("CREATE TABLE IF NOT EXISTS Infocard" +
                     "(infocardId INTEGER PRIMARY KEY AUTOINCREMENT," +
                     "mindcardId INTEGER NOT NULL," +
@@ -87,8 +84,8 @@ public class AppDatabase {
         }
         System.out.println("Infocard Table created successfully!");
     }
-    private void createCardGroupTable() {
-        try (Statement statement = genericConnection.createStatement()) {
+    private void createCardGroupTable(Connection connection) {
+        try (Statement statement = connection.createStatement()) {
             statement.executeUpdate("CREATE TABLE IF NOT EXISTS CardGroup" +
                     "(cardGroupId INTEGER PRIMARY KEY AUTOINCREMENT," +
                     "deckId INTEGER NOT NULL," +
@@ -103,8 +100,8 @@ public class AppDatabase {
         }
         System.out.println("Card Group Table created successfully!");
     }
-    private void createGroupMindcardTable() {
-        try (Statement statement = genericConnection.createStatement()) {
+    private void createGroupMindcardTable(Connection connection) {
+        try (Statement statement = connection.createStatement()) {
             statement.executeUpdate("CREATE TABLE IF NOT EXISTS GroupMindcard" +
                     "(cardGroupId INTEGER NOT NULL," +
                     "mindcardId INTEGER NOT NULL," +
@@ -116,8 +113,8 @@ public class AppDatabase {
         }
         System.out.println("Group Mindcard Table created successfully!");
     }
-    private void createDeckTable() {
-        try (Statement statement = genericConnection.createStatement()) {
+    private void createDeckTable(Connection connection) {
+        try (Statement statement = connection.createStatement()) {
             statement.executeUpdate("CREATE TABLE IF NOT EXISTS Deck" +
                     "(deckId INTEGER PRIMARY KEY AUTOINCREMENT," +
                     "ownerId INTEGER," +
@@ -134,8 +131,8 @@ public class AppDatabase {
         }
         System.out.println("Deck Table created successfully!");
     }
-    private void createImageTable() {
-        try (Statement statement = genericConnection.createStatement()) {
+    private void createImageTable(Connection connection) {
+        try (Statement statement = connection.createStatement()) {
             statement.executeUpdate("CREATE TABLE IF NOT EXISTS Image" +
                     "(imageId INTEGER PRIMARY KEY AUTOINCREMENT," +
                     "imagePath TEXT )");
@@ -145,8 +142,8 @@ public class AppDatabase {
         }
         System.out.println("Image Table created successfully!");
     }
-    private void createUserTable() {
-        try (Statement statement = genericConnection.createStatement()) {
+    private void createUserTable(Connection connection) {
+        try (Statement statement = connection.createStatement()) {
             statement.executeUpdate("CREATE TABLE IF NOT EXISTS User" +
                     "(userId INTEGER PRIMARY KEY AUTOINCREMENT," +
                     "username TEXT," +
@@ -160,8 +157,8 @@ public class AppDatabase {
         }
         System.out.println("User Table created successfully!");
     }
-    private void createFavouriteTable() {
-        try (Statement statement = genericConnection.createStatement()) {
+    private void createFavouriteTable(Connection connection) {
+        try (Statement statement = connection.createStatement()) {
             statement.executeUpdate("CREATE TABLE IF NOT EXISTS Favourite" +
                     "(deckId INTEGER NOT NULL," +
                     "userId INTEGER NOT NULL," +

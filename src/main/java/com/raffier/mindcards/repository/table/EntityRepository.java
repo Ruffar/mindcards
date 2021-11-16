@@ -5,15 +5,16 @@ import com.raffier.mindcards.repository.AppDatabase;
 import com.raffier.mindcards.repository.SQLConsumer;
 import com.raffier.mindcards.repository.SQLFunction;
 
+import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
 public abstract class EntityRepository<T, ID> {
 
-    protected AppDatabase database;
-    public EntityRepository(AppDatabase database) {
-        this.database = database;
+    protected Connection connection;
+    protected EntityRepository(AppDatabase database) {
+        this.connection = database.getConnection();
     }
 
     protected void throwEntityNotFound(ID id) {
@@ -27,7 +28,7 @@ public abstract class EntityRepository<T, ID> {
      */
     protected <S> S executeQuery(String statement, SQLConsumer<PreparedStatement> statementConsumer, SQLFunction<ResultSet,S> resultFunction) {
         try {
-            PreparedStatement stmnt = database.getConnection().prepareStatement(statement);
+            PreparedStatement stmnt = connection.prepareStatement(statement);
             statementConsumer.accept(stmnt);
             return resultFunction.apply(stmnt.executeQuery());
         } catch (SQLException e) {
@@ -38,7 +39,7 @@ public abstract class EntityRepository<T, ID> {
 
     protected int executeUpdate (String statement, SQLConsumer<PreparedStatement> statementConsumer) {
         try {
-            PreparedStatement stmnt = database.getConnection().prepareStatement(statement);
+            PreparedStatement stmnt = connection.prepareStatement(statement);
             statementConsumer.accept(stmnt);
             stmnt.executeUpdate();
             ResultSet generatedIds = stmnt.getGeneratedKeys();
