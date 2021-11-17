@@ -49,10 +49,6 @@ public class UserRepository extends EntityRepository<User,Integer> {
         return getById(newId);
     }
 
-    public void delete(User entity) {
-        deleteById(entity.getUserId());
-    }
-
     public void deleteById(Integer id) {
         executeUpdate(
                 "DELETE FROM User WHERE userId=?",

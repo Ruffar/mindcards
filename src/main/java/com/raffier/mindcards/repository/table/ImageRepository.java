@@ -43,10 +43,6 @@ public class ImageRepository extends EntityRepository<Image, Integer> {
         return getById(newId);
     }
 
-    public void delete(Image entity) {
-        deleteById(entity.getImageId());
-    }
-
     public void deleteById(Integer id) {
         executeUpdate(
                 "DELETE FROM Image WHERE imageId=?",

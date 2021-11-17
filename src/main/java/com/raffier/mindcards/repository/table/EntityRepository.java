@@ -1,6 +1,7 @@
 package com.raffier.mindcards.repository.table;
 
 import com.raffier.mindcards.errorHandling.EntityNotFoundException;
+import com.raffier.mindcards.model.table.EntityTable;
 import com.raffier.mindcards.repository.AppDatabase;
 import com.raffier.mindcards.repository.SQLConsumer;
 import com.raffier.mindcards.repository.SQLFunction;
@@ -10,7 +11,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public abstract class EntityRepository<T, ID> {
+public abstract class EntityRepository<T extends EntityTable<ID>, ID> {
 
     protected Connection connection;
     protected EntityRepository(AppDatabase database) {
@@ -54,15 +55,17 @@ public abstract class EntityRepository<T, ID> {
 
     // SQL Statements //
     //Updates
-    public abstract void save(T entity);
+    public abstract void save(T entity); //Saves the entity
 
-    public abstract T add(T entity);
+    public abstract T add(T entity); //Adds the entity and returns a similar object with its new ID
 
-    public abstract void delete(T entity);
+    public abstract void deleteById(ID id); //Deletes entity with the ID
 
-    public abstract void deleteById(ID id);
+    public void delete(T entity) { //Shortcut for deleting entity by passing in an entity object
+        deleteById(entity.getPrimaryKey());
+    }
 
     //Queries
-    public abstract T getById(ID id);
+    public abstract T getById(ID id); //Returns entity object representing an entity of the ID from the database
 
 }

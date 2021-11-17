@@ -36,6 +36,10 @@ public class CardController {
     public ModelAndView deckView(@ModelAttribute User user, @PathVariable int deckId, ModelAndView mv) {
         mv.setViewName("cards/deck");
 
+        if (!cardUtilityService.canUserAccess(CardType.DECK,user,deckId)) {
+            throw new UnauthorisedAccessException("This Deck is private!");
+        }
+
         DeckElement deck = cardElementService.getDeckElement( user, deckId );
 
         mv.addObject("deck",deck);
@@ -46,6 +50,10 @@ public class CardController {
     @GetMapping(value="group/{cardGroupId}")
     public ModelAndView groupView(@ModelAttribute User user, @PathVariable int cardGroupId, ModelAndView mv) {
         mv.setViewName("cards/group");
+
+        if (!cardUtilityService.canUserAccess(CardType.CARDGROUP,user,cardGroupId)) {
+            throw new UnauthorisedAccessException("This Card Group is private!");
+        }
 
         CardElement<CardGroup> group = cardElementService.getCardGroupElement( user, cardGroupId);
 
@@ -60,6 +68,10 @@ public class CardController {
     @GetMapping(value="mindcard/{mindcardId}")
     public ModelAndView mindcardView(@ModelAttribute User user, @PathVariable int mindcardId, ModelAndView mv) {
         mv.setViewName("cards/mindcard");
+
+        if (!cardUtilityService.canUserAccess(CardType.MINDCARD,user,mindcardId)) {
+            throw new UnauthorisedAccessException("This Mindcard is private!");
+        }
 
         CardElement<Mindcard> mindcard = cardElementService.getMindcardElement( user, mindcardId );
         List<CardElement<Infocard>> infoList = cardElementService.getInfocardsFromMindcard( user, mindcardId );

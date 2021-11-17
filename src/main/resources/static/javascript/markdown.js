@@ -69,11 +69,11 @@ function parseHyperlink(text) {
 }
 
 function parseBulletList(text) {
-    return text.replace(/^-(.+?)$/gm,'<replace>$1</replace>').replace(/(<replace>.*?<\/replace>)/g,'<ul>$1</ul>').replace(/<\/ul>(\s*?)<ul>/g,'').replace(/replace>/g,'li>');
+    return text.replace(/^-(.+?)$/gm,'<ul><li>$1</li></ul>').replace(/<\/ul>(\s*?)<ul>/g,'');
 }
 
 function parseNumberList(text) {
-    return text.replace(/^[0-9]+?\.(.+?)$/gm,'<replace>$1</replace>').replace(/(<replace>.*?<\/replace>)/g,'<ol>$1</ol>').replace(/<\/ol>(\s*?)<ol>/g,'').replace(/replace>/g,'li>');
+    return text.replace(/^[0-9]+?\.(.+?)$/gm,'<ol><li>$1</li></ol>').replace(/<\/ol>(\s*?)<ol>/g,'');
 }
 
 function parseLineBreak(text) {

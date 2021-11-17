@@ -52,10 +52,6 @@ public class DeckRepository extends CardRepository<Deck> {
         return getById(newId);
     }
 
-    public void delete(Deck entity) {
-        deleteById(entity.getDeckId());
-    }
-
     public void deleteById(Integer id) {
         executeUpdate(
                 "DELETE FROM Deck WHERE deckId=?",
@@ -85,6 +81,14 @@ public class DeckRepository extends CardRepository<Deck> {
                     stmnt.setInt(1,cardId);
                     stmnt.setInt(2,user.getUserId());
                 },
+                (ResultSet::next)
+        );
+    }
+
+    public boolean isPrivate(int cardId) {
+        return executeQuery(
+                "SELECT Deck.* FROM Deck WHERE deckId=? AND isPrivate=true",
+                (stmnt) -> stmnt.setInt(1,cardId),
                 (ResultSet::next)
         );
     }

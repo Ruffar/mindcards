@@ -64,6 +64,16 @@ public class CardUtilityService {
         return getRepository(cardType).isOwner(user,cardId);
     }
 
+    //Access
+    public boolean canUserAccess(CardType cardType, User user, int cardId) {
+        CardRepository<?> repository = getRepository(cardType);
+        if ( repository.isPrivate(cardId) && user != null ) { //Check if the card is private, if it is then check if user is owner only if there is a registered user
+            return repository.isOwner(user,cardId);
+        } else {
+            return true;
+        }
+    }
+
     //Existence
     public boolean cardExists(CardType cardType, int cardId) {
         //If a card does not exist, normally an entity not found exception is raised; however, we want to return false in this case

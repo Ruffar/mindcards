@@ -46,10 +46,6 @@ public class InfocardRepository extends CardRepository<Infocard> {
         return getById(newId);
     }
 
-    public void delete(Infocard entity) {
-        deleteById(entity.getInfocardId());
-    }
-
     public void deleteById(Integer id) {
         executeUpdate(
                 "DELETE FROM Infocard WHERE infocardId=?",
@@ -93,6 +89,14 @@ public class InfocardRepository extends CardRepository<Infocard> {
                     stmnt.setInt(1,cardId);
                     stmnt.setInt(2,user.getUserId());
                 },
+                (ResultSet::next)
+        );
+    }
+
+    public boolean isPrivate(int cardId) {
+        return executeQuery(
+                "SELECT Deck.* FROM Deck, Mindcard, Infocard WHERE infocardId=? AND Infocard.mindcardId=Mindcard.mindcardId AND Mindcard.deckId=Deck.deckId AND isPrivate=true",
+                (stmnt) -> stmnt.setInt(1,cardId),
                 (ResultSet::next)
         );
     }

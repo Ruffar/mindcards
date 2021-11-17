@@ -50,10 +50,6 @@ public class CardGroupRepository extends CardRepository<CardGroup> {
         return getById(newId);
     }
 
-    public void delete(CardGroup entity) {
-        deleteById(entity.getCardGroupId());
-    }
-
     public void deleteById(Integer id) {
         executeUpdate(
                 "DELETE FROM CardGroup WHERE cardGroupId=?",
@@ -83,6 +79,14 @@ public class CardGroupRepository extends CardRepository<CardGroup> {
                     stmnt.setInt(1,cardId);
                     stmnt.setInt(2,user.getUserId());
                 },
+                (ResultSet::next)
+        );
+    }
+
+    public boolean isPrivate(int cardId) {
+        return executeQuery(
+                "SELECT Deck.* FROM Deck, CardGroup WHERE cardGroupId=? AND CardGroup.deckId=Deck.deckId AND isPrivate=true",
+                (stmnt) -> stmnt.setInt(1,cardId),
                 (ResultSet::next)
         );
     }

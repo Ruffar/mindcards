@@ -31,10 +31,6 @@ public class FavouriteRepository extends EntityRepository<Favourite,Favourite> {
         return entity; //No values are changed, so the same entity can be returned
     }
 
-    public void delete(Favourite entity) {
-        deleteById(entity);
-    }
-
     public void deleteById(Favourite id) {
         executeUpdate(
                 "DELETE FROM Favourite WHERE deckId=? AND userId=?",

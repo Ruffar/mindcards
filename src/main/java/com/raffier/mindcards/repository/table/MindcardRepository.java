@@ -52,10 +52,6 @@ public class MindcardRepository extends CardRepository<Mindcard> {
         return getById(newId);
     }
 
-    public void delete(Mindcard entity) {
-        deleteById(entity.getMindcardId());
-    }
-
     public void deleteById(Integer id) {
         executeUpdate(
                 "DELETE FROM Mindcard WHERE mindcardId=?",
@@ -78,6 +74,25 @@ public class MindcardRepository extends CardRepository<Mindcard> {
                 });
     }
 
+    public boolean isOwner(User user, int cardId) {
+        return executeQuery(
+                "SELECT Deck.* FROM Deck, Mindcard WHERE mindcardId=? AND Mindcard.deckId=Deck.deckId AND ownerId=?",
+                (stmnt) -> {
+                    stmnt.setInt(1,cardId);
+                    stmnt.setInt(2,user.getUserId());
+                },
+                (ResultSet::next)
+        );
+    }
+
+    public boolean isPrivate(int cardId) {
+        return executeQuery(
+                "SELECT Deck.* FROM Deck, Mindcard WHERE mindcardId=? AND Mindcard.deckId=Deck.deckId AND isPrivate=true",
+                (stmnt) -> stmnt.setInt(1,cardId),
+                (ResultSet::next)
+        );
+    }
+
     public List<Mindcard> getRandomFromDeck(int deckId, int amount) {
         return executeQuery(
                 "SELECT Mindcard.* FROM Mindcard, Deck WHERE Mindcard.deckId = ? ORDER BY RANDOM() LIMIT ?",
@@ -93,17 +108,6 @@ public class MindcardRepository extends CardRepository<Mindcard> {
                     }
                     return outList;
                 });
-    }
-
-    public boolean isOwner(User user, int cardId) {
-        return executeQuery(
-                "SELECT Deck.* FROM Deck, Mindcard WHERE mindcardId=? AND Mindcard.deckId=Deck.deckId AND ownerId=?",
-                (stmnt) -> {
-                    stmnt.setInt(1,cardId);
-                    stmnt.setInt(2,user.getUserId());
-                },
-                (ResultSet::next)
-        );
     }
 
 }
