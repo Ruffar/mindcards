@@ -10,9 +10,6 @@ import org.springframework.stereotype.Service;
 public class DeckService {
 
     @Autowired
-    private CardUtilityService cardUtilityService;
-
-    @Autowired
     private FavouriteRepository favouriteRepository;
     @Autowired
     private DeckRepository deckRepository;

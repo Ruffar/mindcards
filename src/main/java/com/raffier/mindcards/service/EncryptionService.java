@@ -3,7 +3,6 @@ package com.raffier.mindcards.service;
 import com.raffier.mindcards.model.table.User;
 import org.springframework.stereotype.Service;
 
-import javax.crypto.KeyGenerator;
 import javax.crypto.SecretKey;
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
