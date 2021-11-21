@@ -16,9 +16,11 @@
 
 <body>
 
-    <th:block th:insert="~{fragments/pageLayout :: navbar('')}"></th:block>
+    <th:block th:insert="~{fragments/pageLayout :: navbar('browse')}"></th:block>
 
     <div class="maincontainer">
+
+        <th:block th:insert="~{fragments/browse :: browseCategories('none')}"></th:block>
 
         <div style="text-align: center;">
             <div class="card-grid">

@@ -1,8 +1,9 @@
 package com.raffier.mindcards.model.table;
 
-import com.raffier.mindcards.service.CardType;
+import com.raffier.mindcards.util.CardType;
 
 import java.sql.Date;
+import java.time.Instant;
 
 public class Deck extends TitledCardTable {
 
@@ -23,14 +24,11 @@ public class Deck extends TitledCardTable {
         this.imageId = imageId;
         this.description = description;
         this.isPrivate = false; // isPrivate is false by default
+        this.timeCreated = new Date(Instant.now().getEpochSecond()); //set the timeCreated to "right now" by default
     }
 
     public Deck(int deckId, int ownerId, String title, int imageId, String description, boolean isPrivate, Date timeCreated) {
-        this(deckId);
-        this.ownerId = ownerId;
-        this.title = title;
-        this.imageId = imageId;
-        this.description = description;
+        this(deckId,ownerId,title,imageId,description);
         this.isPrivate = isPrivate;
         this.timeCreated = timeCreated;
     }

@@ -110,4 +110,18 @@ public class MindcardRepository extends CardRepository<Mindcard> {
                 });
     }
 
+    public List<Mindcard> getFromCardGroup(int cardGroupId) {
+        return executeQuery(
+                "SELECT Mindcard.* FROM Mindcard, CardGroup, GroupMindcard WHERE CardGroup.cardGroupId=? AND CardGroup.cardGroupId=GroupMindcard.cardGroupId AND GroupMindcard.mindcardId=Mindcard.mindcardId",
+                (stmnt) -> stmnt.setInt(1, cardGroupId),
+
+                (results) -> {
+                    List<Mindcard> outList = new ArrayList<>();
+                    while (results.next()) {
+                        outList.add(new Mindcard(results.getInt("mindcardId"), results.getInt("deckId"), results.getString("title"), results.getInt("imageId"), results.getString("description")));
+                    }
+                    return outList;
+                });
+    }
+
 }

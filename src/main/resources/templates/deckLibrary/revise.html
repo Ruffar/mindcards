@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org/">
+<head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <link rel="stylesheet" th:href="@{/css/main.css}"/>
+
+    <style>
+        body {
+            background-color: #444;
+        }
+    </style>
+
+    <meta charset="UTF-8">
+    <title>Browse</title>
+</head>
+
+<body>
+
+    <th:block th:insert="~{fragments/pageLayout :: navbar('revise')}"></th:block>
+
+    <div class="maincontainer">
+
+        <th:block th:with="pageNo=${pageNo} ?: ${1}">
+            <th:block th:insert="~{fragments/pageLayout :: pageNavigation(${pageNo})}"></th:block>
+        </th:block>
+
+        <div style="text-align: center;">
+            <div class="card-grid">
+                <th:block th:each="deck: ${decks}">
+                    <div th:replace="~{fragments/card :: browserCard(cardElement=${deck},cardType='deck')}" style="flex: 0 0 auto;"></div>
+                </th:block>
+            </div>
+        </div>
+
+    </div>
+
+    <script th:src="@{/javascript/browserCards.js}"></script>
+    <script th:src="@{/javascript/markdown.js}"></script>
+    <script>
+        function incrementPage(increment) {
+            var urlParams = new URLSearchParams(window.location.search);
+            var currentPageNo = Number(urlParams.get("page"));
+            if (currentPageNo == null || currentPageNo < 1) currentPageNo = 1;
+            var pageNo = currentPageNo+increment;
+            if (sort != null) {
+                window.location.assign("/revise?page="+pageNo);
+            } else {
+                window.location.assign("/revise");
+            }
+        }
+    </script>
+
+</body>

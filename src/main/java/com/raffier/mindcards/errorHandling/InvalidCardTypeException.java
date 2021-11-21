@@ -1,6 +1,6 @@
 package com.raffier.mindcards.errorHandling;
 
-import com.raffier.mindcards.service.CardType;
+import com.raffier.mindcards.util.CardType;
 
 public class InvalidCardTypeException extends RuntimeException {
 

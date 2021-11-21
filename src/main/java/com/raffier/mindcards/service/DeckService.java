@@ -24,7 +24,11 @@ public class DeckService {
     }
 
     public boolean hasUserFavourited(int deckId, int userId) {
-        return favouriteRepository.getById(new Favourite(deckId,userId)) != null;
+        return favouriteRepository.exists(new Favourite(deckId,userId));
+    }
+
+    public void updateLastViewed(int deckId, int userId) {
+        favouriteRepository.save(new Favourite(deckId, userId)); //Saves the favourite with default time in the first constructor
     }
 
     public int getTotalFavourites(int deckId) {

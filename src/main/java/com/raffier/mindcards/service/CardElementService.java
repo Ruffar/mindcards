@@ -4,6 +4,7 @@ import com.raffier.mindcards.model.card.CardElement;
 import com.raffier.mindcards.model.card.DeckElement;
 import com.raffier.mindcards.model.table.*;
 import com.raffier.mindcards.repository.table.*;
+import com.raffier.mindcards.util.CardType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -86,8 +87,17 @@ public class CardElementService {
     public List<CardElement<Infocard>> getInfocardsFromMindcard(User user, int mindcardId) {
         return getCardElementList(user, infocardRepository.getFromMindcard(mindcardId));
     }
+
+    public List<CardElement<Mindcard>> getMindcardsFromCardGroup(User user, int cardGroupId) {
+        return getCardElementList(user, mindcardRepository.getFromCardGroup(cardGroupId));
+    }
+
     public List<CardElement<Mindcard>> getRandomMindcardsFromDeck(User user, int deckId, int amount) {
         return getCardElementList(user, mindcardRepository.getRandomFromDeck(deckId, amount));
+    }
+
+    public List<CardElement<CardGroup>> getRandomCardGroupsFromDeck(User user, int deckId, int amount) {
+        return getCardElementList(user, cardGroupRepository.getRandomFromDeck(deckId, amount));
     }
 
     //Decks (Pages start at 0)
@@ -95,13 +105,21 @@ public class CardElementService {
         return getDeckElementList(user, deckRepository.getRandom(amount));
     }
 
+    public List<DeckElement> getDeckNewest(User user, int amount, int page) {
+        return getDeckElementList(user, deckRepository.getNewest(amount,amount*page));
+    }
+
     public List<DeckElement> getDeckPopular(User user, int amount, int page) {
         return getDeckElementList(user, deckRepository.getPopular(amount,amount*page));
     }
 
+    public List<DeckElement> getDeckOldestViewed(User user, int amount, int page) {
+        return getDeckElementList(user, deckRepository.getOldestViewed(amount,amount*page));
+    }
+
     //Deck Searching
-    public List<DeckElement> searchDeck(User user, String searchString) {
-        return getDeckElementList(user, deckRepository.search(searchString,10,10));
+    public List<DeckElement> searchDeck(User user, String searchString, int amount, int page) {
+        return getDeckElementList(user, deckRepository.search(searchString,amount,amount*page));
     }
 
 }

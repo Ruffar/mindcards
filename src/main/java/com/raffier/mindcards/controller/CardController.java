@@ -1,14 +1,13 @@
 package com.raffier.mindcards.controller;
 
+import com.raffier.mindcards.errorHandling.EntityNotFoundException;
 import com.raffier.mindcards.errorHandling.InvalidCardTypeException;
 import com.raffier.mindcards.errorHandling.UnauthorisedAccessException;
 import com.raffier.mindcards.model.card.CardElement;
 import com.raffier.mindcards.model.card.DeckElement;
 import com.raffier.mindcards.model.table.*;
-import com.raffier.mindcards.service.CardElementService;
-import com.raffier.mindcards.service.CardUpdateService;
-import com.raffier.mindcards.service.CardType;
-import com.raffier.mindcards.service.CardUtilityService;
+import com.raffier.mindcards.service.*;
+import com.raffier.mindcards.util.CardType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,18 +30,41 @@ public class CardController {
     CardElementService cardElementService;
     @Autowired
     CardUtilityService cardUtilityService;
+    @Autowired
+    DeckService deckService;
+    @Autowired
+    CardGroupService cardGroupService;
+
+    private void handleCardPage(User user, Deck deck) {
+        int deckId = deck.getDeckId();
+        int userId = user == null ? 0 : user.getUserId();
+        //Make sure that card does not have ID 0 (i.e. the card is deleted)
+        if (deckId == 0) {
+            throw new EntityNotFoundException("This card has been deleted...");
+        }
+        //Check if deck can be accessed
+        if (deck.isPrivate() && deck.getOwnerId() != userId) {
+            throw new UnauthorisedAccessException("This Deck is private!");
+        }
+        //Update lastViewed if the user is logged in and has favourited the card
+        if (user != null && deckService.hasUserFavourited(deckId,userId)) {
+            deckService.updateLastViewed(deckId, userId);
+        }
+    }
 
     @GetMapping(value="deck/{deckId}")
     public ModelAndView deckView(@ModelAttribute User user, @PathVariable int deckId, ModelAndView mv) {
         mv.setViewName("cards/deck");
 
-        if (!cardUtilityService.canUserAccess(CardType.DECK,user,deckId)) {
-            throw new UnauthorisedAccessException("This Deck is private!");
-        }
-
         DeckElement deck = cardElementService.getDeckElement( user, deckId );
+        List<CardElement<Mindcard>> mindcards = cardElementService.getRandomMindcardsFromDeck( user, deckId, 12 );
+        List<CardElement<CardGroup>> cardGroups = cardElementService.getRandomCardGroupsFromDeck( user, deckId, 12 );
+
+        handleCardPage(user, deck.getCard());
 
         mv.addObject("deck",deck);
+        mv.addObject("mindcards",mindcards);
+        mv.addObject("cardGroups",cardGroups);
 
         return mv;
     }
@@ -51,15 +73,14 @@ public class CardController {
     public ModelAndView groupView(@ModelAttribute User user, @PathVariable int cardGroupId, ModelAndView mv) {
         mv.setViewName("cards/group");
 
-        if (!cardUtilityService.canUserAccess(CardType.CARDGROUP,user,cardGroupId)) {
-            throw new UnauthorisedAccessException("This Card Group is private!");
-        }
-
         CardElement<CardGroup> group = cardElementService.getCardGroupElement( user, cardGroupId);
+        List<CardElement<Mindcard>> mindcards = cardElementService.getMindcardsFromCardGroup( user, group.getCard().getCardGroupId() );
+        DeckElement deck = cardElementService.getDeckElement( user, group.getCard().getDeckId() );
 
-        CardElement<Deck> deck = cardElementService.getDeckElement( user, group.getCard().getDeckId() );
+        handleCardPage(user, deck.getCard());
 
         mv.addObject("deck",deck);
+        mv.addObject("mindcards",mindcards);
         mv.addObject("group",group);
 
         return mv;
@@ -69,17 +90,15 @@ public class CardController {
     public ModelAndView mindcardView(@ModelAttribute User user, @PathVariable int mindcardId, ModelAndView mv) {
         mv.setViewName("cards/mindcard");
 
-        if (!cardUtilityService.canUserAccess(CardType.MINDCARD,user,mindcardId)) {
-            throw new UnauthorisedAccessException("This Mindcard is private!");
-        }
-
         CardElement<Mindcard> mindcard = cardElementService.getMindcardElement( user, mindcardId );
-        List<CardElement<Infocard>> infoList = cardElementService.getInfocardsFromMindcard( user, mindcardId );
-        CardElement<Deck> deck = cardElementService.getDeckElement( user, mindcard.getCard().getDeckId() );
+        List<CardElement<Infocard>> infocards = cardElementService.getInfocardsFromMindcard( user, mindcardId );
+        DeckElement deck = cardElementService.getDeckElement( user, mindcard.getCard().getDeckId() );
+
+        handleCardPage(user, deck.getCard());
 
         mv.addObject("deck",deck);
         mv.addObject("mindcard",mindcard);
-        mv.addObject("infocards",infoList);
+        mv.addObject("infocards",infocards);
 
         return mv;
     }
@@ -138,7 +157,7 @@ public class CardController {
             throw new UnauthorisedAccessException();
         }
 
-        return ResponseEntity.ok(null);
+        return new ResponseEntity<>(null,HttpStatus.OK);
     }
 
     @PostMapping("addCard")
@@ -183,7 +202,7 @@ public class CardController {
             throw new UnauthorisedAccessException();
         }
 
-        return new ResponseEntity<>(cardElement, HttpStatus.ACCEPTED);
+        return new ResponseEntity<>(cardElement, HttpStatus.CREATED);
     }
 
     @GetMapping("getCardElement")
@@ -208,6 +227,41 @@ public class CardController {
         model.addAttribute("cardType",cardType.toLowerCase());
 
         return "fragments/card :: card(cardElement=${cardElement},cardType=${cardType})";
+    }
+
+    //Group Mindcards
+    private void handleCardGroupAccess(User user, int cardGroupId) {
+
+        if (user == null || !cardUtilityService.isUserCardOwner(CardType.CARDGROUP,user,cardGroupId)) {
+            throw new UnauthorisedAccessException("You do not own this card group!");
+        }
+
+    }
+
+    @PostMapping("addMindcardToCardGroup")
+    public ResponseEntity<?> addMindcardToCardGroup(@ModelAttribute User user, @RequestParam int mindcardId, @RequestParam int cardGroupId) {
+
+        handleCardGroupAccess(user,cardGroupId);
+
+        if (!cardGroupService.isMindcardInCardGroup(mindcardId,cardGroupId)) {
+            cardGroupService.addMindcardToCardGroup(mindcardId, cardGroupId);
+            return new ResponseEntity<>(null,HttpStatus.CREATED);
+        }
+
+        return new ResponseEntity<>(null,HttpStatus.BAD_REQUEST);
+    }
+
+    @DeleteMapping("removeMindcardFromCardGroup")
+    public ResponseEntity<?> removeMindcardFromCardGroup(@ModelAttribute User user, @RequestParam int mindcardId, @RequestParam int cardGroupId) {
+
+        handleCardGroupAccess(user,cardGroupId);
+
+        if (cardGroupService.isMindcardInCardGroup(mindcardId,cardGroupId)) {
+            cardGroupService.removeMindcardFromCardGroup(mindcardId, cardGroupId);
+            return new ResponseEntity<>(null,HttpStatus.OK);
+        }
+
+        return new ResponseEntity<>(null,HttpStatus.BAD_REQUEST);
     }
 
     @ModelAttribute("user")

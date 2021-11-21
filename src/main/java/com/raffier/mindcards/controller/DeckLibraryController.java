@@ -1,11 +1,12 @@
 package com.raffier.mindcards.controller;
 
-import com.raffier.mindcards.model.card.CardElement;
+import com.raffier.mindcards.errorHandling.PageIndexException;
+import com.raffier.mindcards.errorHandling.UnauthorisedAccessException;
 import com.raffier.mindcards.model.card.DeckElement;
-import com.raffier.mindcards.model.table.Deck;
 import com.raffier.mindcards.model.table.User;
 import com.raffier.mindcards.service.CardElementService;
 import com.raffier.mindcards.service.DeckService;
+import com.raffier.mindcards.util.SortType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -21,26 +22,94 @@ import java.util.List;
 public class DeckLibraryController {
 
     @Autowired
-    DeckService deckService;
-    @Autowired
     CardElementService cardElementService;
+    @Autowired
+    DeckService deckService;
 
     @GetMapping(value="browse")
-    public ModelAndView browseView(@ModelAttribute User user, ModelAndView mv) {
-        mv.setViewName("deckLibrary/browse");
+    public ModelAndView browseView(@ModelAttribute User user, @RequestParam(defaultValue = "") String sort, @RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "") String search, ModelAndView mv) {
 
-        mv.addObject("decks", cardElementService.getDeckRandom( user, 12 ));
+        SortType sortType = SortType.getSortTypeFromString(sort);
+        if (page < 1) {
+            throw new PageIndexException(page);
+        }
+
+        if (!search.equals("")) {
+            mv.setViewName("deckLibrary/search");
+            mv.addObject("decks", cardElementService.searchDeck(user, search, 12, page-1));
+        }
+        else if (sortType != SortType.NONE) {
+            mv.setViewName("deckLibrary/filtered");
+            switch(sortType) {
+                case POPULAR:
+                    mv.addObject("decks", cardElementService.getDeckPopular(user, 12, page-1));
+                    break;
+                case NEWEST:
+                    mv.addObject("decks", cardElementService.getDeckNewest(user, 12, page-1));
+                    break;
+                default:
+                    throw new RuntimeException("Invalid sorting method");
+            }
+        }
+        else {
+            mv.setViewName("deckLibrary/random");
+            mv.addObject("decks", cardElementService.getDeckRandom(user, 12));
+        }
+
+        mv.addObject("sort",sort);
+        mv.addObject("pageNo",page);
 
         return mv;
     }
 
-    @GetMapping(value="browse/search")
-    public ModelAndView searchView(@ModelAttribute User user, @RequestParam(defaultValue = "") String searchTerm, ModelAndView mv) {
-        mv.setViewName("deckLibrary/search");
+    @GetMapping(value="revise")
+    public ModelAndView oldestViewedView(@ModelAttribute User user, @RequestParam(defaultValue = "1") int page, ModelAndView mv) {
 
-        mv.addObject("decks", cardElementService.searchDeck( user, searchTerm ));
+        if (page < 1) {
+            throw new PageIndexException(page);
+        }
+
+        if (user == null) {
+            throw new UnauthorisedAccessException();
+        }
+
+        mv.setViewName("deckLibrary/revise");
+        mv.addObject("decks", cardElementService.getDeckOldestViewed(user, 12, page-1));
+        mv.addObject("pageNumber",page);
 
         return mv;
+    }
+
+    @PostMapping(value="favouriteDeck")
+    public ResponseEntity<?> favouriteDeck(@ModelAttribute User user, @RequestParam int deckId) {
+
+        if (user == null) {
+            throw new UnauthorisedAccessException();
+        }
+
+        if (!deckService.hasUserFavourited(deckId, user.getUserId())) {
+            deckService.addFavourite(deckId, user.getUserId());
+            return new ResponseEntity<>(null,HttpStatus.OK);
+        }
+
+        return new ResponseEntity<>(null,HttpStatus.BAD_REQUEST);
+
+    }
+
+    @DeleteMapping(value="unfavouriteDeck")
+    public ResponseEntity<?> unfavouriteDeck(@ModelAttribute User user, @RequestParam int deckId) {
+
+        if (user == null) {
+            throw new UnauthorisedAccessException();
+        }
+
+        if (deckService.hasUserFavourited(deckId, user.getUserId())) {
+            deckService.removeFavourite(deckId, user.getUserId());
+            return new ResponseEntity<>(null,HttpStatus.OK);
+        }
+
+        return new ResponseEntity<>(null,HttpStatus.BAD_REQUEST);
+
     }
 
     //

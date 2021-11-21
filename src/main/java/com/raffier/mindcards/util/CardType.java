@@ -1,4 +1,4 @@
-package com.raffier.mindcards.service;
+package com.raffier.mindcards.util;
 
 import java.util.*;
 

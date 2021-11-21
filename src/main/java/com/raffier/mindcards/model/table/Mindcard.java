@@ -1,6 +1,6 @@
 package com.raffier.mindcards.model.table;
 
-import com.raffier.mindcards.service.CardType;
+import com.raffier.mindcards.util.CardType;
 
 public class Mindcard extends TitledCardTable {
 

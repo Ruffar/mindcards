@@ -1,0 +1,19 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org/">
+
+<head>
+    <link rel="stylesheet" th:href="@{/css/navbar.css}"/>
+</head>
+
+<body>
+
+    <th:block th:fragment="browseCategories(categoryType)">
+        <div class="browseCategories">
+            <a th:href="@{/browse}" th:classappend="${categoryType=='none'} ? 'active' : ''">Random</a>
+            <a th:href="@{/browse(sort='newest')}" th:classappend="${categoryType=='newest'} ? 'active' : ''">Newest</a>
+            <a th:href="@{/browse(sort='popular')}" th:classappend="${categoryType=='popular'} ? 'active' : ''">Popular</a>
+        </div>
+    </th:block>
+
+</body>
+</html>

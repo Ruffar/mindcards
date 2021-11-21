@@ -1,11 +1,6 @@
 package com.raffier.mindcards.model.table;
 
-import com.raffier.mindcards.repository.AppDatabase;
-import com.raffier.mindcards.service.CardType;
-
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import com.raffier.mindcards.util.CardType;
 
 public class Infocard extends CardTable {
 

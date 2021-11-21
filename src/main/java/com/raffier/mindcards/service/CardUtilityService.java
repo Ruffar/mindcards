@@ -4,6 +4,7 @@ import com.raffier.mindcards.errorHandling.EntityNotFoundException;
 import com.raffier.mindcards.errorHandling.InvalidCardTypeException;
 import com.raffier.mindcards.model.table.*;
 import com.raffier.mindcards.repository.table.*;
+import com.raffier.mindcards.util.CardType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -56,14 +57,14 @@ public class CardUtilityService {
     }
 
     //Access
-    public boolean canUserAccess(CardType cardType, User user, int cardId) {
+    /*public boolean canUserAccess(CardType cardType, User user, int cardId) {
         CardRepository<?> repository = getRepository(cardType);
         if ( repository.isPrivate(cardId) && user != null ) { //Check if the card is private, if it is then check if user is owner only if there is a registered user
             return repository.isOwner(user,cardId);
         } else {
             return true;
         }
-    }
+    }*/
 
     //Existence
     public boolean cardExists(CardType cardType, int cardId) {

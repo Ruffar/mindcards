@@ -2,9 +2,12 @@ package com.raffier.mindcards.repository.table;
 
 import com.raffier.mindcards.errorHandling.EntityNotFoundException;
 import com.raffier.mindcards.model.table.Favourite;
+import com.raffier.mindcards.model.table.GroupMindcard;
 import com.raffier.mindcards.repository.AppDatabase;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.sql.ResultSet;
 
 @Component
 public class FavouriteRepository extends EntityRepository<Favourite,Favourite> {
@@ -18,15 +21,22 @@ public class FavouriteRepository extends EntityRepository<Favourite,Favourite> {
 
     // Updates //
     public void save(Favourite entity) {
-        //As all columns of a favourite are part of the primary key, there is no possible method of changing any value without creating a new entity
+        executeUpdate(
+                "UPDATE Favourite SET lastViewed=? WHERE deckId=? AND userId=?",
+                (stmnt) -> {
+                    stmnt.setDate(1,entity.getLastViewed());
+                    stmnt.setInt(2,entity.getDeckId());
+                    stmnt.setInt(3,entity.getUserId());
+                });
     }
 
     public Favourite add(Favourite entity) {
         executeUpdate(
-                "INSERT INTO Favourite (deckId, userId) VALUES (?,?)",
+                "INSERT INTO Favourite (deckId, userId, lastViewed) VALUES (?,?,?)",
                 (stmnt) -> {
                     stmnt.setInt(1, entity.getDeckId());
                     stmnt.setInt(2, entity.getUserId());
+                    stmnt.setDate(3, entity.getLastViewed());
                 });
         return entity; //No values are changed, so the same entity can be returned
     }
@@ -51,10 +61,23 @@ public class FavouriteRepository extends EntityRepository<Favourite,Favourite> {
                 },
                 (results) -> {
                     if (results.next()) {
-                        return id; //Similarly, if the deck exists, then it is the same entity used to search
+                        return new Favourite(results.getInt("deckId"), results.getInt("userId"), results.getDate("lastViewed"));
                     }
+                    throwEntityNotFound(id);
                     return null;
                 });
+    }
+
+    public boolean exists(Favourite entity) {
+        return executeQuery(
+                "SELECT * FROM Favourite WHERE deckId=? AND userId=?",
+                (stmnt) -> {
+                    stmnt.setInt(1,entity.getDeckId());
+                    stmnt.setInt(2,entity.getUserId());
+                },
+
+                ResultSet::next
+        );
     }
 
     public int getTotalDeckFavourites(int deckId) {

@@ -17,7 +17,7 @@ public class AppErrorController implements ErrorController {
 
     @GetMapping("error")
     private ModelAndView errorPage(HttpServletRequest request) {
-        ModelAndView mv = new ModelAndView("error/generic");
+        ModelAndView mv = new ModelAndView("/error");
 
         HttpStatus statusCode = HttpStatus.valueOf((int)request.getAttribute(RequestDispatcher.ERROR_STATUS_CODE));
         String message = (String)request.getAttribute(RequestDispatcher.ERROR_MESSAGE);

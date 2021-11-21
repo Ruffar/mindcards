@@ -16,9 +16,9 @@ $("form").submit(function(event){
       var urlParams = new URLSearchParams(window.location.search);
       var returnUrl = urlParams.get("return");
       if (returnUrl != null) {
-        window.location.replace(returnUrl);
+        window.location.assign(returnUrl);
       } else {
-        window.location.replace("/home");
+        window.location.assign("/home");
       }
     },
     error: function(response) {

@@ -3,6 +3,7 @@ package com.raffier.mindcards.service;
 import com.raffier.mindcards.errorHandling.InvalidHyperlinkException;
 import com.raffier.mindcards.model.table.*;
 import com.raffier.mindcards.repository.table.*;
+import com.raffier.mindcards.util.CardType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
@@ -13,6 +14,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.sql.Date;
+import java.time.Instant;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 

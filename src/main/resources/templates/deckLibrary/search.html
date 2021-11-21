@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org/">
+<head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <link rel="stylesheet" th:href="@{/css/main.css}"/>
+
+    <style>
+        body {
+            background-color: #444;
+        }
+    </style>
+
+    <meta charset="UTF-8">
+    <title>Browse</title>
+</head>
+
+<body>
+
+    <th:block th:insert="~{fragments/pageLayout :: navbar('browse')}"></th:block>
+
+    <div class="maincontainer">
+
+        <th:block th:insert="~{fragments/pageLayout :: pageNavigation(${pageNumber})"></th:block>
+
+        <div style="text-align: center;">
+            <div class="card-grid">
+                <th:block th:each="deck: ${decks}">
+                    <div th:replace="~{fragments/card :: browserCard(cardElement=${deck},cardType='deck')}" style="flex: 0 0 auto;"></div>
+                </th:block>
+            </div>
+        </div>
+
+    </div>
+
+    <script th:src="@{/javascript/browserCards.js}"></script>
+    <script th:src="@{/javascript/markdown.js}"></script>
+
+</body>

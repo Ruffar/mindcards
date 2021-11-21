@@ -1,6 +1,7 @@
 package com.raffier.mindcards.repository.table;
 
 import com.raffier.mindcards.errorHandling.EntityNotFoundException;
+import com.raffier.mindcards.errorHandling.InvalidCardTypeException;
 import com.raffier.mindcards.model.table.*;
 import com.raffier.mindcards.repository.AppDatabase;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,7 +47,7 @@ public class DeckRepository extends CardRepository<Deck> {
                     stmnt.setInt(3,entity.getImageId());
                     stmnt.setString(4,entity.getDescription());
                     stmnt.setBoolean(5, entity.isPrivate());
-                    stmnt.setDate(6, new Date(Instant.now().getEpochSecond())); //Set the deck's creation time to current time
+                    stmnt.setDate(6, entity.getTimeCreated()); //Set the deck's creation time to current time
                 });
         System.out.println("Deck with ID "+newId+" successfully created.");
         return getById(newId);
@@ -93,13 +94,80 @@ public class DeckRepository extends CardRepository<Deck> {
         );
     }
 
+    public <T extends CardTable> Deck getDeck(T card) {
+        int cardId = card.getPrimaryKey();
+        if (card instanceof Deck) {
+            return (Deck) card;
+        } else if (card instanceof CardGroup) {
+            return executeQuery(
+                    "SELECT Deck.* FROM Deck, CardGroup WHERE CardGroup.cardGroupId=? AND CardGroup.deckId=Deck.deckId",
+                    (stmnt) -> stmnt.setInt(1,cardId),
+
+                    (results) -> {
+                        if (results.next()) {
+                            return new Deck(cardId, results.getInt("ownerId"), results.getString("title"), results.getInt("imageId"), results.getString("description"), results.getBoolean("isPrivate"), results.getDate("timeCreated"));
+                        }
+                        throwEntityNotFound(cardId);
+                        return null;
+                    });
+        } else if (card instanceof Mindcard) {
+            return executeQuery(
+                    "SELECT Deck.* FROM Deck, Mindcard WHERE Mindcard.mindcardId=? AND Mindcard.deckId=Deck.deckId",
+                    (stmnt) -> stmnt.setInt(1,cardId),
+
+                    (results) -> {
+                        if (results.next()) {
+                            return new Deck(cardId, results.getInt("ownerId"), results.getString("title"), results.getInt("imageId"), results.getString("description"), results.getBoolean("isPrivate"), results.getDate("timeCreated"));
+                        }
+                        throwEntityNotFound(cardId);
+                        return null;
+                    });
+        } else if (card instanceof Infocard) {
+            return executeQuery(
+                    "SELECT Deck.* FROM Deck, CardGroup WHERE Infocard.infocardId=? AND Infocard.mindcardId=Mindcard.mindcardId AND Mindcard.deckId=Deck.deckId",
+                    (stmnt) -> stmnt.setInt(1,cardId),
+
+                    (results) -> {
+                        if (results.next()) {
+                            return new Deck(cardId, results.getInt("ownerId"), results.getString("title"), results.getInt("imageId"), results.getString("description"), results.getBoolean("isPrivate"), results.getDate("timeCreated"));
+                        }
+                        throwEntityNotFound(cardId);
+                        return null;
+                    });
+        } else {
+            throw new InvalidCardTypeException(card.getCardType());
+        }
+    }
+
     public List<Deck> search(String searchString, int amount, int offset) {
-        return executeQuery(
+        /*return executeQuery(
                 "SELECT Deck.*, (IFF(Deck.title LIKE '%?%' OR Deck.description LIKE '%?%',100,0) + COUNT(Mindcard.*)*2 + COUNT(CardGroup.*)*2 + COUNT(Infocard.*)) as MatchScore FROM Deck " +
                 "INNER JOIN Mindcard ON Mindcard.deckId = Deck.deckId AND (Mindcard.title LIKE '%?%' OR Mindcard.description LIKE '%?%') " +
                 "INNER JOIN CardGroup ON CardGroup.deckId = Deck.deckId AND (CardGroup.title LIKE '%?%' OR CardGroup.description LIKE '%?%') " +
                 "INNER JOIN Infocard ON Infocard.mindcardId = Mindcard.mindcardId AND Mindcard.deckId = Deck.deckId AND Infocard.description LIKE '%?%' " +
                 "ORDER BY MatchScore HAVING MatchScore > 0 DESC LIMIT ? OFFSET ?",
+
+                (stmnt) -> {
+                    for (int i = 1; i <= 7; i++) {
+                        stmnt.setString(i, searchString); //Set parameters 1 to 7 inclusive as searchString
+                    }
+                    stmnt.setInt(8,amount);
+                    stmnt.setInt(9,offset);
+                },
+
+                (results) -> {
+                    List<Deck> outList = new ArrayList<>();
+                    while (results.next()) {
+                        outList.add( new Deck(results.getInt("deckId"),results.getInt("ownerId"),results.getString("title"),results.getInt("imageId"),results.getString("description"),results.getBoolean("isPrivate"),results.getDate("timeCreated")) );
+                    }
+                    return outList;
+                });*/
+        return executeQuery(
+                "SELECT Deck.*, (IFF(Deck.title LIKE '%?%' OR Deck.description LIKE '%?%',1,0)) AS deckScore, COUNT(Mindcard.*) AS mindcardScore, COUNT(CardGroup.*) AS groupScore, COUNT(Infocard.*)) AS infocardScore FROM Deck " +
+                        "INNER JOIN Mindcard ON Mindcard.deckId = Deck.deckId AND (Mindcard.title LIKE '%?%' OR Mindcard.description LIKE '%?%') " +
+                        "INNER JOIN CardGroup ON CardGroup.deckId = Deck.deckId AND (CardGroup.title LIKE '%?%' OR CardGroup.description LIKE '%?%') " +
+                        "INNER JOIN Infocard ON Infocard.mindcardId = Mindcard.mindcardId AND Mindcard.deckId = Deck.deckId AND Infocard.description LIKE '%?%' " +
+                        "ORDER BY deckScore HAVING deckScore > 0 DESC, groupScore DESC, mindcardScore DESC, infocardScore, DESC LIMIT ? OFFSET ?",
 
                 (stmnt) -> {
                     for (int i = 1; i <= 7; i++) {
@@ -153,7 +221,24 @@ public class DeckRepository extends CardRepository<Deck> {
 
     public List<Deck> getPopular(int amount, int offset) {
         return executeQuery(
-                "SELECT *, COUNT(Favourite.deckId) as favCount FROM Deck, Favourite GROUP BY Favourite.deckId ORDER BY favCount DESC LIMIT ? OFFSET ?",
+                "SELECT Deck.*, COUNT(Favourite.deckId) AS favCount FROM Deck, Favourite GROUP BY Favourite.deckId ORDER BY favCount DESC LIMIT ? OFFSET ?",
+                (stmnt) -> {
+                    stmnt.setInt(1,amount);
+                    stmnt.setInt(2,offset);
+                },
+
+                (results) -> {
+                    List<Deck> outList = new ArrayList<>();
+                    while (results.next()) {
+                        outList.add( new Deck(results.getInt("deckId"),results.getInt("ownerId"),results.getString("title"),results.getInt("imageId"),results.getString("description"),results.getBoolean("isPrivate"),results.getDate("timeCreated")) );
+                    }
+                    return outList;
+                });
+    }
+
+    public List<Deck> getOldestViewed(int amount, int offset) {
+        return executeQuery(
+                "SELECT Deck.* FROM Deck, Favourite GROUP BY Favourite.deckId ORDER BY Favourite.lastViewed ASC LIMIT ? OFFSET ?",
                 (stmnt) -> {
                     stmnt.setInt(1,amount);
                     stmnt.setInt(2,offset);
@@ -200,19 +285,6 @@ public class DeckRepository extends CardRepository<Deck> {
                 });
     }
 
-    /*public List<Tag> getTags(int deckId) {
-        List<Tag> outList = new ArrayList<>();
-        try {
-            PreparedStatement statement = database.getConnection().prepareStatement("SELECT Tag.tagId, Tag.tagName FROM Tag, PackTag WHERE PackTag.deckId=? AND Tag.tagId=PackTag.tagId");
-            statement.setInt(1,deckId);
-            ResultSet result = statement.executeQuery();
-            while (result.next()) {
-                outList.add(new Tag(result.getInt("tagId"),result.getString("tagName")));
-            }
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-        }
-        return outList;
-    }*/
+
 
 }

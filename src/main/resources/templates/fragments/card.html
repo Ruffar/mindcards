@@ -79,6 +79,7 @@
 <th:block th:fragment="browserCard(cardElement,cardType)" th:with="cardWidth=${cardWidth} ?: ${300}">
     <div class="card browserCard" th:classappend="|${cardType}|" th:style="|margin: auto; width: ${cardWidth}px; height: ${cardWidth/2}px;|">
 
+        <span class="cardId" hidden th:text="${cardElement.getCard().getPrimaryKey()}"></span>
         <span class="cardLink" hidden th:text="|/${cardType}/${cardElement.getCard().getPrimaryKey()}|"></span>
         <div class="card-view">
             <div class="card-decoration">
@@ -91,7 +92,7 @@
             </div>
             <div class="cornerButtons">
                 <div th:if="${cardType} == 'deck'">
-                    <img class="favouriteButton" th:src="${cardElement.isFavourited()} ? @{/images/asset/favourite.png} : @{/images/asset/favouriteEmpty.png}" th:style="|float: left; width: ${cardWidth/10}px; height: ${cardWidth/10}px;|"/>
+                    <input type="image" class="favouriteButton" th:classappend="|${cardElement.isFavourited()} ? 'favourited' : ''|" th:src="${cardElement.isFavourited()} ? @{/images/asset/favourite.png} : @{/images/asset/favouriteEmpty.png}" th:style="|float: left; width: ${cardWidth/10}px; height: ${cardWidth/10}px;|"/>
                     <span th:text="${cardElement.getTotalFavourites()}" style="float: left; color: #fff;"></span>
                 </div>
             </div>
