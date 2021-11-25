@@ -11,12 +11,9 @@ public class CardElement<T extends CardTable> implements Serializable {
     private final T card;
     private final Image image;
 
-    private final boolean isOwned;
-
-    public CardElement(T card, Image image, boolean isOwned) {
+    public CardElement(T card, Image image) {
         this.card = card;
         this.image = image;
-        this.isOwned = isOwned;
     }
 
     public T getCard() { return card; }
@@ -34,8 +31,5 @@ public class CardElement<T extends CardTable> implements Serializable {
     }
 
     public String getImagePath() { return image != null ? image.getImagePath() : ""; }
-
-
-    public boolean isOwned() { return isOwned; }
 
 }

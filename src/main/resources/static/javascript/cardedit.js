@@ -1,78 +1,100 @@
 
 //This script expects markdown.js to have been loaded before this script
 
+//Utility
+function getCardType(cardDiv) {
+    if (cardDiv.hasClass("mindcard")) {
+        return "mindcard";
+    } else if (cardDiv.hasClass("infocard")) {
+        return "infocard";
+    } else if (cardDiv.hasClass("cardgroup")) {
+        return "cardgroup";
+    } else if (cardDiv.hasClass("deck")) {
+        return "deck";
+    }
+    return "";
+}
+
 //Editing Cards
 $(document).on("click",".editCardButton",function(event){
 
-  var cardDiv = $(this).parents(".card");
+    var cardDiv = $(this).parents(".card");
+    var cardType = getCardType(cardDiv);
 
-  //Match the editor's data with current viewer ones in the case of a cancelled edit
-  var cardView = cardDiv.find(".card-view");
-  var cardEditor = cardDiv.find(".card-editor");
+    var cardEditorTemp = $("#cardTemplates").find(".editorCard."+cardType);
+    cardDiv.append(cardEditorTemp.html());
+    //Match the editor's data with current viewer ones in the case of a cancelled edit
+    var cardView = cardDiv.find(".card-view");
+    var cardEditor = cardDiv.find(".card-editor");
 
-  cardEditor.find(".description").val(cardView.find(".description").text());
+    cardEditor.find("[name='cardId']").val(cardView.find(".cardId").text());
+    cardEditor.find(".description").val(cardView.find(".description").text());
 
-  if (cardView.find(".title") != null) {
-    cardEditor.find(".title").val(cardView.find(".title").text());
-  }
+    if (cardView.find(".title") != null) {
+        cardEditor.find(".title").val(cardView.find(".title").text());
+    }
 
-  //Toggle the visibility of the elements
-  cardView.attr("hidden",true);
-  cardEditor.attr("hidden",false);
+    //Toggle the visibility of the elements
+    cardView.attr("hidden",true);
+    //cardEditor.attr("hidden",false);
 
 });
 
 $(document).on("click",".cancelEditCardButton",function(event){
 
-  event.preventDefault(); //Prevents the form from automatically doing some action
-  var cardDiv = $(this).parents(".card");
+    event.preventDefault(); //Prevents the form from automatically doing some action
+    var cardDiv = $(this).parents(".card");
+    var cardType = getCardType(cardDiv);
 
-  //Toggle the visibility of the elements
-  cardDiv.find(".card-view").attr("hidden",false);
-  cardDiv.find(".card-editor").attr("hidden",true);
+    //var cardDisplayTemp = $("cardTemplates").find(".cardDisplay."+cardType);
+    //cardDiv.html(cardDisplayTemp);
+
+    //Toggle the visibility of the elements
+    cardDiv.find(".card-view").attr("hidden",false);
+    cardDiv.find(".card-editor").remove();
 
 });
 
 $(document).on("click",".deleteCardButton",function(event){
 
-  event.preventDefault();
-  var cardDiv = $(this).parents(".card");
-  var form = cardDiv.find(".card-editor");
-  var cardData = new FormData(form[0]);
+    event.preventDefault();
+    var cardDiv = $(this).parents(".card");
+    var form = $(this).parents(".card-editor");
+    var cardData = new FormData(form[0]);
 
-  var cardMain = cardDiv.hasClass("card-main");
+    var cardMain = cardDiv.hasClass("card-main");
 
-  $.ajax({
-    type: "POST",
+    $.ajax({
+    type: "DELETE",
     url: "/deleteCard",
     data: cardData,
     cache: false,
     contentType: false,
     processData: false,
     success: function(response) {
-      cardDiv.remove();
-      if (cardMain) {
-        $("parentButton").click();
-      }
+        cardDiv.remove();
+        if (cardMain) {
+            $("parentButton").click();
+        }
     },
     error: function(response) {
-      cardDiv.find(".errorLabel").text(response.responseJSON.message);
+        cardDiv.find(".errorLabel").text(response.responseJSON.message);
     }
-  });
+    });
 
 });
 
 $(document).on("click",".saveCardButton",function(event){
 
-  event.preventDefault();
-  var cardDiv = $(this).parents(".card");
-  var form = cardDiv.find(".card-editor");
-  var cardData = new FormData(form[0]);
+    event.preventDefault();
+    var cardDiv = $(this).parents(".card");
+    var form = cardDiv.find(".card-editor");
+    var cardData = new FormData(form[0]);
 
-  var cardMain = cardDiv.hasClass("card-main");
-  var cardTitle = cardData.get("title");
+    var cardMain = cardDiv.hasClass("card-main");
+    var cardTitle = cardData.get("title");
 
-  $.ajax({
+    $.ajax({
     type: "POST",
     url: "/saveCard",
     data: cardData,
@@ -80,46 +102,46 @@ $(document).on("click",".saveCardButton",function(event){
     contentType: false,
     processData: false,
     success: function(response) {
-      updateCardElement(response,cardDiv);
+        updateCardElement(response,cardDiv);
 
-      if (cardMain) { //Is this the page's main card?
-        $(document).attr("title",cardTitle); //Change title of the page
-      }
+        if (cardMain) { //Is this the page's main card?
+            $(document).attr("title",cardTitle); //Change title of the page
+        }
 
-      cardDiv.find(".card-view").attr("hidden",false);
-      cardDiv.find(".card-editor").attr("hidden",true);
+        cardDiv.find(".card-view").attr("hidden",false);
+        cardDiv.find(".card-editor").remove();
     },
     error: function(response) {
-      cardDiv.find(".errorLabel").text(response.responseJSON.message);
+        cardDiv.find(".errorLabel").text(response.responseJSON.message);
     }
-  });
+    });
 
 });
 
 //Adding cards
 $(document).on("click",".card-add",function(event){
 
-  var cardDiv = $(this).parents(".card");
+    var cardDiv = $(this).parents(".card");
 
-  //Match the editor's data with current viewer ones in the case of a cancelled edit
-  var cardEditor = cardDiv.find(".card-editor");
-  cardEditor.find(".description").val("");
-  if (cardEditor.find(".title") != null) {
-    cardEditor.find(".title").val("");
-  }
+    //Match the editor's data with current viewer ones in the case of a cancelled edit
+    var cardEditor = cardDiv.find(".card-editor");
+        cardEditor.find(".description").val("");
+    if (cardEditor.find(".title") != null) {
+        cardEditor.find(".title").val("");
+    }
 
-  cardDiv.find(".card-add").attr("hidden",true);
-  cardDiv.find(".card-editor").attr("hidden",false);
+    cardDiv.find(".card-add").attr("hidden",true);
+    cardDiv.find(".card-editor").attr("hidden",false);
 
 });
 
 $(document).on("click",".cancelAddCardButton",function(event){
 
-  event.preventDefault();
-  var cardDiv = $(this).parents(".card");
+    event.preventDefault();
+    var cardDiv = $(this).parents(".card");
 
-  cardDiv.find(".card-add").attr("hidden",false);
-  cardDiv.find(".card-editor").attr("hidden",true);
+    cardDiv.find(".card-add").attr("hidden",false);
+    cardDiv.find(".card-editor").attr("hidden",true);
 
 });
 

@@ -4,7 +4,6 @@ import com.raffier.mindcards.model.card.CardElement;
 import com.raffier.mindcards.model.card.DeckElement;
 import com.raffier.mindcards.model.table.*;
 import com.raffier.mindcards.repository.table.*;
-import com.raffier.mindcards.util.CardType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -31,25 +30,22 @@ public class CardElementService {
     protected <T extends CardTable, S extends EntityRepository<T,Integer>> CardElement<T> getCardElement(User user, int cardId, S repository) {
         T card = repository.getById(cardId);
         Image image = cardUtilityService.getCardImage(card);
-        boolean isOwner = cardUtilityService.isUserCardOwner(card.getCardType(),user,cardId);
-        return new CardElement<>(card,image,isOwner);
+        return new CardElement<>(card,image);
     }
 
     public DeckElement getDeckElement(User user, int cardId) {
         Deck card = deckRepository.getById(cardId);
         Image image = cardUtilityService.getCardImage(card);
-        boolean isOwner = cardUtilityService.isUserCardOwner(card.getCardType(),user,cardId);
         boolean isFavourited = user != null && deckService.hasUserFavourited(cardId, user.getUserId());
         int totalFavourites = deckService.getTotalFavourites(cardId);
-        return new DeckElement(card,image,isOwner,isFavourited,totalFavourites);
+        return new DeckElement(card,image,isFavourited,totalFavourites);
     }
 
     protected  <T extends CardTable> List<CardElement<T>> getCardElementList(User user, List<T> list) {
         List<CardElement<T>> pairList = new ArrayList<>();
         for (T i: list) {
             Image image = cardUtilityService.getCardImage(i);
-            boolean isOwner = cardUtilityService.isUserCardOwner(i.getCardType(),user,i.getPrimaryKey());
-            pairList.add(new CardElement<>(i,image,isOwner));
+            pairList.add(new CardElement<>(i,image));
         }
         return pairList;
     }
@@ -60,11 +56,10 @@ public class CardElementService {
             int deckId = i.getDeckId();
 
             Image image = cardUtilityService.getCardImage(i);
-            boolean isOwner = cardUtilityService.isUserCardOwner(CardType.DECK,user,deckId);
             boolean isFavourited = user != null && deckService.hasUserFavourited(deckId, user.getUserId());
             int totalFavourites = deckService.getTotalFavourites(deckId);
 
-            pairList.add(new DeckElement(i,image,isOwner,isFavourited,totalFavourites));
+            pairList.add(new DeckElement(i,image,isFavourited,totalFavourites));
         }
         return pairList;
     }

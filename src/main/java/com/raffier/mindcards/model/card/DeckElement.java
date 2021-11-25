@@ -9,8 +9,8 @@ public class DeckElement extends CardElement<Deck> {
     private final boolean isFavourited;
     private final int totalFavourites;
 
-    public DeckElement(Deck card, Image image, boolean isOwned, boolean isFavourited, int totalFavourites) {
-        super(card, image, isOwned);
+    public DeckElement(Deck card, Image image, boolean isFavourited, int totalFavourites) {
+        super(card, image);
         this.isFavourited = isFavourited;
         this.totalFavourites = totalFavourites;
     }

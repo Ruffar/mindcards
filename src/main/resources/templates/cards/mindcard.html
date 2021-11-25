@@ -16,22 +16,29 @@
 
 <body>
 
+    <span id="cardTemplates" hidden>
+        <div th:replace="~{fragments/card :: cardDisplayTemplate(cardType='mindcard',cardWidth=${774},isOwned=${isOwned})}"></div>
+        <div th:replace="~{fragments/card :: cardDisplayTemplate(cardType='infocard',cardWidth=${500},isOwned=${isOwned})}"></div>
+        <div th:replace="~{fragments/card :: cardEditor(cardType='mindcard',cardWidth=${774})}"></div>
+        <div th:replace="~{fragments/card :: cardEditor(cardType='infocard',cardWidth=${500})}"></div>
+    </span>
+
     <th:block th:insert="~{fragments/pageLayout :: navbar('')}"></th:block>
 
     <div class="maincontainer">
 
         <a id="parentButton" th:text="${deck.card.title}" th:href="@{/deck/__${deck.card.getPrimaryKey()}__}">Deck</a>
 
-        <div th:replace="~{fragments/card :: card(isMain=${true},cardElement=${mindcard},cardType='mindcard',cardWidth=${774})}"></div>
+        <div th:replace="~{fragments/card :: cardDisplay(isMain=${true},cardElement=${mindcard},cardType='mindcard',cardWidth=${774},isOwned=${isOwned})}"></div>
 
         <hr>
 
         <div style="text-align: center;">
             <div class="infocard-grid">
                 <th:block th:each="infocard: ${infocards}">
-                    <div th:replace="~{fragments/card :: card(isMain=${false},cardElement=${infocard},cardType='infocard',cardWidth=${500})}" style="flex: 0 0 auto;"></div>
+                    <div th:replace="~{fragments/card :: cardDisplay(isMain=${false},cardElement=${infocard},cardType='infocard',cardWidth=${500},isOwned=${isOwned})}" style="flex: 0 0 auto;"></div>
                 </th:block>
-                <th:block th:if="${mindcard.isOwned}">
+                <th:block th:if="${isOwned}">
                     <div th:replace="~{fragments/card :: cardAdder(parentElement=${mindcard},cardType='infocard',cardWidth=${500})}"></div>
                 </th:block>
             </div>

@@ -7,10 +7,11 @@
 
 <body>
 
-<th:block th:fragment="card(cardElement,cardType)" th:with="cardWidth=${cardWidth} ?: ${500}, isMain=${isMain} ?: ${false}">
-    <div class="card" th:classappend="|${isMain ? 'card-main ' : ''}${cardType}|" th:style="|margin: auto; width: ${cardWidth}px; height: ${cardWidth/2}px;|">
+<th:block th:fragment="cardDisplay(cardElement,cardType,isOwned)" th:with="cardWidth=${cardWidth} ?: ${500}, isMain=${isMain} ?: ${false}">
+    <div class="card displayCard" th:classappend="|${isMain ? 'card-main ' : ''}${cardType}|" th:style="|margin: auto; width: ${cardWidth}px; height: ${cardWidth/2}px;|">
 
         <div class="card-view">
+            <span hidden class="cardId" th:text="${cardElement.getCard().getPrimaryKey()}"></span>
             <div class="card-decoration">
                 <div th:hidden="${cardElement.getImagePath() == ''}" class="imgcontainer" th:styleappend="${cardElement.getImagePath() != ''} ? 'background-image: url('+@{${cardElement.getImagePath()}}+')'"></div>
             </div>
@@ -20,19 +21,47 @@
                 <div class="unescapedDesc"></div>
             </div>
             <div class="cornerButtons">
-                <button th:if="${cardElement.isOwned}" class="editCardButton">Edit</button>
+                <button th:if="${isOwned}" class="editCardButton">Edit</button>
             </div>
         </div>
 
-        <form hidden th:if="${cardElement.isOwned}" class="card-editor" enctype="multipart/form-data">
-            <input type="hidden" name="cardType" th:value="${cardType}"/>
-            <input type="hidden" name="cardId" th:value="${cardElement.getCard().getPrimaryKey()}"/>
+    </div>
+</th:block>
+
+<th:block th:fragment="cardDisplayTemplate(cardType,isOwned)" th:with="cardWidth=${cardWidth} ?: ${500}, isMain=${isMain} ?: ${false}">
+    <div class="card displayCard" th:classappend="|${isMain ? 'card-main ' : ''}${cardType}|" th:style="|margin: auto; width: ${cardWidth}px; height: ${cardWidth/2}px;|">
+
+        <div class="card-view">
+            <span hidden class="cardId"></span>
             <div class="card-decoration">
-                <input type="file" name="image" class="imgcontainer"/>
+                <div class="imgcontainer"></div>
             </div>
             <div class="card-text">
-                <input th:unless="${cardType} == 'infocard'" name="title" class="title" type="text" th:value="${cardElement.getTitle()}" /><br/>
-                <textarea name="description" class="description" th:rows="${isMain} ? 20 : 12" th:text="${cardElement.getDescription()}" ></textarea><br/>
+                <h3 th:unless="${cardType} == 'infocard'" class="title"><b> MindcardTitle </b></h3>
+                <p hidden class="description"> Description </p>
+                <div class="unescapedDesc"></div>
+            </div>
+            <div class="cornerButtons">
+                <button th:if="${isOwned}" class="editCardButton">Edit</button>
+            </div>
+        </div>
+
+    </div>
+</th:block>
+
+
+<th:block th:fragment="cardEditor(cardType)" th:with="cardWidth=${cardWidth} ?: ${500}, isMain=${isMain} ?: ${false}">
+    <div class="card editorCard" th:classappend="|${isMain ? 'card-main ' : ''}${cardType}|" th:style="|margin: auto; width: ${cardWidth}px; height: ${cardWidth/2}px;|">
+
+        <form class="card-editor" enctype="multipart/form-data">
+            <input type="hidden" name="cardType" th:value="${cardType}"/>
+            <input type="hidden" name="cardId"/>
+            <div class="card-decoration">
+                <input type="file" name="image" class="imgcontainer" accept="image/png ,image/jpg, image/jpeg"/>
+            </div>
+            <div class="card-text">
+                <input th:unless="${cardType} == 'infocard'" name="title" class="title" type="text" /><br/>
+                <textarea name="description" class="description" rows="12" ></textarea><br/>
                 <label class="errorLabel" style="color: #f66;"></label>
             </div>
             <div class="cornerButtons">
@@ -54,7 +83,7 @@
             <img th:src="@{/images/asset/addCard.png}" th:style="|width: ${cardWidth/4}px; height: ${cardWidth/4}px;|"/>
         </div>
 
-        <form hidden class="card-editor" enctype="multipart/form-data">
+        <!--<form hidden class="card-editor" enctype="multipart/form-data">
             <input type="hidden" name="cardType" th:value="${cardType}"/>
             <input type="hidden" name="parentCardId" th:value="${parentElement.getCard().getPrimaryKey()}"/>
             <div class="card-decoration">
@@ -69,7 +98,7 @@
                 <button type="submit" class="confirmAddCardButton">Save</button>
                 <button class="cancelAddCardButton">Cancel</button>
             </div>
-        </form>
+        </form>-->
 
     </div>
 </th:block>

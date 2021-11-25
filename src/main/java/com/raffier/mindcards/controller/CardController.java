@@ -35,7 +35,7 @@ public class CardController {
     @Autowired
     CardGroupService cardGroupService;
 
-    private void handleCardPage(User user, Deck deck) {
+    private void handleCardPage(User user, Deck deck, ModelAndView mv) {
         int deckId = deck.getDeckId();
         int userId = user == null ? 0 : user.getUserId();
         //Make sure that card does not have ID 0 (i.e. the card is deleted)
@@ -50,6 +50,10 @@ public class CardController {
         if (user != null && deckService.hasUserFavourited(deckId,userId)) {
             deckService.updateLastViewed(deckId, userId);
         }
+        //Add ownership
+        System.out.println(userId);
+        System.out.println(deck.getOwnerId());
+        mv.addObject("isOwned",userId == deck.getOwnerId());
     }
 
     @GetMapping(value="deck/{deckId}")
@@ -60,7 +64,7 @@ public class CardController {
         List<CardElement<Mindcard>> mindcards = cardElementService.getRandomMindcardsFromDeck( user, deckId, 12 );
         List<CardElement<CardGroup>> cardGroups = cardElementService.getRandomCardGroupsFromDeck( user, deckId, 12 );
 
-        handleCardPage(user, deck.getCard());
+        handleCardPage(user, deck.getCard(), mv);
 
         mv.addObject("deck",deck);
         mv.addObject("mindcards",mindcards);
@@ -77,7 +81,7 @@ public class CardController {
         List<CardElement<Mindcard>> mindcards = cardElementService.getMindcardsFromCardGroup( user, group.getCard().getCardGroupId() );
         DeckElement deck = cardElementService.getDeckElement( user, group.getCard().getDeckId() );
 
-        handleCardPage(user, deck.getCard());
+        handleCardPage(user, deck.getCard(), mv);
 
         mv.addObject("deck",deck);
         mv.addObject("mindcards",mindcards);
@@ -94,7 +98,7 @@ public class CardController {
         List<CardElement<Infocard>> infocards = cardElementService.getInfocardsFromMindcard( user, mindcardId );
         DeckElement deck = cardElementService.getDeckElement( user, mindcard.getCard().getDeckId() );
 
-        handleCardPage(user, deck.getCard());
+        handleCardPage(user, deck.getCard(), mv);
 
         mv.addObject("deck",deck);
         mv.addObject("mindcard",mindcard);
