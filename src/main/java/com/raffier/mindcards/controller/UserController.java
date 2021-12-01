@@ -1,12 +1,10 @@
 package com.raffier.mindcards.controller;
 
-import com.raffier.mindcards.model.AppResponse;
+import com.raffier.mindcards.model.web.AppResponse;
 import com.raffier.mindcards.model.table.User;
 import com.raffier.mindcards.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.support.SessionStatus;
@@ -69,19 +67,6 @@ public class UserController {
 
         return new AppResponse(HttpStatus.BAD_REQUEST);
 
-    }
-
-    @GetMapping(value="profile")
-    public ModelAndView profile(@ModelAttribute("user") User user, HttpSession session) {
-        ModelAndView mv = new ModelAndView("profilePage");
-
-        if (user == null) {
-            mv.setViewName("redirect:/login");
-            return mv;
-        }
-
-        mv.addObject("user",user);
-        return mv;
     }
 
     @GetMapping(value="logout")

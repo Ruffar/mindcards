@@ -1,7 +1,7 @@
 package com.raffier.mindcards.service;
 
-import com.raffier.mindcards.model.card.CardElement;
-import com.raffier.mindcards.model.card.DeckElement;
+import com.raffier.mindcards.model.web.CardElement;
+import com.raffier.mindcards.model.web.DeckElement;
 import com.raffier.mindcards.model.table.*;
 import com.raffier.mindcards.repository.table.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -96,6 +96,10 @@ public class CardElementService {
     }
 
     //Decks (Pages start at 0)
+    public List<DeckElement> getDecksFromUser(User currentUser, User owner) {
+        return getDeckElementList(currentUser, deckRepository.getUserDecks(owner.getUserId()));
+    }
+
     public List<DeckElement> getDeckRandom(User user, int amount) {
         return getDeckElementList(user, deckRepository.getRandom(amount));
     }

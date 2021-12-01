@@ -35,12 +35,16 @@
 
         <div style="text-align: center;">
             <div class="infocard-grid">
+
                 <th:block th:each="infocard: ${infocards}">
                     <div th:replace="~{fragments/card :: cardDisplay(isMain=${false},cardElement=${infocard},cardType='infocard',cardWidth=${500},isOwned=${isOwned})}" style="flex: 0 0 auto;"></div>
                 </th:block>
-                <th:block th:if="${isOwned}">
-                    <div th:replace="~{fragments/card :: cardAdder(parentElement=${mindcard},cardType='infocard',cardWidth=${500})}"></div>
-                </th:block>
+
+
+                <div th:if="${isOwned}" class="card infocard addInfocard" style="margin: auto; width: 500px; height: 250px;">
+                    <img th:src="@{/images/asset/addCard.png}" style="width: 125px; height: 125px; align-vertical: center; align-horizontal: center;"/>
+                </div>
+
             </div>
         </div>
     </div>

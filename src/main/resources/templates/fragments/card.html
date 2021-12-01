@@ -80,7 +80,7 @@
     <div class="card" th:classappend="${cardType}" th:style="|margin: auto; width: ${cardWidth}px; height: ${cardWidth/2}px;|">
 
         <div class="card-add">
-            <img th:src="@{/images/asset/addCard.png}" th:style="|width: ${cardWidth/4}px; height: ${cardWidth/4}px;|"/>
+            <img th:src="@{/images/addCard.png}" th:style="|width: ${cardWidth/4}px; height: ${cardWidth/4}px;|"/>
         </div>
 
         <!--<form hidden class="card-editor" enctype="multipart/form-data">
@@ -104,6 +104,15 @@
 </th:block>
 
 
+<th:block th:fragment="mainCardAdder(parentElement,cardType)" th:with="cardWidth=${cardWidth} ?: ${500}">
+
+    <div class="mainCardAdder" th:classappend="|${cardType}|">
+        <span th:if="${parentElement}" class="cardId" hidden th:text="${parentElement.card.getPrimaryKey()}"></span>
+        <img th:src="@{/images/addCard.png}" style="width: 75%;height: 75%;padding: 12.5%;"/>
+    </div>
+
+</th:block>
+
 
 <th:block th:fragment="browserCard(cardElement,cardType)" th:with="cardWidth=${cardWidth} ?: ${300}">
     <div class="card browserCard" th:classappend="|${cardType}|" th:style="|margin: auto; width: ${cardWidth}px; height: ${cardWidth/2}px;|">
@@ -121,7 +130,7 @@
             </div>
             <div class="cornerButtons">
                 <div th:if="${cardType} == 'deck'">
-                    <input type="image" class="favouriteButton" th:classappend="|${cardElement.isFavourited()} ? 'favourited' : ''|" th:src="${cardElement.isFavourited()} ? @{/images/asset/favourite.png} : @{/images/asset/favouriteEmpty.png}" th:style="|float: left; width: ${cardWidth/10}px; height: ${cardWidth/10}px;|"/>
+                    <input type="image" class="favouriteButton" th:classappend="|${cardElement.isFavourited()} ? 'favourited' : ''|" th:src="${cardElement.isFavourited()} ? @{/images/favourite.png} : @{/images/favouriteEmpty.png}" th:style="|float: left; width: ${cardWidth/10}px; height: ${cardWidth/10}px;|"/>
                     <span th:text="${cardElement.getTotalFavourites()}" style="float: left; color: #fff;"></span>
                 </div>
             </div>

@@ -1,6 +1,5 @@
-package com.raffier.mindcards.model.card;
+package com.raffier.mindcards.model.web;
 
-import com.raffier.mindcards.model.table.CardTable;
 import com.raffier.mindcards.model.table.Deck;
 import com.raffier.mindcards.model.table.Image;
 

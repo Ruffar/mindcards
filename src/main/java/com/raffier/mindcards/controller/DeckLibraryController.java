@@ -2,10 +2,11 @@ package com.raffier.mindcards.controller;
 
 import com.raffier.mindcards.errorHandling.PageIndexException;
 import com.raffier.mindcards.errorHandling.UnauthorisedAccessException;
-import com.raffier.mindcards.model.card.DeckElement;
+import com.raffier.mindcards.model.web.DeckElement;
 import com.raffier.mindcards.model.table.User;
 import com.raffier.mindcards.service.CardElementService;
 import com.raffier.mindcards.service.DeckService;
+import com.raffier.mindcards.service.UserService;
 import com.raffier.mindcards.util.SortType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -25,6 +26,8 @@ public class DeckLibraryController {
     CardElementService cardElementService;
     @Autowired
     DeckService deckService;
+    @Autowired
+    UserService userService;
 
     @GetMapping(value="browse")
     public ModelAndView browseView(@ModelAttribute User user, @RequestParam(defaultValue = "") String sort, @RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "") String search, ModelAndView mv) {
@@ -121,6 +124,31 @@ public class DeckLibraryController {
     @GetMapping(value="getDeckPopular")
     public ResponseEntity<List<DeckElement>> getPopular (@ModelAttribute User user, @RequestParam("amount") int amount, @RequestParam(name="page",defaultValue="0") int page) {
         return new ResponseEntity<>(cardElementService.getDeckPopular( user, amount, page ), HttpStatus.OK);
+    }
+
+    //Profile
+    @GetMapping(value="profile")
+    public ModelAndView myProfile(@ModelAttribute("user") User user, ModelAndView mv) {
+
+        if (user == null) {
+            mv.setViewName("redirect:/login");
+            return mv;
+        }
+
+        mv.setViewName("redirect:/profile/"+user.getUserId());
+        return mv;
+    }
+
+    @GetMapping(value="profile/{userId}")
+    public ModelAndView profile(@ModelAttribute("user") User user, @PathVariable int userId, ModelAndView mv) {
+        mv.setViewName("profilePage");
+
+        User profileUser = userService.getUser(userId);
+
+        mv.addObject("profileUser",profileUser);
+        mv.addObject("decks", cardElementService.getDecksFromUser(user, profileUser));
+
+        return mv;
     }
 
     //

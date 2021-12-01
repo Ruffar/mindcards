@@ -3,8 +3,8 @@ package com.raffier.mindcards.controller;
 import com.raffier.mindcards.errorHandling.EntityNotFoundException;
 import com.raffier.mindcards.errorHandling.InvalidCardTypeException;
 import com.raffier.mindcards.errorHandling.UnauthorisedAccessException;
-import com.raffier.mindcards.model.card.CardElement;
-import com.raffier.mindcards.model.card.DeckElement;
+import com.raffier.mindcards.model.web.CardElement;
+import com.raffier.mindcards.model.web.DeckElement;
 import com.raffier.mindcards.model.table.*;
 import com.raffier.mindcards.service.*;
 import com.raffier.mindcards.util.CardType;
@@ -134,7 +134,7 @@ public class CardController {
         return new ResponseEntity<>(cardElement, HttpStatus.ACCEPTED);
     }
 
-    @PostMapping("deleteCard")
+    @DeleteMapping("deleteCard")
     public ResponseEntity<?> deleteCard(@ModelAttribute User user, @RequestParam String cardType, @RequestParam int cardId, Model model) {
 
         CardType cardTypeEnum = CardType.getCardTypeFromString(cardType);
@@ -165,7 +165,7 @@ public class CardController {
     }
 
     @PostMapping("addCard")
-    public ResponseEntity<CardElement<?>> addCard(@ModelAttribute User user, @RequestParam String cardType, @RequestParam int parentCardId, @RequestParam MultipartFile image, @RequestParam(defaultValue = "") String title, @RequestParam String description, Model model) {
+    public ResponseEntity<CardElement<?>> addCard(@ModelAttribute User user, @RequestParam String cardType, @RequestParam int parentCardId, Model model) {
 
         CardType cardTypeEnum = CardType.getCardTypeFromString(cardType);
         boolean isOwner;
@@ -177,26 +177,26 @@ public class CardController {
         }
 
         CardElement<?> cardElement;
-        if (isOwner && cardUpdateService.areHyperlinksValid(description)) {
+        if (isOwner) {
             switch (cardTypeEnum) {
                 case MINDCARD:
                     cardElement = cardElementService.getMindcardElement(
-                            user, cardUpdateService.addMindcard(parentCardId, title, image, description).getPrimaryKey()
+                            user, cardUpdateService.addMindcard(parentCardId).getPrimaryKey()
                     );
                     break;
                 case INFOCARD:
                     cardElement = cardElementService.getInfocardElement(
-                            user, cardUpdateService.addInfocard(parentCardId, image, description).getPrimaryKey()
+                            user, cardUpdateService.addInfocard(parentCardId).getPrimaryKey()
                     );
                     break;
                 case CARDGROUP:
                     cardElement = cardElementService.getCardGroupElement(
-                            user, cardUpdateService.addCardGroup(parentCardId, title, image, description).getPrimaryKey()
+                            user, cardUpdateService.addCardGroup(parentCardId).getPrimaryKey()
                     );
                     break;
                 case DECK:
                     cardElement = cardElementService.getDeckElement(
-                            user, cardUpdateService.addDeck(user.getUserId(), title, image, description).getPrimaryKey()
+                            user, cardUpdateService.addDeck(user.getUserId()).getPrimaryKey()
                     );
                     break;
                 default:

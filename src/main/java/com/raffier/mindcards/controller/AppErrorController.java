@@ -1,6 +1,6 @@
 package com.raffier.mindcards.controller;
 
-import com.raffier.mindcards.model.AppResponse;
+import com.raffier.mindcards.model.web.AppResponse;
 import org.springframework.boot.web.servlet.error.ErrorController;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;

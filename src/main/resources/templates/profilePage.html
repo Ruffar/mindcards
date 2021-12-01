@@ -18,7 +18,27 @@
     <th:block th:insert="~{fragments/pageLayout :: navbar('profile')}"></th:block>
 
     <div class="maincontainer">
-        <h3 th:text="${user} ? ${user.username} : 'Username'"> Username </h3>
+        <h1 th:text="${profileUser} ? ${profileUser.username} : 'Username'"> Username </h1>
+
+        <br>
+
+        <div style="display: flex;">
+            <h2>Decks</h2>
+            <th:block th:if="${session.user != null && profileUser.userId == session.user.userId}">
+                <div th:replace="~{fragments/card :: mainCardAdder(cardType='deck',parentElement=${null})}"></div>
+            </th:block>
+        </div>
+
+        <br>
+
+        <div style="text-align: center;">
+            <div class="card-grid">
+                <th:block th:each="deck: ${decks}">
+                    <div th:replace="~{fragments/card :: browserCard(cardElement=${deck},cardType='deck')}" style="flex: 0 0 auto;"></div>
+                </th:block>
+            </div>
+        </div>
+
     </div>
 
 </body>

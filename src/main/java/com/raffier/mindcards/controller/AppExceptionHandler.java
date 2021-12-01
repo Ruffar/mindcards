@@ -1,7 +1,7 @@
 package com.raffier.mindcards.controller;
 
 import com.raffier.mindcards.errorHandling.*;
-import com.raffier.mindcards.model.AppResponse;
+import com.raffier.mindcards.model.web.AppResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;

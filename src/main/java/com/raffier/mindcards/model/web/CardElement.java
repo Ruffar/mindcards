@@ -1,4 +1,4 @@
-package com.raffier.mindcards.model.card;
+package com.raffier.mindcards.model.web;
 
 import com.raffier.mindcards.model.table.CardTable;
 import com.raffier.mindcards.model.table.Image;
@@ -18,6 +18,8 @@ public class CardElement<T extends CardTable> implements Serializable {
 
     public T getCard() { return card; }
     public Image getImage() { return image; }
+
+    public int getPrimaryKey() { return card.getPrimaryKey(); }
 
     public boolean hasTitle() { return card instanceof TitledCardTable; }
 

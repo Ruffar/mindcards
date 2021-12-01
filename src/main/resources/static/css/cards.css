@@ -93,6 +93,25 @@ input.title {
     border-color: #666;
 }
 
+.addInfocard {
+    margin: auto;
+    width: 500px;
+    height: 250px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.mainCardAdder {
+    width: 50px;
+    height: 50px;
+    background-color: #333;
+    border-radius: 50%;
+    margin-top: auto;
+    margin-bottom: auto;
+    margin-left: 10px;
+}
+
 .infocard-grid {
     display: flex;
     flex-wrap: wrap;

@@ -95,24 +95,23 @@ public class CardUpdateService {
     }
 
     //Add cards
-    private <T extends CardTable, S extends EntityRepository<T,Integer>> T addCard(T newCard, MultipartFile image, S repository) {
+    private <T extends CardTable, S extends EntityRepository<T,Integer>> T addCard(T newCard, S repository) {
         T card = repository.add(newCard);
-        setCardImage(card,image);
         repository.save(card);
         return card;
     }
 
-    public Mindcard addMindcard(int deckId, String title, MultipartFile image, String description) {
-        return addCard( new Mindcard(0,deckId,title,0,description), image, mindcardRepository);
+    public Mindcard addMindcard(int deckId) {
+        return addCard( new Mindcard(0,deckId,"New Mindcard",0,"Description"), mindcardRepository);
     }
-    public Infocard addInfocard(int mindcardId, MultipartFile image, String description) {
-        return addCard( new Infocard(0,mindcardId,0,description), image, infocardRepository);
+    public Infocard addInfocard(int mindcardId) {
+        return addCard( new Infocard(0,mindcardId,0,"Description"), infocardRepository);
     }
-    public CardGroup addCardGroup(int deckId, String title, MultipartFile image, String description) {
-        return addCard( new CardGroup(0,deckId, title,0,description), image, cardGroupRepository);
+    public CardGroup addCardGroup(int deckId) {
+        return addCard( new CardGroup(0,deckId, "New Group",0,"Description"), cardGroupRepository);
     }
-    public Deck addDeck(int ownerId, String title, MultipartFile image, String description) {
-        return addCard( new Deck(0,ownerId,title,0,description), image, deckRepository);
+    public Deck addDeck(int ownerId) {
+        return addCard( new Deck(0,ownerId,"New Deck",0,"Description"), deckRepository);
     }
 
     //Delete cards
