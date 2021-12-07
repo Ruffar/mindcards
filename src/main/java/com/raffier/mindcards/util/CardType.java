@@ -25,8 +25,11 @@ public enum CardType {
     public String toString() { return this.name; }
 
     public static CardType getCardTypeFromString(String string) {
-        for (CardType type : EnumSet.allOf(CardType.class)) {
-            if (type.name.equals(string.toLowerCase())) { return type; }
+        if (string != null) {
+            String lowercase = string.toLowerCase();
+            for (CardType type : EnumSet.allOf(CardType.class)) {
+                if (type.name.equals(lowercase)) { return type; }
+            }
         }
         return NONE;
     }

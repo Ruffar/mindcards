@@ -6,6 +6,40 @@
     $(this).html("poop");
 });*/
 
+//Stack
+class Stack {
+
+    constructor() {
+        this.items = [];
+        this.top = -1;
+    }
+
+    isEmpty() {
+        return this.top < 0;
+    }
+
+    push(item) {
+        this.top += 1;
+        this.items[this.top] = item;
+    }
+
+    peek() {
+        if (!this.isEmpty()) {
+            return this.items[this.top];
+        }
+        return null;
+    }
+
+    pop() {
+        if (!this.isEmpty()) {
+            this.top -= 1;
+            return this.items[this.top+1];
+        }
+        return null;
+    }
+
+}
+
 $(document).ready(function() {
     $(".card-view").map(function(){
         parseCardDescription($(this));
@@ -33,6 +67,8 @@ function convertMarkdown(text) {
 
     text = parseBulletList(text);
     text = parseNumberList(text);
+
+    text = parseMathExpression(text);
 
     text = parseLineBreak(text);
 
@@ -66,6 +102,70 @@ function parseHorizontalRule(text) {
 
 function parseHyperlink(text) {
     return text.replace(/\[(.+?)]\((.+?)\)/g, '<a href="$2">$1</a>');
+}
+
+function parseMathExpression(text) {
+    return text.replace(/\\\((.+?)\\\)/g,(match,$1)=> {
+        var expression = match.slice(2,match.length-2);
+        var symbolStack = new Stack();
+        var isVariable = false;
+        var output = "<span class='mathExp'>"
+        for (let i = 0; i < expression.length; i++) {
+            currentChar = expression[i];
+            if (currentChar == '\\') {
+                if (expression.slice(i+1,i+5) == "frac") {
+                    output += "<div class='frac'><div class='fracExp'>";
+                    symbolStack.push("frac");
+                    i += 4;
+                } else if (expression.slice(i+1,i+5) == "sqrt") {
+                    output += "<span>&#x221A;</span><span><hr style='padding-top: 0.1em; padding-bottom: 0.1em; margin-top: 0; margin-bottom: 0'>";
+                    symbolStack.push("sqrt");
+                    i+=4;
+                } else if (expression.slice(i+1,i+4) == "sin") {
+                    output += "<span style='font-style: italic;'>sin</span><span style='padding-left: 0.25em; padding-right:0.25em;'>";
+                    symbolStack.push("sin");
+                    i += 3;
+                }
+            } else if (currentChar == '{') {
+                symbolStack.push("{");
+            } else {
+                if (currentChar == '}' && symbolStack.peek() == '{') {
+                    symbolStack.pop();
+                } else if (currentChar.match(/[a-z]/i)) { //i means not case sensitive
+                    output += "<span class='variables'>"+currentChar;
+                    isVariable = true;
+                } else if (isVariable) {
+                    output += currentChar+"</span>";
+                    isVariable = false;
+                } else {
+                    output += currentChar;
+                }
+                if (!symbolStack.isEmpty()) {
+                    var symbol = symbolStack.peek();
+                    switch(symbol) {
+                        case "frac":
+                            output += "</div><hr class='fracLine'><div class='fracExp'>";
+                            symbolStack.pop();
+                            symbolStack.push("frac1");
+                            break;
+                        case "frac1":
+                            output += "</div></div>";
+                            symbolStack.pop();
+                            break;
+                        case "sqrt":
+                            output += "</span>";
+                            symbolStack.pop();
+                            break;
+                        case "sin":
+                            output += "</span>";
+                            symbolStack.pop();
+                            break;
+                    }
+                }
+            }
+        }
+        return output+"</span>";
+    });
 }
 
 function parseBulletList(text) {

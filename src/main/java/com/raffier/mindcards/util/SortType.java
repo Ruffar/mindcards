@@ -17,8 +17,11 @@ public enum SortType {
     public String toString() { return this.name; }
 
     public static SortType getSortTypeFromString(String string) {
-        for (SortType type : EnumSet.allOf(SortType.class)) {
-            if (type.name.equals(string.toLowerCase())) { return type; }
+        if (string != null) {
+            String lowercase = string.toLowerCase();
+            for (SortType type : EnumSet.allOf(SortType.class)) {
+                if (type.name.equals(lowercase)) { return type; }
+            }
         }
         return NONE;
     }

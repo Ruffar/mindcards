@@ -7,11 +7,33 @@
 
 <body>
 
+    <th:block th:fragment="searchBar(url)">
+        <form >
+            <input type="input"/>
+        </form>
+    </th:block>
+
     <th:block th:fragment="browseCategories(categoryType)">
         <div class="browseCategories">
-            <a th:href="@{/browse}" th:classappend="${categoryType=='none'} ? 'active' : ''">Random</a>
+            <a th:href="@{/browse}" th:classappend="${categoryType==null} ? 'active' : ''">Random</a>
             <a th:href="@{/browse(sort='newest')}" th:classappend="${categoryType=='newest'} ? 'active' : ''">Newest</a>
             <a th:href="@{/browse(sort='popular')}" th:classappend="${categoryType=='popular'} ? 'active' : ''">Popular</a>
+        </div>
+    </th:block>
+
+    <th:block th:fragment="pageNavigation(url,sortType,currentPage)">
+        <div style="margin: auto; display: flex; justify-content: center;">
+            <form th:unless="${currentPage == null || currentPage <= 1}" th:action="|@{${url}}|" method="get">
+                <input type="hidden" name="sort" th:value="${sortType}"/>
+                <input type="hidden" name="page" th:value="${currentPage-1}"/>
+                <input type="submit" class="previousPageButton" style="background-image: url(/images/asset/previousPage.png); width: 50px; height: 50px;"/>
+            </form>
+            <p th:text="|Page ${currentPage}|">Page 0</p>
+            <form th:action="|@{${url}}|" method="get">
+                <input type="hidden" name="sort" th:value="${sortType}"/>
+                <input type="hidden" name="page" th:value="${currentPage+1}"/>
+                <input type="submit" class="nextPageButton" style="background-image: url(/images/asset/nextPage.png); width: 50px; height: 50px;"/>
+            </form>
         </div>
     </th:block>
 

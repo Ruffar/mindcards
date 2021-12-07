@@ -21,7 +21,7 @@
     <div class="maincontainer">
 
         <th:block th:with="pageNo=${pageNo} ?: ${1}">
-            <th:block th:insert="~{fragments/pageLayout :: pageNavigation(${pageNo})}"></th:block>
+            <th:block th:insert="~{fragments/browse :: pageNavigation('/revise',${null},${pageNo})}"></th:block>
         </th:block>
 
         <div style="text-align: center;">

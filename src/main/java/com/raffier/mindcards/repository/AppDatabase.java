@@ -135,16 +135,16 @@ public class AppDatabase {
                         "username TEXT," +
                         "password TEXT," +
                         "email TEXT NOT NULL," +
-                        "isDeveloper INTEGER Default 0,"+
-                        "studyHelp INTEGER Default 1)"
+                        "isDeveloper INTEGER Default 0)"
         );
-        executeUpdate("INSERT OR REPLACE INTO User VALUES (0,'DeletedUser','deletedpassword1234','deleted@mindcards.com',0,1)");
+        executeUpdate("INSERT OR REPLACE INTO User VALUES (0,'DeletedUser','deletedpassword1234','deleted@mindcards.com',0)");
         System.out.println("User Table created successfully!");
     }
     private void createFavouriteTable() {
         executeUpdate("CREATE TABLE IF NOT EXISTS Favourite" +
                         "(deckId INTEGER NOT NULL," +
                         "userId INTEGER NOT NULL," +
+                        "lastViewed REAL," +
                         "PRIMARY KEY (deckId,userId)," +
                         "FOREIGN KEY (deckId) references Deck(deckId)," +
                         "FOREIGN KEY (userId) references User(userId) )"

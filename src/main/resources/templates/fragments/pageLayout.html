@@ -23,13 +23,5 @@
     </div>
 </th:block>
 
-<th:block th:fragment="pageNavigation(currentPage)">
-    <div style="margin: auto; display: flex; justify-content: center;">
-        <input th:unless="${currentPage == null || currentPage <= 1}" type="image" class="previousPageButton" th:src="@{/images/asset/previousPage.png}" style="float: left; width: 50px; height: 50px;" onclick="incrementPage(-1)"/>
-        <p th:text="|Page ${currentPage}|" style="float: left;">Page 0</p>
-        <input type="image" class="nextPageButton" th:src="@{/images/asset/nextPage.png}" style="width: 50px; height: 50px;" th:onclick="incrementPage(1)"/>
-    </div>
-</th:block>
-
 </body>
 </html>

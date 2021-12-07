@@ -51,8 +51,6 @@ public class CardController {
             deckService.updateLastViewed(deckId, userId);
         }
         //Add ownership
-        System.out.println(userId);
-        System.out.println(deck.getOwnerId());
         mv.addObject("isOwned",userId == deck.getOwnerId());
     }
 

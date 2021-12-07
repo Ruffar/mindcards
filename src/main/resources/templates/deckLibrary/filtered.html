@@ -20,9 +20,13 @@
 
     <div class="maincontainer">
 
-        <th:block th:with="sort=${sort}?:'none', pageNo=${pageNo} ?: ${1}">
+        <form action="/browse" method="get">
+            <input class="searchBar" type="search" name="search"/>
+        </form>
+
+        <th:block th:with="pageNo=${pageNo} ?: ${1}">
             <th:block th:insert="~{fragments/browse :: browseCategories(${sort})}"></th:block>
-            <th:block th:insert="~{fragments/pageLayout :: pageNavigation(${pageNo})}"></th:block>
+            <th:block th:insert="~{fragments/browse :: pageNavigation('/browse',${sort},${pageNo})}"></th:block>
         </th:block>
 
         <div style="text-align: center;">

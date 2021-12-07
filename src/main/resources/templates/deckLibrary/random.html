@@ -20,7 +20,11 @@
 
     <div class="maincontainer">
 
-        <th:block th:insert="~{fragments/browse :: browseCategories('none')}"></th:block>
+        <form action="/browse" method="get">
+            <input class="searchBar" type="search" name="search"/>
+        </form>
+
+        <th:block th:insert="~{fragments/browse :: browseCategories(${null})}"></th:block>
 
         <div style="text-align: center;">
             <div class="card-grid">

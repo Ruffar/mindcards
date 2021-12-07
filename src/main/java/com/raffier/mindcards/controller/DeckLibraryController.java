@@ -30,7 +30,7 @@ public class DeckLibraryController {
     UserService userService;
 
     @GetMapping(value="browse")
-    public ModelAndView browseView(@ModelAttribute User user, @RequestParam(defaultValue = "") String sort, @RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "") String search, ModelAndView mv) {
+    public ModelAndView browseView(@ModelAttribute User user, @RequestParam(required = false) String sort, @RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "") String search, ModelAndView mv) {
 
         SortType sortType = SortType.getSortTypeFromString(sort);
         if (page < 1) {
@@ -40,6 +40,7 @@ public class DeckLibraryController {
         if (!search.equals("")) {
             mv.setViewName("deckLibrary/search");
             mv.addObject("decks", cardElementService.searchDeck(user, search, 12, page-1));
+            mv.addObject("search",search);
         }
         else if (sortType != SortType.NONE) {
             mv.setViewName("deckLibrary/filtered");
@@ -73,7 +74,7 @@ public class DeckLibraryController {
         }
 
         if (user == null) {
-            throw new UnauthorisedAccessException();
+            throw new UnauthorisedAccessException("You need to be logged in...");
         }
 
         mv.setViewName("deckLibrary/revise");

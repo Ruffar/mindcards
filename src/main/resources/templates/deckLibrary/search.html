@@ -20,7 +20,19 @@
 
     <div class="maincontainer">
 
-        <th:block th:insert="~{fragments/pageLayout :: pageNavigation(${pageNumber})"></th:block>
+        <div style="margin: auto; display: flex; justify-content: center;">
+            <form th:unless="${pageNo == null || pageNo <= 1}" th:action="|@{${url}}|" method="get">
+                <input type="hidden" name="search" th:value="${search}"/>
+                <input type="hidden" name="page" th:value="${pageNo-1}"/>
+                <input type="submit" class="previousPageButton" style="background-image: url(/images/asset/previousPage.png); width: 50px; height: 50px;"/>
+            </form>
+            <p th:text="|Page ${pageNo}|">Page 0</p>
+            <form th:action="|@{${url}}|" method="get">
+                <input type="hidden" name="search" th:value="${search}"/>
+                <input type="hidden" name="page" th:value="${pageNo+1}"/>
+                <input type="submit" class="nextPageButton" style="background-image: url(/images/asset/nextPage.png); width: 50px; height: 50px;"/>
+            </form>
+        </div>
 
         <div style="text-align: center;">
             <div class="card-grid">

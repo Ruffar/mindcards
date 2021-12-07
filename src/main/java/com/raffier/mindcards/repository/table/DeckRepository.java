@@ -140,38 +140,18 @@ public class DeckRepository extends CardRepository<Deck> {
     }
 
     public List<Deck> search(String searchString, int amount, int offset) {
-        /*return executeQuery(
-                "SELECT Deck.*, (IFF(Deck.title LIKE '%?%' OR Deck.description LIKE '%?%',100,0) + COUNT(Mindcard.*)*2 + COUNT(CardGroup.*)*2 + COUNT(Infocard.*)) as MatchScore FROM Deck " +
-                "INNER JOIN Mindcard ON Mindcard.deckId = Deck.deckId AND (Mindcard.title LIKE '%?%' OR Mindcard.description LIKE '%?%') " +
-                "INNER JOIN CardGroup ON CardGroup.deckId = Deck.deckId AND (CardGroup.title LIKE '%?%' OR CardGroup.description LIKE '%?%') " +
-                "INNER JOIN Infocard ON Infocard.mindcardId = Mindcard.mindcardId AND Mindcard.deckId = Deck.deckId AND Infocard.description LIKE '%?%' " +
-                "ORDER BY MatchScore HAVING MatchScore > 0 DESC LIMIT ? OFFSET ?",
-
-                (stmnt) -> {
-                    for (int i = 1; i <= 7; i++) {
-                        stmnt.setString(i, searchString); //Set parameters 1 to 7 inclusive as searchString
-                    }
-                    stmnt.setInt(8,amount);
-                    stmnt.setInt(9,offset);
-                },
-
-                (results) -> {
-                    List<Deck> outList = new ArrayList<>();
-                    while (results.next()) {
-                        outList.add( new Deck(results.getInt("deckId"),results.getInt("ownerId"),results.getString("title"),results.getInt("imageId"),results.getString("description"),results.getBoolean("isPrivate"),results.getDate("timeCreated")) );
-                    }
-                    return outList;
-                });*/
         return executeQuery(
-                "SELECT Deck.*, (IFF(Deck.title LIKE '%?%' OR Deck.description LIKE '%?%',1,0)) AS deckScore, COUNT(Mindcard.*) AS mindcardScore, COUNT(CardGroup.*) AS groupScore, COUNT(Infocard.*)) AS infocardScore FROM Deck " +
-                        "INNER JOIN Mindcard ON Mindcard.deckId = Deck.deckId AND (Mindcard.title LIKE '%?%' OR Mindcard.description LIKE '%?%') " +
-                        "INNER JOIN CardGroup ON CardGroup.deckId = Deck.deckId AND (CardGroup.title LIKE '%?%' OR CardGroup.description LIKE '%?%') " +
-                        "INNER JOIN Infocard ON Infocard.mindcardId = Mindcard.mindcardId AND Mindcard.deckId = Deck.deckId AND Infocard.description LIKE '%?%' " +
-                        "ORDER BY deckScore HAVING deckScore > 0 DESC, groupScore DESC, mindcardScore DESC, infocardScore, DESC LIMIT ? OFFSET ?",
+                "SELECT d1.*, " +
+                        "(SELECT COUNT(d2.deckId) FROM Deck d2 WHERE d1.deckId = d2.deckId AND (d2.title LIKE ? OR d2.description LIKE ?)) AS deckScore, " + //deckScore = 1 if title or description of a deck matches
+                        "(SELECT COUNT(Mindcard.mindcardId) FROM Mindcard WHERE Mindcard.deckId = d1.deckId AND (Mindcard.title LIKE ? OR Mindcard.description LIKE ?)) AS mindcardScore, " + //mindcardScore
+                        "(SELECT COUNT(CardGroup.cardGroupId) FROM CardGroup WHERE CardGroup.deckId = d1.deckId AND (CardGroup.title LIKE ? OR CardGroup.description LIKE ?)) AS groupScore, " +
+                        "(SELECT COUNT(Infocard.infocardId) FROM Infocard, Mindcard WHERE Infocard.mindcardId = Mindcard.mindcardId AND Mindcard.deckId = d1.deckId AND Infocard.description LIKE ?) AS infocardScore " +
+                        "FROM Deck d1 " +
+                        "ORDER BY deckScore DESC, groupScore DESC, mindcardScore DESC, infocardScore DESC LIMIT ? OFFSET ?;",
 
                 (stmnt) -> {
                     for (int i = 1; i <= 7; i++) {
-                        stmnt.setString(i, searchString); //Set parameters 1 to 7 inclusive as searchString
+                        stmnt.setString(i, "%"+searchString+"%"); //Set parameters 1 to 7 inclusive as searchString
                     }
                     stmnt.setInt(8,amount);
                     stmnt.setInt(9,offset);
