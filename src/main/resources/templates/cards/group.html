@@ -2,32 +2,96 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org/">
 <head>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://kit.fontawesome.com/fd57869c39.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" th:href="@{/css/main.css}"/>
 
-    <style>
-        body {
-            background-color: #444;
-        }
-    </style>
-
     <meta charset="UTF-8">
-    <title th:text="${group.card.title}">Group</title>
+    <title th:text="${cardGroup.card.title}">Group</title>
 </head>
 
 <body>
+
+    <div id="cardTemplates" hidden>
+        <div th:replace="~{fragments/card :: cardDisplayTemplate(cardType='cardGroup',cardWidth=${774},isOwned=${isOwned})}"></div>
+        <div th:replace="~{fragments/card :: cardEditor(cardType='cardGroup',cardWidth=${774})}"></div>
+        <div th:replace="~{fragments/card :: groupMindcardTemplate()}"></div>
+
+        <div class="card adderBrowserCard mindcard">
+            <span class="cardId" hidden></span>
+            <div class="cardBody card-view">
+                <div class="card-decoration">
+                    <div class="imgcontainer"></div>
+                </div>
+                <div class="card-text">
+                    <h3 class="title"><b> MindcardTitle </b></h3>
+                    <p hidden class="description"> Description </p>
+                    <div class="unescapedDesc"></div>
+                </div>
+            </div>
+        </div>
+
+        <div th:replace="~{fragments/card :: hoverCardTemplate(cardType='deck')}"></div>
+        <div th:replace="~{fragments/card :: hoverCardTemplate(cardType='cardGroup')}"></div>
+        <div th:replace="~{fragments/card :: hoverCardTemplate(cardType='mindcard')}"></div>
+        <div th:replace="~{fragments/card :: hoverCardTemplate(cardType='infocard')}"></div>
+
+    </div>
 
     <th:block th:insert="~{fragments/pageLayout :: navbar('')}"></th:block>
 
     <div class="maincontainer">
 
+        <form th:action="|/deck/${deck.card.getDeckId()}|" method="get">
+            <input class="searchBar" type="search" name="search"/>
+        </form>
+
         <a id="parentButton" th:text="${deck.card.title}" th:href="@{/deck/__${deck.card.getPrimaryKey()}__}">Deck</a>
 
-        <div th:replace="~{fragments/card :: card(isMain=${true},cardElement=${group},cardType='cardgroup',cardWidth=${774})}"></div>
+        <div th:replace="~{fragments/card :: cardDisplay(isMain=${true},cardElement=${cardGroup},cardType='cardGroup',cardWidth=${774},isOwned=${isOwned})}"></div>
 
-        <hr>
+        <br>
+
+        <div style="text-align: center;">
+
+            <div style="display: flex;">
+                <h2>Mindcards</h2>
+                <div th:if="${isOwned}" class="groupMindcardAdder" th:classappend="|${cardType}|">
+                    <i class="fas fa-plus plusSign"></i>
+                </div>
+            </div>
+
+            <br>
+
+            <div class="card-grid">
+
+                <th:block th:each="mindcard: ${mindcards}">
+                    <div th:replace="~{fragments/card :: groupMindcard(cardElement=${mindcard})}"></div>
+                </th:block>
+
+            </div>
+        </div>
 
     </div>
 
-    <script th:src="@{/javascript/cardedit.js}" th:inline="javascript"></script>
+    <div th:if="${isOwned}" hidden class="groupMindcardPopup">
+        <span hidden class="deckId" th:text="${deck.card.getDeckId()}"></span>
+        <span hidden class="cardGroupId" th:text="${cardGroup.card.getCardGroupId()}"></span>
+        <div class="popupInterface">
+                <span style="display: flex">
+                    <form class="popupSearch">
+                        <input class="searchBar" type="search" name="search"/>
+                    </form>
+                    <div class="closeButton">
+                        <i class="fas fa-times"></i>
+                    </div>
+                </span>
+            <div class="card-grid">
+            </div>
+        </div>
+    </div>
+
+    <script th:src="@{/javascript/cardUtility.js}"></script>
+    <script th:src="@{/javascript/markdown.js}"></script>
+    <script th:src="@{/javascript/cardedit.js}"></script>
 
 </body>

@@ -4,6 +4,7 @@ import com.raffier.mindcards.model.web.CardElement;
 import com.raffier.mindcards.model.web.DeckElement;
 import com.raffier.mindcards.model.table.*;
 import com.raffier.mindcards.repository.table.*;
+import com.raffier.mindcards.util.CardType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -27,7 +28,7 @@ public class CardElementService {
     @Autowired
     private DeckRepository deckRepository;
 
-    protected <T extends CardTable, S extends EntityRepository<T,Integer>> CardElement<T> getCardElement(User user, int cardId, S repository) {
+    protected <T extends CardTable, S extends EntityRepository<T,Integer>> CardElement<T> getCardElement(int cardId, S repository) {
         T card = repository.getById(cardId);
         Image image = cardUtilityService.getCardImage(card);
         return new CardElement<>(card,image);
@@ -41,7 +42,7 @@ public class CardElementService {
         return new DeckElement(card,image,isFavourited,totalFavourites);
     }
 
-    protected  <T extends CardTable> List<CardElement<T>> getCardElementList(User user, List<T> list) {
+    protected  <T extends CardTable> List<CardElement<T>> getCardElementList(List<T> list) {
         List<CardElement<T>> pairList = new ArrayList<>();
         for (T i: list) {
             Image image = cardUtilityService.getCardImage(i);
@@ -66,33 +67,50 @@ public class CardElementService {
 
     // Getting Single Cards //
 
-    public CardElement<Infocard> getInfocardElement(User user, int cardId) {
-        return getCardElement(user,cardId,infocardRepository);
+    public CardElement<Infocard> getInfocardElement(int cardId) {
+        return getCardElement(cardId,infocardRepository);
     }
-    public CardElement<Mindcard> getMindcardElement(User user, int cardId) {
-        return getCardElement(user,cardId,mindcardRepository);
+    public CardElement<Mindcard> getMindcardElement(int cardId) {
+        return getCardElement(cardId,mindcardRepository);
     }
-    public CardElement<CardGroup> getCardGroupElement(User user, int cardId) {
-        return getCardElement(user,cardId,cardGroupRepository);
+    public CardElement<CardGroup> getCardGroupElement(int cardId) {
+        return getCardElement(cardId,cardGroupRepository);
     }
     //GetDeckElement is already defined
 
+    //Parent Deck
+    public DeckElement getMindcardDeck(User user, int cardId) {
+        Mindcard card = mindcardRepository.getById(cardId);
+        return getDeckElement(user, card.getDeckId());
+    }
+
+    public DeckElement getInfocardDeck(User user, int cardId) {
+        Infocard card = infocardRepository.getById(cardId);
+        Mindcard mindcard = mindcardRepository.getById(card.getMindcardId());
+        return getDeckElement(user, mindcard.getDeckId());
+    }
+
+    public DeckElement getCardGroupDeck(User user, int cardId) {
+        CardGroup card = cardGroupRepository.getById(cardId);
+        return getDeckElement(user, card.getDeckId());
+    }
+
     //  Getting multiple cards  //
 
-    public List<CardElement<Infocard>> getInfocardsFromMindcard(User user, int mindcardId) {
-        return getCardElementList(user, infocardRepository.getFromMindcard(mindcardId));
+    public List<CardElement<Infocard>> getInfocardsFromMindcard(int mindcardId) {
+        return getCardElementList(infocardRepository.getFromMindcard(mindcardId));
     }
 
-    public List<CardElement<Mindcard>> getMindcardsFromCardGroup(User user, int cardGroupId) {
-        return getCardElementList(user, mindcardRepository.getFromCardGroup(cardGroupId));
+    public List<CardElement<Mindcard>> getMindcardsFromCardGroup(int cardGroupId) {
+        return getCardElementList(mindcardRepository.getFromCardGroup(cardGroupId));
     }
 
-    public List<CardElement<Mindcard>> getRandomMindcardsFromDeck(User user, int deckId, int amount) {
-        return getCardElementList(user, mindcardRepository.getRandomFromDeck(deckId, amount));
+    public List<CardElement<Mindcard>> getRandomMindcardsFromDeck(int deckId, int amount) {
+        return getCardElementList(mindcardRepository.getRandomFromDeck(deckId, amount));
     }
 
-    public List<CardElement<CardGroup>> getRandomCardGroupsFromDeck(User user, int deckId, int amount) {
-        return getCardElementList(user, cardGroupRepository.getRandomFromDeck(deckId, amount));
+    public List<CardElement<CardGroup>> getRandomCardGroupsFromDeck(int deckId, int amount) {
+        return getCardElementList(cardGroupRepository.getRandomFromDeck(deckId, amount));
     }
 
     //Decks (Pages start at 0)
@@ -116,9 +134,17 @@ public class CardElementService {
         return getDeckElementList(user, deckRepository.getOldestViewed(amount,amount*page));
     }
 
-    //Deck Searching
-    public List<DeckElement> searchDeck(User user, String searchString, int amount, int page) {
-        return getDeckElementList(user, deckRepository.search(searchString,amount,amount*page));
+    //Searching
+    public List<DeckElement> searchDecks(User user, String searchString, int amount, int page) {
+        return getDeckElementList(user, deckRepository.search(searchString, amount, amount*page));
+    }
+
+    public List<CardElement<Mindcard>> searchMindcards(int deckId, String searchString, int amount, int page) {
+        return getCardElementList(mindcardRepository.search(deckId, searchString, amount, amount*page));
+    }
+
+    public List<CardElement<CardGroup>> searchCardGroups(int deckId, String searchString, int amount, int page) {
+        return getCardElementList(cardGroupRepository.search(deckId, searchString, amount, amount*page));
     }
 
 }

@@ -1,10 +1,7 @@
 package com.raffier.mindcards.repository.table;
 
 import com.raffier.mindcards.errorHandling.EntityNotFoundException;
-import com.raffier.mindcards.model.table.Image;
-import com.raffier.mindcards.model.table.Infocard;
-import com.raffier.mindcards.model.table.Mindcard;
-import com.raffier.mindcards.model.table.User;
+import com.raffier.mindcards.model.table.*;
 import com.raffier.mindcards.repository.AppDatabase;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -95,7 +92,7 @@ public class MindcardRepository extends CardRepository<Mindcard> {
 
     public List<Mindcard> getRandomFromDeck(int deckId, int amount) {
         return executeQuery(
-                "SELECT Mindcard.* FROM Mindcard, Deck WHERE Mindcard.deckId = ? ORDER BY RANDOM() LIMIT ?",
+                "SELECT * FROM Mindcard WHERE Mindcard.deckId = ? ORDER BY RANDOM() LIMIT ?",
                 (stmnt) -> {
                     stmnt.setInt(1, deckId);
                     stmnt.setInt(2, amount);
@@ -112,13 +109,40 @@ public class MindcardRepository extends CardRepository<Mindcard> {
 
     public List<Mindcard> getFromCardGroup(int cardGroupId) {
         return executeQuery(
-                "SELECT Mindcard.* FROM Mindcard, CardGroup, GroupMindcard WHERE CardGroup.cardGroupId=? AND CardGroup.cardGroupId=GroupMindcard.cardGroupId AND GroupMindcard.mindcardId=Mindcard.mindcardId",
+                "SELECT Mindcard.* FROM Mindcard, GroupMindcard WHERE GroupMindcard.cardGroupId = ? AND GroupMindcard.mindcardId=Mindcard.mindcardId",
                 (stmnt) -> stmnt.setInt(1, cardGroupId),
 
                 (results) -> {
                     List<Mindcard> outList = new ArrayList<>();
                     while (results.next()) {
                         outList.add(new Mindcard(results.getInt("mindcardId"), results.getInt("deckId"), results.getString("title"), results.getInt("imageId"), results.getString("description")));
+                    }
+                    return outList;
+                });
+    }
+
+    public List<Mindcard> search(int deckId, String searchString, int amount, int offset) {
+        return executeQuery(
+                "SELECT m1.*, " +
+                        "(SELECT COUNT(m2.mindcardId) FROM Mindcard m2 WHERE m2.deckId = m1.deckId AND (m2.title LIKE ? OR m2.description LIKE ?)) AS mindcardScore, " + //deckScore = 1 if title or description of a deck matches
+                        "(SELECT COUNT(Infocard.infocardId) FROM Infocard WHERE Infocard.mindcardId = m1.mindcardId AND Infocard.description LIKE ?) AS infocardScore " +
+                        "FROM Mindcard m1 " +
+                        "WHERE m1.deckId = ? " +
+                        "ORDER BY mindcardScore DESC, infocardScore DESC LIMIT ? OFFSET ?;",
+
+                (stmnt) -> {
+                    for (int i = 1; i <= 3; i++) {
+                        stmnt.setString(i, "%"+searchString+"%"); //Set parameters 1 to 3 inclusive as searchString
+                    }
+                    stmnt.setInt(4,deckId);
+                    stmnt.setInt(5,amount);
+                    stmnt.setInt(6,offset);
+                },
+
+                (results) -> {
+                    List<Mindcard> outList = new ArrayList<>();
+                    while (results.next()) {
+                        outList.add( new Mindcard(results.getInt("mindcardId"),results.getInt("deckId"),results.getString("title"),results.getInt("imageId"),results.getString("description")) );
                     }
                     return outList;
                 });

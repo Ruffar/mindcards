@@ -8,10 +8,10 @@
 <body>
 
 <th:block th:fragment="cardDisplay(cardElement,cardType,isOwned)" th:with="cardWidth=${cardWidth} ?: ${500}, isMain=${isMain} ?: ${false}">
-    <div class="card displayCard" th:classappend="|${isMain ? 'card-main ' : ''}${cardType}|" th:style="|margin: auto; width: ${cardWidth}px; height: ${cardWidth/2}px;|">
+    <div class="card displayCard" th:classappend="|${isMain ? 'card-main ' : ''}${cardType}|">
 
-        <div class="card-view">
-            <span hidden class="cardId" th:text="${cardElement.getCard().getPrimaryKey()}"></span>
+        <span hidden class="cardId" th:text="${cardElement.getCard().getPrimaryKey()}"></span>
+        <div class="cardBody card-view">
             <div class="card-decoration">
                 <div th:hidden="${cardElement.getImagePath() == ''}" class="imgcontainer" th:styleappend="${cardElement.getImagePath() != ''} ? 'background-image: url('+@{${cardElement.getImagePath()}}+')'"></div>
             </div>
@@ -20,19 +20,19 @@
                 <p hidden class="description" th:text="${cardElement.getDescription()}"> Description </p>
                 <div class="unescapedDesc"></div>
             </div>
-            <div class="cornerButtons">
-                <button th:if="${isOwned}" class="editCardButton">Edit</button>
-            </div>
+        </div>
+        <div class="cornerButtons card-view">
+            <button th:if="${isOwned}" class="editCardButton">Edit</button>
         </div>
 
     </div>
 </th:block>
 
 <th:block th:fragment="cardDisplayTemplate(cardType,isOwned)" th:with="cardWidth=${cardWidth} ?: ${500}, isMain=${isMain} ?: ${false}">
-    <div class="card displayCard" th:classappend="|${isMain ? 'card-main ' : ''}${cardType}|" th:style="|margin: auto; width: ${cardWidth}px; height: ${cardWidth/2}px;|">
+    <div class="card displayCard" th:classappend="|${isMain ? 'card-main ' : ''}${cardType}|">
 
-        <div class="card-view">
-            <span hidden class="cardId"></span>
+        <span hidden class="cardId"></span>
+        <div class="cardBody card-view">
             <div class="card-decoration">
                 <div class="imgcontainer"></div>
             </div>
@@ -41,64 +41,58 @@
                 <p hidden class="description"> Description </p>
                 <div class="unescapedDesc"></div>
             </div>
-            <div class="cornerButtons">
-                <button th:if="${isOwned}" class="editCardButton">Edit</button>
-            </div>
+        </div>
+        <div class="cornerButtons card-view">
+            <button th:if="${isOwned}" class="editCardButton">Edit</button>
         </div>
 
     </div>
 </th:block>
 
+<th:block th:fragment="hoverCardTemplate(cardType)">
+    <div class="card hoverCard" th:classappend="${cardType}">
+        <span hidden class="cardId"></span>
+        <div class="cardBody card-view">
+            <div class="card-decoration">
+                <div class="imgcontainer"></div>
+            </div>
+            <div class="card-text">
+                <h3 th:unless="${cardType} == 'infocard'" class="title"><b> MindcardTitle </b></h3>
+                <p hidden class="description"> Description </p>
+                <div class="unescapedDesc"></div>
+            </div>
+        </div>
+    </div>
+</th:block>
+
 
 <th:block th:fragment="cardEditor(cardType)" th:with="cardWidth=${cardWidth} ?: ${500}, isMain=${isMain} ?: ${false}">
-    <div class="card editorCard" th:classappend="|${isMain ? 'card-main ' : ''}${cardType}|" th:style="|margin: auto; width: ${cardWidth}px; height: ${cardWidth/2}px;|">
+    <div class="card editorCard" th:classappend="|${isMain ? 'card-main ' : ''}${cardType}|">
 
-        <form class="card-editor" enctype="multipart/form-data">
+        <form class="cardBody card-editor" enctype="multipart/form-data">
             <input type="hidden" name="cardType" th:value="${cardType}"/>
             <input type="hidden" name="cardId"/>
             <div class="card-decoration">
-                <input type="file" name="image" class="imgcontainer" accept="image/png ,image/jpg, image/jpeg"/>
+                <select class="imageSelect" name="imageChange">
+                    <option value="none">None</option>
+                    <option value="remove">Remove</option>
+                    <option value="upload">Upload</option>
+                    <option value="url">URL</option>
+                </select>
+                <input type="file" name="imageFile" class="imgcontainer" accept="image/png ,image/jpg, image/jpeg"/>
+                <input type="text" name="imageUrl"/>
             </div>
             <div class="card-text">
                 <input th:unless="${cardType} == 'infocard'" name="title" class="title" type="text" /><br/>
                 <textarea name="description" class="description" rows="12" ></textarea><br/>
                 <label class="errorLabel" style="color: #f66;"></label>
             </div>
-            <div class="cornerButtons">
-                <button class="deleteCardButton">Delete</button>
-                <button type="submit" class="saveCardButton">Save</button>
-                <button class="cancelEditCardButton">Cancel</button>
-            </div>
         </form>
-
-    </div>
-</th:block>
-
-
-
-<th:block th:fragment="cardAdder(parentElement,cardType)" th:with="cardWidth=${cardWidth} ?: ${500}">
-    <div class="card" th:classappend="${cardType}" th:style="|margin: auto; width: ${cardWidth}px; height: ${cardWidth/2}px;|">
-
-        <div class="card-add">
-            <img th:src="@{/images/addCard.png}" th:style="|width: ${cardWidth/4}px; height: ${cardWidth/4}px;|"/>
+        <div class="cornerButtons card-editor">
+            <button class="deleteCardButton">Delete</button>
+            <button type="submit" class="saveCardButton">Save</button>
+            <button class="cancelEditCardButton">Cancel</button>
         </div>
-
-        <!--<form hidden class="card-editor" enctype="multipart/form-data">
-            <input type="hidden" name="cardType" th:value="${cardType}"/>
-            <input type="hidden" name="parentCardId" th:value="${parentElement.getCard().getPrimaryKey()}"/>
-            <div class="card-decoration">
-                <input type="file" name="image" class="imgcontainer"/>
-            </div>
-            <div class="card-text">
-                <input th:unless="${cardType} == 'infocard'" name="title" class="title" type="text" /><br/>
-                <textarea name="description" class="description" th:rows="12" ></textarea><br/>
-                <label class="errorLabel" style="color: #f66;"></label>
-            </div>
-            <div class="cornerButtons">
-                <button type="submit" class="confirmAddCardButton">Save</button>
-                <button class="cancelAddCardButton">Cancel</button>
-            </div>
-        </form>-->
 
     </div>
 </th:block>
@@ -108,18 +102,18 @@
 
     <div class="mainCardAdder" th:classappend="|${cardType}|">
         <span th:if="${parentElement}" class="cardId" hidden th:text="${parentElement.card.getPrimaryKey()}"></span>
-        <img th:src="@{/images/addCard.png}" style="width: 75%;height: 75%;padding: 12.5%;"/>
+        <i class="fas fa-plus plusSign"></i>
     </div>
 
 </th:block>
 
 
 <th:block th:fragment="browserCard(cardElement,cardType)" th:with="cardWidth=${cardWidth} ?: ${300}">
-    <div class="card browserCard" th:classappend="|${cardType}|" th:style="|margin: auto; width: ${cardWidth}px; height: ${cardWidth/2}px;|">
+    <div class="card browserCard" th:classappend="|${cardType}|">
 
         <span class="cardId" hidden th:text="${cardElement.getCard().getPrimaryKey()}"></span>
         <span class="cardLink" hidden th:text="|/${cardType}/${cardElement.getCard().getPrimaryKey()}|"></span>
-        <div class="card-view">
+        <div class="cardBody card-view">
             <div class="card-decoration">
                 <div th:hidden="${cardElement.getImagePath() == ''}" class="imgcontainer" th:styleappend="${cardElement.getImagePath() != ''} ? 'background-image: url('+@{${cardElement.getImagePath()}}+')'"></div>
             </div>
@@ -128,14 +122,87 @@
                 <p hidden class="description" th:text="${cardElement.getDescription()}"> Description </p>
                 <div class="unescapedDesc"></div>
             </div>
-            <div class="cornerButtons">
-                <div th:if="${cardType} == 'deck'">
-                    <input type="image" class="favouriteButton" th:classappend="|${cardElement.isFavourited()} ? 'favourited' : ''|" th:src="${cardElement.isFavourited()} ? @{/images/favourite.png} : @{/images/favouriteEmpty.png}" th:style="|float: left; width: ${cardWidth/10}px; height: ${cardWidth/10}px;|"/>
-                    <span th:text="${cardElement.getTotalFavourites()}" style="float: left; color: #fff;"></span>
-                </div>
-            </div>
+        </div>
+        <div class="cornerButtons">
+            <button th:if="${cardType} == 'deck'" class="favouriteButton" th:classappend="${cardElement.isFavourited()} ? 'favourited' : ''">
+                <span class="favouriteHeart">
+                    <i class="fa-heart" th:classappend="${cardElement.isFavourited()} ? 'fas' : 'far'"></i>
+                </span>
+                <span class="favouriteNumber" th:text="${cardElement.getTotalFavourites()}"></span>
+            </button>
         </div>
 
+    </div>
+</th:block>
+
+<th:block th:fragment="browserCardTemplate(cardType)" th:with="cardWidth=${cardWidth} ?: ${300}">
+    <div class="card browserCard" th:classappend="|${cardType}|">
+
+        <span class="cardId" hidden></span>
+        <span class="cardLink" hidden th:text="|/${cardType}/|"></span>
+        <div class="cardBody card-view">
+            <div class="card-decoration">
+                <div class="imgcontainer"></div>
+            </div>
+            <div class="card-text">
+                <h3 th:unless="${cardType} == 'infocard'" class="title"><b> MindcardTitle </b></h3>
+                <p hidden class="description"> Description </p>
+                <div class="unescapedDesc"></div>
+            </div>
+        </div>
+        <div class="cornerButtons">
+            <button th:if="${cardType} == 'deck'" class="favouriteButton">
+                <span class="favouriteHeart">
+                    <i class="far fa-heart"></i>
+                </span>
+                <span class="favouriteNumber">0</span>
+            </button>
+        </div>
+
+    </div>
+</th:block>
+
+<th:block th:fragment="groupMindcard(cardElement)">
+    <div class="card browserCard mindcard">
+        <span class="cardId" hidden th:text="${cardElement.getCard().getPrimaryKey()}"></span>
+        <span class="cardLink" hidden th:text="|/${cardType}/${cardElement.getCard().getPrimaryKey()}|"></span>
+        <div class="cardBody card-view">
+            <div class="card-decoration">
+                <div th:hidden="${cardElement.getImagePath() == ''}" class="imgcontainer" th:styleappend="${cardElement.getImagePath() != ''} ? 'background-image: url('+@{${cardElement.getImagePath()}}+')'"></div>
+            </div>
+            <div class="card-text">
+                <h3 class="title" th:text="${cardElement.getTitle()}"><b> MindcardTitle </b></h3>
+                <p hidden class="description" th:text="${cardElement.getDescription()}"> Description </p>
+                <div class="unescapedDesc"></div>
+            </div>
+        </div>
+        <div class="cornerButtons">
+            <button th:if="${isOwned}" class="removeFromGroupButton">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+    </div>
+</th:block>
+
+<th:block th:fragment="groupMindcardTemplate()">
+    <div class="card browserCard mindcard">
+        <span class="cardId" hidden></span>
+        <span class="cardLink" hidden></span>
+        <div class="cardBody card-view">
+            <div class="card-decoration">
+                <div class="imgcontainer"></div>
+            </div>
+            <div class="card-text">
+                <h3 class="title"><b> MindcardTitle </b></h3>
+                <p hidden class="description"> Description </p>
+                <div class="unescapedDesc"></div>
+            </div>
+        </div>
+        <div class="cornerButtons">
+            <button th:if="${isOwned}" class="removeFromGroupButton">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
     </div>
 </th:block>
 

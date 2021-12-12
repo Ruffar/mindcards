@@ -2,25 +2,94 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org/">
 
 <head>
-    <link rel="stylesheet" th:href="@{/css/navbar.css}"/>
+    <link rel="stylesheet" th:onclick="|navClick('@{/css/navbar.css}"/>
 </head>
 
 <body>
 
 <th:block th:fragment="navbar(module)">
     <div class="navbar">
-        <a th:href="@{/home}" th:classappend="${module == 'home'} ? 'active' : ''">Home</a>
-        <a th:href="@{/browse}" th:classappend="${module == 'browse'} ? 'active' : ''">Browse</a>
-        <th:block th:unless="${session.user}">
-            <a th:href="@{/login(return=${#httpServletRequest.requestURI})}" th:classappend="${module == 'login'} ? 'active' : ''">Login</a>
-            <a th:href="@{/register(return=${#httpServletRequest.requestURI})}" th:classappend="${module == 'register'} ? 'active' : ''">Register</a>
-        </th:block>
-        <th:block th:if="${session.user}">
-            <a th:href="@{/revise}" th:classappend="${module == 'revise'} ? 'active' : ''">Revise</a>
-            <a th:href="@{/profile}" th:classappend="${module == 'profile'} ? 'active' : ''" th:text="${session.user} ? ${session.user.username} : 'Profile'">Profile</a>
-            <a th:href="@{/logout}" class="logout">Logout</a>
-        </th:block>
+        <ul class="topItems">
+
+            <!-- Home -->
+            <li th:onclick="|navClick('@{/home}')|" th:classappend="${module == 'home'} ? 'active' : ''">
+                <span class="icon">
+
+                    <svg xmlns:dc="http://purl.org/dc/elements/1.1/" xmlns:cc="http://creativecommons.org/ns#" xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+                         xmlns:svg="http://www.w3.org/2000/svg" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" height="8rem" width="5rem" id="svg863" version="1.1">
+                      <metadata id="metadata869">
+                        <rdf:RDF>
+                          <cc:Work rdf:about="">
+                            <dc:format>image/svg+xml</dc:format>
+                            <dc:type rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+                            <dc:title></dc:title>
+                          </cc:Work>
+                        </rdf:RDF>
+                      </metadata>
+                      <defs id="defs867" />
+                      <g id="g871">
+                        <path d="m 256.42188,113.42773 c -55.22847,0 -100,44.77153 -100,100 v 48.00586 c 5e-4,0.937 0.0142,1.87394 0.041,2.81055 h -27.35937 c -44.182782,0 -80.000004,35.81722 -80.000004,80 v 168.92969 c 0,44.18278 35.817222,80 80.000004,80 H 501.4082 l 248.83203,90.61914 0.005,-170.0166 c 0.006,-0.40166 0.005,-169.53223 0.005,-169.53223 0,-44.18278 -35.81722,-80 -80,-80 h -29.0957 c 0.0268,-0.93661 0.0405,-1.87355 0.041,-2.81055 v -48.00586 c 0,-55.22847 -44.77153,-100 -100,-100 z m -102.8086,200.56836 h 107.77344 c 33.13708,0 60,26.86292 60,60 v 110.00782 c 0,33.13708 -26.86292,60 -60,60 H 153.61328 c -33.13708,0 -59.999999,-26.86292 -59.999999,-60 V 373.99609 c 0,-33.13708 26.862919,-60 59.999999,-60 z"
+                                style="display:inline;fill:currentColor;fill-opacity:1;stroke:#ffffff;stroke-width:0;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" id="rect1436" />
+                      </g>
+                    </svg>
+                </span>
+                <span class="text">Mindcards</span>
+            </li>
+            <!-- Browse -->
+            <li th:onclick="|navClick('@{/browse}')|" th:classappend="${module == 'browse'} ? 'active' : ''">
+                <span class="icon">
+                    <i class="fas fa-window-restore"></i>
+                </span>
+                <span class="text">Browse</span>
+            </li>
+            <th:block th:if="${session.user}">
+                <!-- Revise -->
+                <li th:onclick="|navClick('@{/revise}')|" th:classappend="${module == 'revise'} ? 'active' : ''">
+                    <span class="icon">
+                       <i class="fas fa-book"></i>
+                    </span>
+                    <span class="text">Revise</span>
+                </li>
+            </th:block>
+
+        </ul>
+
+        <ul class="bottomItems">
+            <th:block th:unless="${session.user}">
+                <!-- Login -->
+                <li th:onclick="|navClick('@{/login(return=${#httpServletRequest.requestURI})}')|" th:classappend="${module == 'login'} ? 'active' : ''">
+                    <span class="icon">
+                        <i class="fas fa-sign-in-alt"></i>
+                    </span>
+                    <span class="text">Login</span>
+                </li>
+            </th:block>
+            <th:block th:if="${session.user}">
+                <!-- Profile -->
+                <li th:onclick="|navClick('@{/profile}')|" th:classappend="${module == 'profile'} ? 'active' : ''">
+                    <span class="icon">
+                        <i class="fas fa-user"></i>
+                    </span>
+                    <span class="text" th:text="${session.user} ? ${session.user.username} : 'Profile'">Profile</span>
+                </li>
+                <!-- Logout -->
+                <li th:onclick="|navClick('@{/logout}')|" class="logout">
+                    <span class="icon">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </span>
+                    <span class="text">Logout</span>
+                </li>
+            </th:block>
+        </ul>
+
+        <script>
+            function navClick(url) {
+                window.location.assign(url);
+            }
+        </script>
+
     </div>
+
 </th:block>
 
 </body>

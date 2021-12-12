@@ -39,7 +39,7 @@ public class DeckLibraryController {
 
         if (!search.equals("")) {
             mv.setViewName("deckLibrary/search");
-            mv.addObject("decks", cardElementService.searchDeck(user, search, 12, page-1));
+            mv.addObject("decks", cardElementService.searchDecks(user, search, 12, page-1));
             mv.addObject("search",search);
         }
         else if (sortType != SortType.NONE) {

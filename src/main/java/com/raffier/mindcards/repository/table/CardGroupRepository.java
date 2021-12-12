@@ -1,10 +1,7 @@
 package com.raffier.mindcards.repository.table;
 
 import com.raffier.mindcards.errorHandling.EntityNotFoundException;
-import com.raffier.mindcards.model.table.CardGroup;
-import com.raffier.mindcards.model.table.Image;
-import com.raffier.mindcards.model.table.Mindcard;
-import com.raffier.mindcards.model.table.User;
+import com.raffier.mindcards.model.table.*;
 import com.raffier.mindcards.repository.AppDatabase;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -104,6 +101,34 @@ public class CardGroupRepository extends CardRepository<CardGroup> {
                     List<CardGroup> outList = new ArrayList<>();
                     while (results.next()) {
                         outList.add(new CardGroup(results.getInt("cardGroupId"), results.getInt("deckId"), results.getString("title"), results.getInt("imageId"), results.getString("description")));
+                    }
+                    return outList;
+                });
+    }
+
+    public List<CardGroup> search(int deckId, String searchString, int amount, int offset) {
+        return executeQuery(
+                "SELECT g1.*, " +
+                        "(SELECT COUNT(g2.cardGroupId) FROM CardGroup g2 WHERE g1.deckId = g2.deckId AND (g2.title LIKE ? OR g2.description LIKE ?)) AS groupScore, " + //deckScore = 1 if title or description of a deck matches
+                        "(SELECT COUNT(Mindcard.mindcardId) FROM Mindcard, GroupMindcard WHERE GroupMindcard.cardGroupId = g1.cardGroupId AND GroupMindcard.mindcardId = Mindcard.mindcardId AND (Mindcard.title LIKE ? OR Mindcard.description LIKE ?)) AS mindcardScore, " + //mindcardScore
+                        "(SELECT COUNT(Infocard.infocardId) FROM Infocard, GroupMindcard WHERE GroupMindcard.cardGroupId = g1.cardGroupId AND GroupMindcard.mindcardId = Infocard.mindcardId AND Infocard.description LIKE ?) AS infocardScore " +
+                        "FROM CardGroup g1 " +
+                        "WHERE g1.deckId = ? " +
+                        "ORDER BY groupScore DESC, mindcardScore DESC, infocardScore DESC LIMIT ? OFFSET ?;",
+
+                (stmnt) -> {
+                    for (int i = 1; i <= 5; i++) {
+                        stmnt.setString(i, "%"+searchString+"%"); //Set parameters 1 to 5 inclusive as searchString
+                    }
+                    stmnt.setInt(6, deckId);
+                    stmnt.setInt(7,amount);
+                    stmnt.setInt(8,offset);
+                },
+
+                (results) -> {
+                    List<CardGroup> outList = new ArrayList<>();
+                    while (results.next()) {
+                        outList.add( new CardGroup(results.getInt("cardGroupId"),results.getInt("deckId"),results.getString("title"),results.getInt("imageId"),results.getString("description")) );
                     }
                     return outList;
                 });

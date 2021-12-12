@@ -1,21 +1,21 @@
 package com.raffier.mindcards.service;
 
+import com.raffier.mindcards.errorHandling.ImageChangeException;
 import com.raffier.mindcards.errorHandling.InvalidHyperlinkException;
 import com.raffier.mindcards.model.table.*;
 import com.raffier.mindcards.repository.table.*;
-import com.raffier.mindcards.util.CardType;
+import com.raffier.mindcards.util.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
-import java.sql.Date;
-import java.time.Instant;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -50,46 +50,72 @@ public class CardUpdateService {
     /*
     Saves the image into the database but DOES NOT save the card
      */
-    public <T extends CardTable> void setCardImage(T card, MultipartFile file) {
+    public <T extends CardTable> void setCardImage(T card, ImageUpdate imageUpdate) {
 
         Image image = cardUtilityService.getCardImage(card);
-        if (image == null && !file.isEmpty()) {
-            image = imageRepository.add( new Image(0,"") );
+        if (image == null && imageUpdate.getChangeType() != ImageChangeType.REMOVE && imageUpdate.getChangeType() != ImageChangeType.NONE) {
+            image = imageRepository.add(new Image(0, ""));
             card.setImageId(image.getImageId());
-            image.setImagePath("/images/card/"+image.getImageId() + ".png");
-            imageRepository.save(image);
         }
 
         if (image != null) {
+
             try {
                 Path path = imageDirectory.resolve(image.getImageId() + ".png");
-                if (!file.isEmpty()) {
+                //Update file
+                if (imageUpdate instanceof ImageFileUpdate) {
+                    MultipartFile file = ((ImageFileUpdate) imageUpdate).getFile();
                     Files.copy(file.getInputStream(), path, StandardCopyOption.REPLACE_EXISTING);
-                } else {
+                    image.setImagePath("/cardImages/" + image.getImageId() + ".png");
+                    imageRepository.save(image);
+
+                //Update URL
+                } else if (imageUpdate instanceof ImageUrlUpdate) {
+                    Files.deleteIfExists(path);
+                    image.setImagePath( ((ImageUrlUpdate) imageUpdate).getUrl() );
+                    imageRepository.save(image);
+
+                //Remove image
+                } else if (imageUpdate.getChangeType() == ImageChangeType.REMOVE) {
                     Files.deleteIfExists(path);
                     card.setImageId(0);
                     imageRepository.delete(image);
                 }
-            } catch (Exception e) {
-                e.printStackTrace();
+            } catch (IOException e) {
+                throw new ImageChangeException();
             }
         }
 
     }
 
     //Update card main information
+    public void updateDeck(int cardId, String title, ImageUpdate imageUpdate, String description) {
+        Deck card = deckRepository.getById(cardId);
+        card.setTitle(title);
+        setCardImage(card,imageUpdate);
+        card.setDescription(description);
+        deckRepository.save(card);
+    }
 
-    public void updateMindcard(int cardId, String title, MultipartFile image, String description) {
+    public void updateCardGroup(int cardId, String title, ImageUpdate imageUpdate, String description) {
+        CardGroup card = cardGroupRepository.getById(cardId);
+        card.setTitle(title);
+        setCardImage(card,imageUpdate);
+        card.setDescription(description);
+        cardGroupRepository.save(card);
+    }
+
+    public void updateMindcard(int cardId, String title, ImageUpdate imageUpdate, String description) {
         Mindcard card = mindcardRepository.getById(cardId);
         card.setTitle(title);
-        setCardImage(card,image);
+        setCardImage(card,imageUpdate);
         card.setDescription(description);
         mindcardRepository.save(card);
     }
 
-    public void updateInfocard(int cardId, MultipartFile image, String description) {
+    public void updateInfocard(int cardId, ImageUpdate imageUpdate, String description) {
         Infocard card = infocardRepository.getById(cardId);
-        setCardImage(card,image);
+        setCardImage(card,imageUpdate);
         card.setDescription(description);
         infocardRepository.save(card);
     }

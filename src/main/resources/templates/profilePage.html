@@ -1,19 +1,22 @@
 <!DOCTYPE html>
 <html lang="en" xmlns:th="http://www.thymeleaf.org/">
 <head>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://kit.fontawesome.com/fd57869c39.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" th:href="@{/css/main.css}"/>
-
-    <style>
-        body {
-            background-color: #444;
-        }
-    </style>
 
     <meta charset="UTF-8">
     <title>Mindcards</title>
 </head>
 
 <body>
+
+    <div id="cardTemplates" hidden>
+        <div th:replace="~{fragments/card :: hoverCardTemplate(cardType='deck')}"></div>
+        <div th:replace="~{fragments/card :: hoverCardTemplate(cardType='cardGroup')}"></div>
+        <div th:replace="~{fragments/card :: hoverCardTemplate(cardType='mindcard')}"></div>
+        <div th:replace="~{fragments/card :: hoverCardTemplate(cardType='infocard')}"></div>
+    </div>
 
     <th:block th:insert="~{fragments/pageLayout :: navbar('profile')}"></th:block>
 
@@ -40,6 +43,11 @@
         </div>
 
     </div>
+
+    <script th:src="@{/javascript/cardUtility.js}"></script>
+    <script th:src="@{/javascript/markdown.js}"></script>
+    <script th:src="@{/javascript/browserCards.js}"></script>
+    <script th:src="@{/javascript/cardEdit.js}"></script>
 
 </body>
 </html>

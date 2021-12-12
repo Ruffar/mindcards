@@ -1,6 +1,15 @@
+@import url('https://fonts.googleapis.com/css2?family=Varela+Round&display=swap');
+
 @import "navbar.css";
 @import "cards.css";
 
+body {
+    background-color: #444;
+    color: #fff;
+    font-family: Varela Round;
+}
+
 .maincontainer {
-  margin-left: 10%;
+  margin-left: 8rem;
+  padding: 0 1rem;
 }

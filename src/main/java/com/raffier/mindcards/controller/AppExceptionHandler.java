@@ -15,6 +15,11 @@ import javax.servlet.http.HttpServletRequest;
 public class AppExceptionHandler extends ResponseEntityExceptionHandler {
 
     //Exceptions
+    @ExceptionHandler(ImageChangeException.class)
+    private Object handleImageChangeException(ImageChangeException e, HttpServletRequest request) {
+        return buildResponse(request, new AppResponse(HttpStatus.NOT_ACCEPTABLE, e.getMessage()));
+    }
+
     @ExceptionHandler(PageIndexException.class)
     private Object handlePageIndexException(PageIndexException e, HttpServletRequest request) {
         return buildResponse(request, new AppResponse(HttpStatus.NOT_ACCEPTABLE, e.getMessage()));

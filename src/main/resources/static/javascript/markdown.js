@@ -6,6 +6,38 @@
     $(this).html("poop");
 });*/
 
+// Hyperlink Hover //
+$(document).on("mouseover","a.cardHyperlink",function(event){
+
+    var hyperlink = $(this);
+    var cardDiv = $(this).closest(".card")
+    var hoverCard = $(this).find(".hoverCard");
+    if (hoverCard.length == 0) { //If there is no hoverCard inside of the hyperlink, create one
+
+        var linkParam = hyperlink.attr("href").split("/");
+        var cardType = linkParam[0];
+        var cardId = linkParam[1];
+        $.ajax({
+            type: "GET",
+            url: "/getCardElement",
+            data: {cardType: cardType, cardId: cardId},
+
+            success: function(response) {
+               var newDiv = $("#cardTemplates").find(".hoverCard."+cardType).clone();
+               newDiv.appendTo(hyperlink);
+               updateCardElement(response,newDiv);
+            },
+            error: function(response) {
+                console.log(response.responseJSON.message);
+            }
+        });
+
+    }
+
+});
+
+
+// Markdown //
 //Stack
 class Stack {
 
@@ -101,7 +133,7 @@ function parseHorizontalRule(text) {
 }
 
 function parseHyperlink(text) {
-    return text.replace(/\[(.+?)]\((.+?)\)/g, '<a href="$2">$1</a>');
+    return text.replace(/\[(.+?)]\((.+?)\)/g, '<a class="cardHyperlink" href="$2">$1</a>');
 }
 
 function parseMathExpression(text) {

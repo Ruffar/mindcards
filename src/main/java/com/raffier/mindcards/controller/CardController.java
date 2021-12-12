@@ -1,13 +1,15 @@
 package com.raffier.mindcards.controller;
 
 import com.raffier.mindcards.errorHandling.EntityNotFoundException;
+import com.raffier.mindcards.errorHandling.ImageChangeException;
 import com.raffier.mindcards.errorHandling.InvalidCardTypeException;
 import com.raffier.mindcards.errorHandling.UnauthorisedAccessException;
+import com.raffier.mindcards.model.web.AppResponse;
 import com.raffier.mindcards.model.web.CardElement;
 import com.raffier.mindcards.model.web.DeckElement;
 import com.raffier.mindcards.model.table.*;
 import com.raffier.mindcards.service.*;
-import com.raffier.mindcards.util.CardType;
+import com.raffier.mindcards.util.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -55,12 +57,19 @@ public class CardController {
     }
 
     @GetMapping(value="deck/{deckId}")
-    public ModelAndView deckView(@ModelAttribute User user, @PathVariable int deckId, ModelAndView mv) {
+    public ModelAndView deckView(@ModelAttribute User user, @PathVariable int deckId, @RequestParam(defaultValue = "") String search, ModelAndView mv) {
         mv.setViewName("cards/deck");
 
         DeckElement deck = cardElementService.getDeckElement( user, deckId );
-        List<CardElement<Mindcard>> mindcards = cardElementService.getRandomMindcardsFromDeck( user, deckId, 12 );
-        List<CardElement<CardGroup>> cardGroups = cardElementService.getRandomCardGroupsFromDeck( user, deckId, 12 );
+        List<CardElement<Mindcard>> mindcards;
+        List<CardElement<CardGroup>> cardGroups;
+        if (!search.equals("")) {
+            mindcards = cardElementService.searchMindcards(deckId, search, 12, 0);
+            cardGroups = cardElementService.searchCardGroups(deckId, search, 12, 0);
+        } else {
+            mindcards = cardElementService.getRandomMindcardsFromDeck(deckId, 12);
+            cardGroups = cardElementService.getRandomCardGroupsFromDeck(deckId, 12);
+        }
 
         handleCardPage(user, deck.getCard(), mv);
 
@@ -71,19 +80,19 @@ public class CardController {
         return mv;
     }
 
-    @GetMapping(value="group/{cardGroupId}")
+    @GetMapping(value="cardGroup/{cardGroupId}")
     public ModelAndView groupView(@ModelAttribute User user, @PathVariable int cardGroupId, ModelAndView mv) {
         mv.setViewName("cards/group");
 
-        CardElement<CardGroup> group = cardElementService.getCardGroupElement( user, cardGroupId);
-        List<CardElement<Mindcard>> mindcards = cardElementService.getMindcardsFromCardGroup( user, group.getCard().getCardGroupId() );
+        CardElement<CardGroup> group = cardElementService.getCardGroupElement( cardGroupId);
+        List<CardElement<Mindcard>> mindcards = cardElementService.getMindcardsFromCardGroup( group.getCard().getCardGroupId() );
         DeckElement deck = cardElementService.getDeckElement( user, group.getCard().getDeckId() );
 
         handleCardPage(user, deck.getCard(), mv);
 
         mv.addObject("deck",deck);
         mv.addObject("mindcards",mindcards);
-        mv.addObject("group",group);
+        mv.addObject("cardGroup",group);
 
         return mv;
     }
@@ -92,8 +101,8 @@ public class CardController {
     public ModelAndView mindcardView(@ModelAttribute User user, @PathVariable int mindcardId, ModelAndView mv) {
         mv.setViewName("cards/mindcard");
 
-        CardElement<Mindcard> mindcard = cardElementService.getMindcardElement( user, mindcardId );
-        List<CardElement<Infocard>> infocards = cardElementService.getInfocardsFromMindcard( user, mindcardId );
+        CardElement<Mindcard> mindcard = cardElementService.getMindcardElement( mindcardId );
+        List<CardElement<Infocard>> infocards = cardElementService.getInfocardsFromMindcard( mindcardId );
         DeckElement deck = cardElementService.getDeckElement( user, mindcard.getCard().getDeckId() );
 
         handleCardPage(user, deck.getCard(), mv);
@@ -106,21 +115,46 @@ public class CardController {
     }
 
     @PostMapping("saveCard")
-    public ResponseEntity<CardElement<?>> saveCard(@ModelAttribute User user, @RequestParam String cardType, @RequestParam int cardId, @RequestParam MultipartFile image, @RequestParam(defaultValue = "") String title, @RequestParam String description, Model model) {
+    public ResponseEntity<CardElement<?>> saveCard(@ModelAttribute User user, @RequestParam String cardType, @RequestParam int cardId, @RequestParam(defaultValue="none") String imageChange, @RequestParam(required = false) MultipartFile imageFile, @RequestParam(required = false) String imageUrl, @RequestParam(defaultValue = "") String title, @RequestParam(defaultValue="") String description) {
 
         CardType cardTypeEnum = CardType.getCardTypeFromString(cardType);
+        //Create image update data
+        ImageChangeType imageChangeEnum = ImageChangeType.getImageChangeTypeFromString(imageChange);
+        ImageUpdate imageUpdateData;
+        switch(imageChangeEnum) {
+            case UPLOAD:
+                if (imageFile == null || imageFile.isEmpty()) throw new ImageChangeException("Image not yet uploaded...");
+                imageUpdateData = new ImageFileUpdate(imageFile);
+                break;
+            case URL:
+                if (imageUrl == null || imageUrl.equals("")) throw new ImageChangeException("Image URL must not be empty...");
+                imageUpdateData = new ImageUrlUpdate(imageUrl);
+                break;
+            default:
+                imageUpdateData = new ImageUpdate(imageChangeEnum);
+                break;
+        }
+
         boolean isOwner = cardUtilityService.isUserCardOwner(cardTypeEnum, user, cardId);
 
         CardElement<?> cardElement;
         if (isOwner && cardUpdateService.areHyperlinksValid(description)) {
             switch (cardTypeEnum) {
+                case DECK:
+                    cardUpdateService.updateDeck(cardId, title, imageUpdateData, description);
+                    cardElement = cardElementService.getDeckElement( user, cardId );
+                    break;
+                case CARDGROUP:
+                    cardUpdateService.updateCardGroup(cardId, title, imageUpdateData, description);
+                    cardElement = cardElementService.getCardGroupElement( cardId );
+                    break;
                 case MINDCARD:
-                    cardUpdateService.updateMindcard(cardId, title, image, description);
-                    cardElement = cardElementService.getMindcardElement( user, cardId );
+                    cardUpdateService.updateMindcard(cardId, title, imageUpdateData, description);
+                    cardElement = cardElementService.getMindcardElement( cardId );
                     break;
                 case INFOCARD:
-                    cardUpdateService.updateInfocard(cardId, image, description);
-                    cardElement = cardElementService.getInfocardElement( user, cardId );
+                    cardUpdateService.updateInfocard(cardId, imageUpdateData, description);
+                    cardElement = cardElementService.getInfocardElement( cardId );
                     break;
                 default:
                     throw new InvalidCardTypeException(cardTypeEnum);
@@ -133,7 +167,7 @@ public class CardController {
     }
 
     @DeleteMapping("deleteCard")
-    public ResponseEntity<?> deleteCard(@ModelAttribute User user, @RequestParam String cardType, @RequestParam int cardId, Model model) {
+    public ResponseEntity<?> deleteCard(@ModelAttribute User user, @RequestParam String cardType, @RequestParam int cardId) {
 
         CardType cardTypeEnum = CardType.getCardTypeFromString(cardType);
         boolean isOwner = cardUtilityService.isUserCardOwner(cardTypeEnum, user, cardId);
@@ -163,7 +197,7 @@ public class CardController {
     }
 
     @PostMapping("addCard")
-    public ResponseEntity<CardElement<?>> addCard(@ModelAttribute User user, @RequestParam String cardType, @RequestParam int parentCardId, Model model) {
+    public ResponseEntity<CardElement<?>> addCard(@ModelAttribute User user, @RequestParam String cardType, @RequestParam int parentCardId) {
 
         CardType cardTypeEnum = CardType.getCardTypeFromString(cardType);
         boolean isOwner;
@@ -179,17 +213,17 @@ public class CardController {
             switch (cardTypeEnum) {
                 case MINDCARD:
                     cardElement = cardElementService.getMindcardElement(
-                            user, cardUpdateService.addMindcard(parentCardId).getPrimaryKey()
+                            cardUpdateService.addMindcard(parentCardId).getPrimaryKey()
                     );
                     break;
                 case INFOCARD:
                     cardElement = cardElementService.getInfocardElement(
-                            user, cardUpdateService.addInfocard(parentCardId).getPrimaryKey()
+                            cardUpdateService.addInfocard(parentCardId).getPrimaryKey()
                     );
                     break;
                 case CARDGROUP:
                     cardElement = cardElementService.getCardGroupElement(
-                            user, cardUpdateService.addCardGroup(parentCardId).getPrimaryKey()
+                            cardUpdateService.addCardGroup(parentCardId).getPrimaryKey()
                     );
                     break;
                 case DECK:
@@ -208,27 +242,67 @@ public class CardController {
     }
 
     @GetMapping("getCardElement")
-    public String getCardElement(@ModelAttribute User user, @RequestParam String cardType, @RequestParam int cardId, Model model) {
+    public ResponseEntity<CardElement<?>> getCardElement(@ModelAttribute User user, @RequestParam String cardType, @RequestParam int cardId) {
 
         CardType cardTypeEnum = CardType.getCardTypeFromString(cardType);
-        boolean isOwner = cardUtilityService.isUserCardOwner(cardTypeEnum, user, cardId);
+        //boolean isOwner = cardUtilityService.isUserCardOwner(cardTypeEnum, user, cardId);
 
         CardElement<?> cardElement;
+        Deck deck;
         switch(cardTypeEnum) {
             case MINDCARD:
-                cardElement = cardElementService.getMindcardElement( user, cardId );
+                cardElement = cardElementService.getMindcardElement( cardId );
+                deck = cardElementService.getMindcardDeck( user, cardId ).getCard();
                 break;
             case INFOCARD:
-                cardElement = cardElementService.getInfocardElement( user, cardId );
+                cardElement = cardElementService.getInfocardElement( cardId );
+                deck = cardElementService.getInfocardDeck( user, cardId ).getCard();
+                break;
+            case CARDGROUP:
+                cardElement = cardElementService.getCardGroupElement( cardId );
+                deck = cardElementService.getCardGroupDeck( user, cardId ).getCard();
+                break;
+            case DECK:
+                cardElement = cardElementService.getDeckElement( user, cardId );
+                deck = (Deck) cardElement.getCard();
                 break;
             default:
                 throw new InvalidCardTypeException(cardTypeEnum);
         }
 
-        model.addAttribute("cardElement",cardElement);
-        model.addAttribute("cardType",cardType.toLowerCase());
+        int deckId = deck.getDeckId();
+        int userId = user == null ? 0 : user.getUserId();
+        //Make sure that card does not have ID 0 (i.e. the card is deleted)
+        if (deckId == 0) {
+            throw new EntityNotFoundException("This card has been deleted...");
+        }
+        //Check if deck can be accessed
+        if (deck.isPrivate() && deck.getOwnerId() != userId) {
+            throw new UnauthorisedAccessException("This Deck is private!");
+        }
 
-        return "fragments/card :: card(cardElement=${cardElement},cardType=${cardType})";
+        return new ResponseEntity<>(cardElement, HttpStatus.OK);
+    }
+
+    @GetMapping("searchDeckMindcards")
+    public ResponseEntity<List<CardElement<Mindcard>>> getCardElement(@ModelAttribute User user, @RequestParam int deckId, @RequestParam String search) {
+
+        //boolean isOwner = cardUtilityService.isUserCardOwner(cardTypeEnum, user, cardId);
+
+        Deck deck = cardElementService.getDeckElement( user, deckId ).getCard();
+        List<CardElement<Mindcard>> mindcards = cardElementService.searchMindcards(deckId, search, 10, 0);
+
+        int userId = user == null ? 0 : user.getUserId();
+        //Make sure that card does not have ID 0 (i.e. the card is deleted)
+        if (deckId == 0) {
+            throw new EntityNotFoundException("This card has been deleted...");
+        }
+        //Check if deck can be accessed
+        if (deck.isPrivate() && deck.getOwnerId() != userId) {
+            throw new UnauthorisedAccessException("This Deck is private!");
+        }
+
+        return new ResponseEntity<>(mindcards, HttpStatus.OK);
     }
 
     //Group Mindcards
@@ -240,7 +314,7 @@ public class CardController {
 
     }
 
-    @PostMapping("addMindcardToCardGroup")
+    @PostMapping("addGroupMindcard")
     public ResponseEntity<?> addMindcardToCardGroup(@ModelAttribute User user, @RequestParam int mindcardId, @RequestParam int cardGroupId) {
 
         handleCardGroupAccess(user,cardGroupId);
@@ -253,19 +327,23 @@ public class CardController {
         return new ResponseEntity<>(null,HttpStatus.BAD_REQUEST);
     }
 
-    @DeleteMapping("removeMindcardFromCardGroup")
-    public ResponseEntity<?> removeMindcardFromCardGroup(@ModelAttribute User user, @RequestParam int mindcardId, @RequestParam int cardGroupId) {
+    @DeleteMapping("/removeGroupMindcard")
+    public ResponseEntity<AppResponse> removeGroupMindcard(@ModelAttribute User user, @RequestParam int mindcardId, @RequestParam int cardGroupId) {
 
+        System.out.println("hey");
         handleCardGroupAccess(user,cardGroupId);
 
         if (cardGroupService.isMindcardInCardGroup(mindcardId,cardGroupId)) {
+            System.out.println("hi");
             cardGroupService.removeMindcardFromCardGroup(mindcardId, cardGroupId);
-            return new ResponseEntity<>(null,HttpStatus.OK);
+            return new ResponseEntity<>(new AppResponse(HttpStatus.OK),HttpStatus.OK);
         }
 
-        return new ResponseEntity<>(null,HttpStatus.BAD_REQUEST);
+        System.out.println("bye");
+        return new ResponseEntity<>(new AppResponse(HttpStatus.BAD_REQUEST),HttpStatus.BAD_REQUEST);
     }
 
+    //Model attributes
     @ModelAttribute("user")
     public User getUser(HttpSession session) {
         return (User)session.getAttribute("user");

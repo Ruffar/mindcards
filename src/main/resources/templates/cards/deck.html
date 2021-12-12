@@ -2,13 +2,8 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org/">
 <head>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://kit.fontawesome.com/fd57869c39.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" th:href="@{/css/main.css}"/>
-
-    <style>
-        body {
-            background-color: #444;
-        }
-    </style>
 
     <meta charset="UTF-8">
     <title th:text="${deck.card.title}">Deck</title>
@@ -16,14 +11,71 @@
 
 <body>
 
+    <span id="cardTemplates" hidden>
+        <div th:replace="~{fragments/card :: cardDisplayTemplate(cardType='deck',cardWidth=${774},isOwned=${isOwned})}"></div>
+        <div th:replace="~{fragments/card :: browserCardTemplate(cardType='mindcard',cardWidth=${500})}"></div>
+        <div th:replace="~{fragments/card :: browserCardTemplate(cardType='cardGroup',cardWidth=${500})}"></div>
+        <div th:replace="~{fragments/card :: cardEditor(cardType='deck',cardWidth=${774})}"></div>
+
+        <div th:replace="~{fragments/card :: hoverCardTemplate(cardType='deck')}"></div>
+        <div th:replace="~{fragments/card :: hoverCardTemplate(cardType='cardGroup')}"></div>
+        <div th:replace="~{fragments/card :: hoverCardTemplate(cardType='mindcard')}"></div>
+        <div th:replace="~{fragments/card :: hoverCardTemplate(cardType='infocard')}"></div>
+    </span>
+
     <th:block th:insert="~{fragments/pageLayout :: navbar('')}"></th:block>
 
     <div class="maincontainer">
 
-        <div th:replace="~{fragments/card :: card(isMain=${true},cardElement=${deck},cardType='deck',cardWidth=${774})}"></div>
+        <form th:action="|/deck/${deck.card.getDeckId()}|" method="get">
+            <input class="searchBar" type="search" name="search"/>
+        </form>
+
+        <div th:replace="~{fragments/card :: cardDisplay(isMain=${true},cardElement=${deck},cardType='deck',cardWidth=${774},isOwned=${isOwned})}"></div>
+
+        <div style="display: flex;">
+
+            <div style="width: 50%;">
+                <div style="display: flex;">
+                    <h2>Mindcards</h2>
+                    <th:block th:if="${isOwned}">
+                        <div th:replace="~{fragments/card :: mainCardAdder(cardType='mindcard',parentElement=${deck})}"></div>
+                    </th:block>
+                </div>
+                <br>
+                <div style="text-align: center;">
+                    <div class="card-grid">
+                        <th:block th:each="mindcard: ${mindcards}">
+                            <div th:replace="~{fragments/card :: browserCard(cardElement=${mindcard},cardType='mindcard')}"></div>
+                        </th:block>
+                    </div>
+                </div>
+            </div>
+
+            <div style="width: 50%;">
+                <div style="display: flex;">
+                    <h2>Groups</h2>
+                    <th:block th:if="${isOwned}">
+                        <div th:replace="~{fragments/card :: mainCardAdder(cardType='cardGroup',parentElement=${deck})}"></div>
+                    </th:block>
+                </div>
+                <br>
+                <div style="text-align: center;">
+                    <div class="card-grid">
+                        <th:block th:each="cardGroup: ${cardGroups}">
+                            <div th:replace="~{fragments/card :: browserCard(cardElement=${cardGroup},cardType='cardGroup')}"></div>
+                        </th:block>
+                    </div>
+                </div>
+            </div>
+
+        </div>
 
     </div>
 
-    <script th:src="@{/javascript/cardedit.js}" th:inline="javascript"></script>
+    <script th:src="@{/javascript/cardUtility.js}"></script>
+    <script th:src="@{/javascript/markdown.js}"></script>
+    <script th:src="@{/javascript/browserCards.js}"></script>
+    <script th:src="@{/javascript/cardEdit.js}"></script>
 
 </body>

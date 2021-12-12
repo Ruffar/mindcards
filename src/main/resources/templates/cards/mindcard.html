@@ -2,6 +2,7 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org/">
 <head>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://kit.fontawesome.com/fd57869c39.js" crossorigin="anonymous"></script>
     <link rel="stylesheet" th:href="@{/css/main.css}"/>
 
     <style>
@@ -21,35 +22,48 @@
         <div th:replace="~{fragments/card :: cardDisplayTemplate(cardType='infocard',cardWidth=${500},isOwned=${isOwned})}"></div>
         <div th:replace="~{fragments/card :: cardEditor(cardType='mindcard',cardWidth=${774})}"></div>
         <div th:replace="~{fragments/card :: cardEditor(cardType='infocard',cardWidth=${500})}"></div>
+
+        <div th:replace="~{fragments/card :: hoverCardTemplate(cardType='deck')}"></div>
+        <div th:replace="~{fragments/card :: hoverCardTemplate(cardType='cardGroup')}"></div>
+        <div th:replace="~{fragments/card :: hoverCardTemplate(cardType='mindcard')}"></div>
+        <div th:replace="~{fragments/card :: hoverCardTemplate(cardType='infocard')}"></div>
     </span>
 
     <th:block th:insert="~{fragments/pageLayout :: navbar('')}"></th:block>
 
     <div class="maincontainer">
 
+        <form th:action="|/deck/${deck.card.getDeckId()}|" method="get">
+            <input class="searchBar" type="search" name="search"/>
+        </form>
+
         <a id="parentButton" th:text="${deck.card.title}" th:href="@{/deck/__${deck.card.getPrimaryKey()}__}">Deck</a>
 
         <div th:replace="~{fragments/card :: cardDisplay(isMain=${true},cardElement=${mindcard},cardType='mindcard',cardWidth=${774},isOwned=${isOwned})}"></div>
 
-        <hr>
+        <br>
 
-        <div style="text-align: center;">
+        <div>
             <div class="infocard-grid">
 
                 <th:block th:each="infocard: ${infocards}">
-                    <div th:replace="~{fragments/card :: cardDisplay(isMain=${false},cardElement=${infocard},cardType='infocard',cardWidth=${500},isOwned=${isOwned})}" style="flex: 0 0 auto;"></div>
+                    <div th:replace="~{fragments/card :: cardDisplay(isMain=${false},cardElement=${infocard},cardType='infocard',cardWidth=${500},isOwned=${isOwned})}"></div>
                 </th:block>
 
 
-                <div th:if="${isOwned}" class="card infocard addInfocard" style="margin: auto; width: 500px; height: 250px;">
-                    <img th:src="@{/images/asset/addCard.png}" style="width: 125px; height: 125px; align-vertical: center; align-horizontal: center;"/>
+                <div th:if="${isOwned}" class="card infocard infocardAdder">
+                    <div class="cardBody">
+                        <i class="fas fa-plus plusSign"></i>
+                    </div>
                 </div>
 
             </div>
         </div>
+
     </div>
 
-    <script th:src="@{/javascript/cardedit.js}"></script>
+    <script th:src="@{/javascript/cardUtility.js}"></script>
     <script th:src="@{/javascript/markdown.js}"></script>
+    <script th:src="@{/javascript/cardEdit.js}"></script>
 
 </body>

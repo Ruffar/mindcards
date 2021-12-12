@@ -94,51 +94,6 @@ public class DeckRepository extends CardRepository<Deck> {
         );
     }
 
-    public <T extends CardTable> Deck getDeck(T card) {
-        int cardId = card.getPrimaryKey();
-        if (card instanceof Deck) {
-            return (Deck) card;
-        } else if (card instanceof CardGroup) {
-            return executeQuery(
-                    "SELECT Deck.* FROM Deck, CardGroup WHERE CardGroup.cardGroupId=? AND CardGroup.deckId=Deck.deckId",
-                    (stmnt) -> stmnt.setInt(1,cardId),
-
-                    (results) -> {
-                        if (results.next()) {
-                            return new Deck(cardId, results.getInt("ownerId"), results.getString("title"), results.getInt("imageId"), results.getString("description"), results.getBoolean("isPrivate"), results.getDate("timeCreated"));
-                        }
-                        throwEntityNotFound(cardId);
-                        return null;
-                    });
-        } else if (card instanceof Mindcard) {
-            return executeQuery(
-                    "SELECT Deck.* FROM Deck, Mindcard WHERE Mindcard.mindcardId=? AND Mindcard.deckId=Deck.deckId",
-                    (stmnt) -> stmnt.setInt(1,cardId),
-
-                    (results) -> {
-                        if (results.next()) {
-                            return new Deck(cardId, results.getInt("ownerId"), results.getString("title"), results.getInt("imageId"), results.getString("description"), results.getBoolean("isPrivate"), results.getDate("timeCreated"));
-                        }
-                        throwEntityNotFound(cardId);
-                        return null;
-                    });
-        } else if (card instanceof Infocard) {
-            return executeQuery(
-                    "SELECT Deck.* FROM Deck, CardGroup WHERE Infocard.infocardId=? AND Infocard.mindcardId=Mindcard.mindcardId AND Mindcard.deckId=Deck.deckId",
-                    (stmnt) -> stmnt.setInt(1,cardId),
-
-                    (results) -> {
-                        if (results.next()) {
-                            return new Deck(cardId, results.getInt("ownerId"), results.getString("title"), results.getInt("imageId"), results.getString("description"), results.getBoolean("isPrivate"), results.getDate("timeCreated"));
-                        }
-                        throwEntityNotFound(cardId);
-                        return null;
-                    });
-        } else {
-            throw new InvalidCardTypeException(card.getCardType());
-        }
-    }
-
     public List<Deck> search(String searchString, int amount, int offset) {
         return executeQuery(
                 "SELECT d1.*, " +
