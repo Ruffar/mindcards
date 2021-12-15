@@ -1,15 +1,11 @@
 package com.raffier.mindcards.repository.table;
 
 import com.raffier.mindcards.errorHandling.EntityNotFoundException;
-import com.raffier.mindcards.errorHandling.UnauthorisedAccessException;
 import com.raffier.mindcards.model.table.User;
 import com.raffier.mindcards.repository.AppDatabase;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -31,7 +27,7 @@ public class UserRepository extends EntityRepository<User,Integer> {
                     stmnt.setString(1, entity.getUsername());
                     stmnt.setString(2, entity.getPassword());
                     stmnt.setString(3, entity.getEmail());
-                    stmnt.setBoolean(4, entity.isDeveloper());
+                    stmnt.setBoolean(4, entity.isUserDeveloper());
                     stmnt.setInt(5, entity.getUserId());
                 });
     }
@@ -43,7 +39,7 @@ public class UserRepository extends EntityRepository<User,Integer> {
                     stmnt.setString(1, entity.getUsername());
                     stmnt.setString(2, entity.getPassword());
                     stmnt.setString(3, entity.getEmail());
-                    stmnt.setBoolean(4, entity.isDeveloper());
+                    stmnt.setBoolean(4, entity.isUserDeveloper());
                 });
         System.out.println("User with ID "+newId+" successfully created.");
         return getById(newId);

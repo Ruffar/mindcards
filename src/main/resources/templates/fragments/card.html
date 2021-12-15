@@ -10,7 +10,7 @@
 <th:block th:fragment="cardDisplay(cardElement,cardType,isOwned)" th:with="cardWidth=${cardWidth} ?: ${500}, isMain=${isMain} ?: ${false}">
     <div class="card displayCard" th:classappend="|${isMain ? 'card-main ' : ''}${cardType}|">
 
-        <span hidden class="cardId" th:text="${cardElement.getCard().getPrimaryKey()}"></span>
+        <span hidden class="cardId" th:text="${cardElement.getPrimaryKey()}"></span>
         <div class="cardBody card-view">
             <div class="card-decoration">
                 <div th:hidden="${cardElement.getImagePath() == ''}" class="imgcontainer" th:styleappend="${cardElement.getImagePath() != ''} ? 'background-image: url('+@{${cardElement.getImagePath()}}+')'"></div>
@@ -79,8 +79,8 @@
                     <option value="upload">Upload</option>
                     <option value="url">URL</option>
                 </select>
-                <input type="file" name="imageFile" class="imgcontainer" accept="image/png ,image/jpg, image/jpeg"/>
-                <input type="text" name="imageUrl"/>
+                <input hidden type="file" name="imageFile" class="imgcontainer" accept="image/png ,image/jpg, image/jpeg"/>
+                <input hidden type="text" name="imageUrl" class="imgcontainer"/>
             </div>
             <div class="card-text">
                 <input th:unless="${cardType} == 'infocard'" name="title" class="title" type="text" /><br/>
@@ -165,7 +165,7 @@
 <th:block th:fragment="groupMindcard(cardElement)">
     <div class="card browserCard mindcard">
         <span class="cardId" hidden th:text="${cardElement.getCard().getPrimaryKey()}"></span>
-        <span class="cardLink" hidden th:text="|/${cardType}/${cardElement.getCard().getPrimaryKey()}|"></span>
+        <span class="cardLink" hidden th:text="|/mindcard/${cardElement.getCard().getPrimaryKey()}|"></span>
         <div class="cardBody card-view">
             <div class="card-decoration">
                 <div th:hidden="${cardElement.getImagePath() == ''}" class="imgcontainer" th:styleappend="${cardElement.getImagePath() != ''} ? 'background-image: url('+@{${cardElement.getImagePath()}}+')'"></div>

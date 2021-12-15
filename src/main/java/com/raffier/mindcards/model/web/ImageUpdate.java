@@ -1,5 +1,6 @@
-package com.raffier.mindcards.util;
+package com.raffier.mindcards.model.web;
 
+import com.raffier.mindcards.util.ImageChangeType;
 import org.springframework.web.multipart.MultipartFile;
 
 public class ImageUpdate {

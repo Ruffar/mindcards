@@ -82,14 +82,6 @@ public class MindcardRepository extends CardRepository<Mindcard> {
         );
     }
 
-    public boolean isPrivate(int cardId) {
-        return executeQuery(
-                "SELECT Deck.* FROM Deck, Mindcard WHERE mindcardId=? AND Mindcard.deckId=Deck.deckId AND isPrivate=true",
-                (stmnt) -> stmnt.setInt(1,cardId),
-                (ResultSet::next)
-        );
-    }
-
     public List<Mindcard> getRandomFromDeck(int deckId, int amount) {
         return executeQuery(
                 "SELECT * FROM Mindcard WHERE Mindcard.deckId = ? ORDER BY RANDOM() LIMIT ?",

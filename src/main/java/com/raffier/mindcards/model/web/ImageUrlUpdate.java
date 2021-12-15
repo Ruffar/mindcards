@@ -1,4 +1,6 @@
-package com.raffier.mindcards.util;
+package com.raffier.mindcards.model.web;
+
+import com.raffier.mindcards.util.ImageChangeType;
 
 public class ImageUrlUpdate extends ImageUpdate {
 

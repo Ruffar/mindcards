@@ -5,8 +5,6 @@ import com.raffier.mindcards.util.CardType;
 public abstract class CardTable extends EntityTable<Integer> {
 
     //Database columns
-    protected int primaryId;
-
     protected Integer imageId;
     protected String description;
 
@@ -24,8 +22,8 @@ public abstract class CardTable extends EntityTable<Integer> {
         this.description = description;
     }
 
+    public abstract Integer getPrimaryKey();
     public String getPrimaryKeyName() { return this.primaryKeyName; }
-    public Integer getPrimaryKey() { return this.primaryId; }
     public Integer getImageId() { return this.imageId; }
     public String getDescription() { return this.description; }
     public abstract CardType getCardType();

@@ -1,0 +1,201 @@
+
+.card {
+    position: relative;
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+    transition: 0.3s;
+    border-radius: 5px;
+    background-color: #333;
+    margin: 0 auto;
+    overflow-wrap: anywhere;
+}
+
+.card-view {
+    height: 100%;
+    width: 100%;
+}
+
+.card-editor {
+    height: 100%;
+    width: 100%;
+}
+
+.card-main {
+    width: 774px;
+}
+
+.card:hover {
+    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2);
+}
+
+.card-text {
+    text-align: left;
+    color: #f2f2f2;
+    margin-left: 25%;
+    padding: 4% 4%;
+}
+
+img {
+    width: 100%;
+    height: 100%;
+    border-radius: 5px 0 0 5px;
+}
+
+.card-decoration {
+    float: left;
+    width: 25%;
+    height: 100%;
+    border-radius: 5px 0 0 5px;
+}
+
+.infocard .card-decoration {
+    background-color: #555;
+}
+
+.mindcard .card-decoration {
+    background-color: #5c5;
+}
+
+.cardgroup .card-decoration {
+    background-color: #55c;
+}
+
+.deck .card-decoration {
+    background-color: #c55;
+}
+
+.imgcontainer {
+    float: right;
+    width: 90%;
+    height: 100%;
+    background-position: center;
+    background-size: cover;
+}
+
+.card-view .title {
+    margin: 2% 0%;
+}
+
+textarea.description {
+    width: 100%;
+    height: 80%;
+    background-color: #444;
+    color: #fff;
+    resize: none;
+}
+
+input.title {
+    background-color: #444;
+    color: #fff;
+    border-style: solid;
+    border-width: 1px;
+    border-radius: 2px;
+    border-color: #666;
+}
+
+.browserCard {
+    cursor: pointer;
+}
+
+.addInfocard {
+    margin: auto;
+    width: 500px;
+    height: 250px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.mainCardAdder {
+    width: 50px;
+    height: 50px;
+    background-color: #333;
+    border-radius: 50%;
+    margin-top: auto;
+    margin-bottom: auto;
+    margin-left: 10px;
+}
+
+.infocard-grid {
+    display: flex;
+    flex-wrap: wrap;
+    grid-gap: 16px;
+    padding: 16px;
+}
+
+.card-grid {
+    display: flex;
+    flex-wrap: wrap;
+    grid-gap: 16px;
+    padding: 16px;
+}
+
+.cornerButtons {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+}
+
+button {
+    width: 50px;
+    height: 50px;
+    box-shadow: 0 4px 8px 0 rgba(0,0,0,0.2);
+    transition: 0.3s;
+    border-radius: 5px;
+    border: none;
+    background-color: #444;
+    margin: 0 auto;
+}
+
+.editCardButton {
+    color: #f2f2f2;
+    opacity: 0;
+    transition: 0.3s;
+}
+
+.saveCardButton {
+    color: #f2f2f2;
+}
+
+.cancelEditCardButton {
+    color: #f2f2f2;
+}
+
+.card:hover button {
+    opacity: 1;
+    transition; opacity .2s ease-out;
+}
+
+blockquote {
+    background: #444;
+    padding: .5em 10px .5em 10px;
+    border-radius: 5px;
+    border-left: 10px solid #555;
+    margin: 1em 5px;
+}
+
+.frac {
+margin-top: -0.20em;
+}
+
+.mathExp {
+    display: flex;
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+font-family: Times New Roman;
+}
+
+.variables {
+font-style: italic;
+}
+
+.fracLine {
+margin-block-start: 0.1em;
+margin-block-end: 0.1em;
+width: 1em;
+}
+
+.fracExp {
+    font-size: 50%;
+text-align: center;
+display: flex;
+}

@@ -37,7 +37,7 @@ public class User extends EntityTable<Integer> {
     public String getUsername() { return username; }
     public String getPassword() { return password; }
     public String getEmail() { return email; }
-    public boolean isDeveloper() { return isDeveloper; }
+    public boolean isUserDeveloper() { return isDeveloper; }
 
     public void setUsername(String username) { this.username = username; }
     public void setPassword(String password) { this.password = password; }

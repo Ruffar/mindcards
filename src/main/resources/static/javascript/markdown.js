@@ -139,64 +139,102 @@ function parseHyperlink(text) {
 function parseMathExpression(text) {
     return text.replace(/\\\((.+?)\\\)/g,(match,$1)=> {
         var expression = match.slice(2,match.length-2);
+
         var symbolStack = new Stack();
-        var isVariable = false;
-        var output = "<span class='mathExp'>"
-        for (let i = 0; i < expression.length; i++) {
-            currentChar = expression[i];
-            if (currentChar == '\\') {
-                if (expression.slice(i+1,i+5) == "frac") {
-                    output += "<div class='frac'><div class='fracExp'>";
-                    symbolStack.push("frac");
-                    i += 4;
-                } else if (expression.slice(i+1,i+5) == "sqrt") {
-                    output += "<span>&#x221A;</span><span><hr style='padding-top: 0.1em; padding-bottom: 0.1em; margin-top: 0; margin-bottom: 0'>";
-                    symbolStack.push("sqrt");
-                    i+=4;
-                } else if (expression.slice(i+1,i+4) == "sin") {
-                    output += "<span style='font-style: italic;'>sin</span><span style='padding-left: 0.25em; padding-right:0.25em;'>";
-                    symbolStack.push("sin");
-                    i += 3;
+            var isVariable = false;
+            var isTerm = false;
+            var output = "<span class='mathExp'>"
+            for (let i = 0; i < expression.length; i++) {
+
+                currentChar = expression[i];
+
+                var isAlphanumeric = currentChar.match(/[a-z0-9]/i);
+                if (!isTerm && isAlphanumeric) { //i means not case sensitive
+                    output += "<span class='term'>";
+                    isTerm = true;
+                } else if (isTerm && !isAlphanumeric) {
+                    output += "</span>";
+                    isTerm = false;
                 }
-            } else if (currentChar == '{') {
-                symbolStack.push("{");
-            } else {
-                if (currentChar == '}' && symbolStack.peek() == '{') {
-                    symbolStack.pop();
-                } else if (currentChar.match(/[a-z]/i)) { //i means not case sensitive
-                    output += "<span class='variables'>"+currentChar;
+
+                var isAlphabet = currentChar.match(/[a-z]/i);
+                if (!isVariable && isAlphabet) { //i means not case sensitive
+                    output += "<span class='variables'>";
                     isVariable = true;
-                } else if (isVariable) {
-                    output += currentChar+"</span>";
+                } else if (isVariable && !isAlphabet) {
+                    output += "</span>";
                     isVariable = false;
-                } else {
-                    output += currentChar;
                 }
-                if (!symbolStack.isEmpty()) {
-                    var symbol = symbolStack.peek();
-                    switch(symbol) {
-                        case "frac":
-                            output += "</div><hr class='fracLine'><div class='fracExp'>";
-                            symbolStack.pop();
-                            symbolStack.push("frac1");
-                            break;
-                        case "frac1":
-                            output += "</div></div>";
-                            symbolStack.pop();
-                            break;
-                        case "sqrt":
-                            output += "</span>";
-                            symbolStack.pop();
-                            break;
-                        case "sin":
-                            output += "</span>";
-                            symbolStack.pop();
-                            break;
+
+                if (currentChar == '\\') {
+                    if (expression.slice(i+1,i+5) == "frac") {
+                        output += "<span class='frac'><span class='fracExp'>";
+                        symbolStack.push("frac");
+                        i += 4;
+                    } else if (expression.slice(i+1,i+5) == "sqrt") {
+                        output += "&#x221A;<span><hr class='sqrtLine'>";
+                        symbolStack.push("sqrt");
+                        i+=4;
+                    } else if (expression.slice(i+1,i+4) == "int") {
+                        output += "&#x222b;";
+                        i += 3;
+                    } else if (expression.slice(i+1,i+6) == "infty") {
+                        output += "&#x221e;"
+                        i += 5;
+                    }
+                } else if (currentChar == '^') {
+                    output += "<sup>"
+                    symbolStack.push("^");
+                } else if (currentChar == '_') {
+                    output += "<sub>"
+                    symbolStack.push("_");
+                } else if (currentChar == '{') {
+                    symbolStack.push("{");
+                } else {
+                    if (currentChar == '}' && symbolStack.peek() == '{') {
+                        symbolStack.pop();
+                    } else {
+                        output += currentChar;
+                    }
+
+                    if (!symbolStack.isEmpty()) {
+                        var symbol = symbolStack.peek();
+                        switch(symbol) {
+                            case "frac":
+                                output += "</span><hr class='fracLine'><span class='fracExp'>";
+                                symbolStack.pop();
+                                symbolStack.push("fracMid");
+                                break;
+                            case "fracMid":
+                                output += "</span></span>";
+                                symbolStack.pop();
+                                break;
+                            case "sqrt":
+                                output += "</span>";
+                                symbolStack.pop();
+                                break;
+                            case "^":
+                                output += "</sup>";
+                                symbolStack.pop();
+                                break;
+                            case "_":
+                                output += "</sub>";
+                                symbolStack.pop();
+                                break;
+                        }
                     }
                 }
+
             }
-        }
-        return output+"</span>";
+
+            if (isVariable) {
+                output += "</span>";
+            }
+            if (isTerm) {
+                output += "</span>"
+            }
+
+            return output+"</span>";
     });
 }
 

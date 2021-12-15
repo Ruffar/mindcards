@@ -323,29 +323,43 @@ blockquote {
     margin: 1em 5px;
 }
 
-.frac {
-    margin-top: -0.20em;
-}
-
+/* Math Expression */
 .mathExp {
-    display: flex;
+    display: inline-block;
+    vertical-align: middle;
     padding-left: 0.5em;
     padding-right: 0.5em;
     font-family: Times New Roman;
+}
+
+.mathExp span {
+    display: inline-block;
+    vertical-align: middle;
 }
 
 .variables {
     font-style: italic;
 }
 
+.term {
+    padding-left: 0.1em;
+    padding-right: 0.1em;
+}
+
 .fracLine {
-    margin-block-start: 0.1em;
-    margin-block-end: 0.1em;
-    width: 1em;
+    margin-top: 0;
+    margin-bottom: 0;
+    width: 100%;
 }
 
 .fracExp {
-    font-size: 50%;
     text-align: center;
-    display: flex;
+}
+
+.sqrtLine {
+    padding-top: 0;
+    padding-bottom: 0;
+    margin-top: 0;
+    margin-bottom: 0;
+    border-bottom: 0;
 }

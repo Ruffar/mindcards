@@ -70,7 +70,7 @@ public class InfocardRepository extends CardRepository<Infocard> {
 
     public List<Infocard> getFromMindcard(int mindcardId) {
         return executeQuery(
-                "SELECT infocardId, imageId, description FROM Infocard WHERE mindcardId = ?",
+                "SELECT * FROM Infocard WHERE mindcardId = ? ORDER BY RANDOM()",
                 (stmnt) -> stmnt.setInt(1,mindcardId),
 
                 (results) -> {
@@ -89,14 +89,6 @@ public class InfocardRepository extends CardRepository<Infocard> {
                     stmnt.setInt(1,cardId);
                     stmnt.setInt(2,user.getUserId());
                 },
-                (ResultSet::next)
-        );
-    }
-
-    public boolean isPrivate(int cardId) {
-        return executeQuery(
-                "SELECT Deck.* FROM Deck, Mindcard, Infocard WHERE infocardId=? AND Infocard.mindcardId=Mindcard.mindcardId AND Mindcard.deckId=Deck.deckId AND isPrivate=true",
-                (stmnt) -> stmnt.setInt(1,cardId),
                 (ResultSet::next)
         );
     }

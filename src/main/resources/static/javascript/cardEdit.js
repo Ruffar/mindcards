@@ -14,7 +14,7 @@ $(document).on("click",".editCardButton",function(event){
     var cardViewButtons = cardDiv.find(">.cornerButtons.card-view");
     var cardEditor = cardDiv.find(">.cardBody.card-editor");
 
-    cardEditor.find("[name='cardId']").val(cardView.find(">.cardId").text());
+    cardEditor.find("[name='cardId']").val(cardDiv.find(">.cardId").text());
     cardEditor.find(">.card-text>.description").val(cardView.find(">.card-text>.description").text());
 
     if (cardView.find(">.card-text>.title") != null) {
@@ -49,7 +49,7 @@ $(document).on("click",".deleteCardButton",function(event){
     var cardMain = cardDiv.hasClass("card-main");
 
     $.ajax({
-        type: "DELETE",
+        type: "POST",
         url: "/deleteCard",
         data: cardData,
         cache: false,
@@ -115,7 +115,26 @@ $(document).on("click",".saveCardButton",function(event){
 //Images
 $(document).on("change",".imageSelect",function(event){
 
+    var cardDecor = $(this).closest(".card-decoration");
+    var imageChange = $(this).val();
+    var fileUploader = cardDecor.find("[name='imageFile']");
+    var urlField = cardDecor.find("[name='imageUrl']")
+
+    if (imageChange == "upload") {
+        fileUploader.attr("hidden", false);
+        urlField.attr("hidden", true)
+    } else if (imageChange == "url") {
+        fileUploader.attr("hidden", true);
+        urlField.attr("hidden", false)
+    } else {
+        fileUploader.attr("hidden", true);
+        urlField.attr("hidden", true)
+    }
 })
+
+$(document).on("submit",".imgcontainer",function(event){
+    event.preventDefault(); //prevent submission of form by pressing Enter on input
+});
 
 //Adding cards
 $(document).on("click",".infocardAdder",function(event){
@@ -176,12 +195,9 @@ $(document).on("click",".removeFromGroupButton",function(event){
     var cardGroupId = $(".maincontainer .card-main>.cardId").text();
 
     $.ajax({
-        type: "DELETE",
+        type: "POST",
         url: "/removeGroupMindcard",
-        data: {mindcardId: mindcardId, cardGroupId: cardGroupId},
-        cache: false,
-        contentType: false,
-        processData: false,
+        data: {"mindcardId": mindcardId, "cardGroupId": cardGroupId},
 
         success: function(response) {
             cardDiv.remove();

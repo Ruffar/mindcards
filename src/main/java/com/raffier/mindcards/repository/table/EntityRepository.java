@@ -27,6 +27,7 @@ public abstract class EntityRepository<T extends EntityTable<ID>, ID> {
     Statement consumer should include any changes to the prepared statement's parameters (e.g. statement.setInt(1,323))
     Result function includes anything that should be done to the results of the query
      */
+    //SQL Queries - any statements that only receive data
     protected <S> S executeQuery(String statement, SQLConsumer<PreparedStatement> statementConsumer, SQLFunction<ResultSet,S> resultFunction) {
         try {
             PreparedStatement stmnt = connection.prepareStatement(statement);
@@ -38,6 +39,7 @@ public abstract class EntityRepository<T extends EntityTable<ID>, ID> {
         }
     }
 
+    //SQL Updates - any statements that change data
     protected int executeUpdate (String statement, SQLConsumer<PreparedStatement> statementConsumer) {
         try {
             PreparedStatement stmnt = connection.prepareStatement(statement);

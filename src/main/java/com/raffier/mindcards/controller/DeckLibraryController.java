@@ -100,7 +100,7 @@ public class DeckLibraryController {
 
     }
 
-    @DeleteMapping(value="unfavouriteDeck")
+    @PostMapping(value="unfavouriteDeck")
     public ResponseEntity<?> unfavouriteDeck(@ModelAttribute User user, @RequestParam int deckId) {
 
         if (user == null) {

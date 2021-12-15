@@ -4,9 +4,7 @@ import com.raffier.mindcards.errorHandling.EntityNotFoundException;
 import com.raffier.mindcards.errorHandling.ImageChangeException;
 import com.raffier.mindcards.errorHandling.InvalidCardTypeException;
 import com.raffier.mindcards.errorHandling.UnauthorisedAccessException;
-import com.raffier.mindcards.model.web.AppResponse;
-import com.raffier.mindcards.model.web.CardElement;
-import com.raffier.mindcards.model.web.DeckElement;
+import com.raffier.mindcards.model.web.*;
 import com.raffier.mindcards.model.table.*;
 import com.raffier.mindcards.service.*;
 import com.raffier.mindcards.util.*;
@@ -14,7 +12,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
@@ -39,7 +36,7 @@ public class CardController {
 
     private void handleCardPage(User user, Deck deck, ModelAndView mv) {
         int deckId = deck.getDeckId();
-        int userId = user == null ? 0 : user.getUserId();
+        int userId = user == null ? 0 : user.getUserId(); //userId is 0 (deleted) if there is no user because int can't be null
         //Make sure that card does not have ID 0 (i.e. the card is deleted)
         if (deckId == 0) {
             throw new EntityNotFoundException("This card has been deleted...");
@@ -166,7 +163,7 @@ public class CardController {
         return new ResponseEntity<>(cardElement, HttpStatus.ACCEPTED);
     }
 
-    @DeleteMapping("deleteCard")
+    @PostMapping("deleteCard")
     public ResponseEntity<?> deleteCard(@ModelAttribute User user, @RequestParam String cardType, @RequestParam int cardId) {
 
         CardType cardTypeEnum = CardType.getCardTypeFromString(cardType);
@@ -327,8 +324,8 @@ public class CardController {
         return new ResponseEntity<>(null,HttpStatus.BAD_REQUEST);
     }
 
-    @DeleteMapping("/removeGroupMindcard")
-    public ResponseEntity<AppResponse> removeGroupMindcard(@ModelAttribute User user, @RequestParam int mindcardId, @RequestParam int cardGroupId) {
+    @PostMapping("removeGroupMindcard")
+    public ResponseEntity<?> removeGroupMindcard(@ModelAttribute User user, @RequestParam int mindcardId, @RequestParam int cardGroupId) {
 
         System.out.println("hey");
         handleCardGroupAccess(user,cardGroupId);

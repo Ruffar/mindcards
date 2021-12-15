@@ -65,20 +65,6 @@ public class ImageRepository extends EntityRepository<Image, Integer> {
                 });
     }
 
-    public Image getByPath(String path) {
-        return executeQuery(
-                "SELECT imageId, imagePath FROM Image WHERE imagePath=?",
-                (stmnt) -> stmnt.setString(1,path),
-
-                (results) -> {
-                    if (results.next()) {
-                        return new Image(results.getInt("imageId"), path);
-                    }
-                    throwEntityNotFound(path);
-                    return null;
-                });
-    }
-
     public <S extends CardTable> Image getFromCard(S card) {
         return executeQuery(
                 "SELECT Image.imageId, Image.imagePath FROM "+card.getTableName()+", Image WHERE "+card.getPrimaryKeyName()+" = ? AND "+card.getTableName()+".imageId = Image.imageId",

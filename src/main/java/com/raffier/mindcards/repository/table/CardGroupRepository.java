@@ -80,17 +80,9 @@ public class CardGroupRepository extends CardRepository<CardGroup> {
         );
     }
 
-    public boolean isPrivate(int cardId) {
-        return executeQuery(
-                "SELECT Deck.* FROM Deck, CardGroup WHERE cardGroupId=? AND CardGroup.deckId=Deck.deckId AND isPrivate=true",
-                (stmnt) -> stmnt.setInt(1,cardId),
-                (ResultSet::next)
-        );
-    }
-
     public List<CardGroup> getRandomFromDeck(int deckId, int amount) {
         return executeQuery(
-                "SELECT CardGroup.* FROM CardGroup, Deck WHERE CardGroup.deckId = ? ORDER BY RANDOM() LIMIT ?",
+                "SELECT * FROM CardGroup WHERE CardGroup.deckId = ? ORDER BY RANDOM() LIMIT ?",
                 (stmnt) -> {
                     stmnt.setInt(1, deckId);
                     stmnt.setInt(2, amount);

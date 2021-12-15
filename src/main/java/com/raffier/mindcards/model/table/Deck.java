@@ -8,13 +8,14 @@ import java.time.Instant;
 public class Deck extends TitledCardTable {
 
     //Database columns
+    private final int deckId;
     private int ownerId;
     private boolean isPrivate;
     private Date timeCreated;
 
     public Deck(int deckId) {
         super("Deck", "deckId");
-        this.primaryId = deckId;
+        this.deckId = deckId;
     }
 
     public Deck(int deckId, int ownerId, String title, int imageId, String description) {
@@ -33,7 +34,8 @@ public class Deck extends TitledCardTable {
         this.timeCreated = timeCreated;
     }
 
-    public int getDeckId() { return this.primaryId; }
+    public Integer getPrimaryKey() {return this.deckId; }
+    public int getDeckId() { return this.deckId; }
     public int getOwnerId() { return ownerId; }
     public boolean isPrivate() { return isPrivate; }
     public Date getTimeCreated() { return this.timeCreated; }

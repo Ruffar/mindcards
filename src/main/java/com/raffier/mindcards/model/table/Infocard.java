@@ -5,11 +5,12 @@ import com.raffier.mindcards.util.CardType;
 public class Infocard extends CardTable {
 
     //Database columns
+    private final int infocardId;
     private int mindcardId;
 
     public Infocard(int infocardId) {
         super("Infocard", "infocardId");
-        this.primaryId = infocardId;
+        this.infocardId = infocardId;
     }
 
     public Infocard(int infocardId, int mindcardId, int imageId, String description) {
@@ -19,7 +20,8 @@ public class Infocard extends CardTable {
         this.description = description;
     }
 
-    public int getInfocardId() { return this.primaryId; }
+    public Integer getPrimaryKey() { return this.infocardId; }
+    public int getInfocardId() { return this.infocardId; }
     public int getMindcardId() { return this.mindcardId; }
     public CardType getCardType() { return CardType.INFOCARD; }
 
