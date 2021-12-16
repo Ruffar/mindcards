@@ -7,6 +7,16 @@
 
 <body>
 
+<!-- Parent button -->
+<th:block th:fragment="parentButton(deckId)">
+    <div id="parentButton" th:onclick="|navigateToParent(${deckId})|")>
+        <i class="fa-solid fa-caret-left"></i>
+        <a>Back to Deck</a>
+        <script th:src="@{/javascript/parentButton.js}"></script>
+    </div>
+</th:block>
+
+<!-- Cards -->
 <th:block th:fragment="cardDisplay(cardElement,cardType,isOwned)" th:with="cardWidth=${cardWidth} ?: ${500}, isMain=${isMain} ?: ${false}">
     <div class="card displayCard" th:classappend="|${isMain ? 'card-main ' : ''}${cardType}|">
 
