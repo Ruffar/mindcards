@@ -3,19 +3,28 @@ package com.raffier.mindcards.repository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-
 import java.sql.*;
 
-@Component
+@Component //Spring singleton
 public class AppDatabase {
 
-    private final String dbPath; //path to database
-    private Connection connection;
+    private Connection connection; //stores connection with database
 
-    @Autowired
-    public AppDatabase(@Value("${dynamicContentDirectory}") String directoryPath) {
+    @Autowired //Constructor is called on singleton creation
+    public AppDatabase(@Value("${dynamicContentDirectory}") String directoryPath) { //dynamicContentDirectory is passed as parameter
 
-        this.dbPath = "jdbc:sqlite:" + directoryPath + "/database.db";
+        try {
+            this.connection = DriverManager.getConnection("jdbc:sqlite:" + directoryPath + "/database.db");
+            /*
+                "jdbc:sqlite:" specifies that the database uses SQLite
+                "/database.db" locates the database file itself under the directoryPath specified
+            */
+            if (this.connection != null) {
+                System.out.println("Database connection created successfully!");
+            }
+        } catch (SQLException e) {
+            System.out.println(e.getMessage());
+        }
 
         this.connection = getConnection(); //creates a connection and database file if not created
         //Create tables
@@ -30,27 +39,10 @@ public class AppDatabase {
     }
 
     public Connection getConnection() {
-
-        if (this.connection != null) return connection;
-
-        try {
-            Connection connection = DriverManager.getConnection(dbPath);
-
-            if (connection != null) {
-                this.connection = connection;
-                System.out.println("Database connection created successfully!");
-            }
-
-            return connection;
-
-        } catch (SQLException e) {
-            System.out.println(e.getMessage());
-            return null;
-        }
-
+        return connection;
     }
              
-    //Create tables
+    //Utility function that makes SQL code below clearer
     private void executeUpdate(String sql) {
         try (Statement statement = connection.createStatement()) {
             statement.executeUpdate(sql);
@@ -59,6 +51,7 @@ public class AppDatabase {
         }
     }
 
+    //Create tables
     private void createMindcardTable() {
         executeUpdate("CREATE TABLE IF NOT EXISTS Mindcard " +
                         "(mindcardId INTEGER PRIMARY KEY AUTOINCREMENT," +
@@ -137,7 +130,7 @@ public class AppDatabase {
                         "email TEXT NOT NULL," +
                         "isDeveloper INTEGER Default 0)"
         );
-        executeUpdate("INSERT OR REPLACE INTO User VALUES (0,'DeletedUser','deletedpassword1234','deleted@mindcards.com',0)");
+        executeUpdate("INSERT OR REPLACE INTO User VALUES (0,'DeletedUser','deletedpassword1234','deleted@mindcards.com',0)"); //'deletedpassword1234' is not the actual password, the program assumes it is the hashed value of the password
         System.out.println("User Table created successfully!");
     }
     private void createFavouriteTable() {
@@ -151,6 +144,4 @@ public class AppDatabase {
         );
         System.out.println("Favourite Table created successfully!");
     }
-
-    
 }

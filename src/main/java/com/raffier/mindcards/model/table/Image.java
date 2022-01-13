@@ -1,9 +1,5 @@
 package com.raffier.mindcards.model.table;
 
-import com.raffier.mindcards.repository.AppDatabase;
-
-import java.sql.*;
-
 public class Image extends EntityTable<Integer> {
 
     //Database columns
@@ -25,5 +21,4 @@ public class Image extends EntityTable<Integer> {
     public String getImagePath() { return imagePath; }
 
     public void setImagePath(String imagePath) { this.imagePath = imagePath; }
-
 }

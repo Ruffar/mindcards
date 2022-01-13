@@ -2,12 +2,10 @@ package com.raffier.mindcards;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-
 import java.util.*;
 
-@SpringBootApplication
+@SpringBootApplication //Spring will inject here
 public class MindcardsApplication {
-
 	public static void main(String[] args) {
 
 		//Create list to store new arguments as args array can't be added to
@@ -49,5 +47,4 @@ public class MindcardsApplication {
 		SpringApplication.run(MindcardsApplication.class, newArgs);
 
 	}
-
 }

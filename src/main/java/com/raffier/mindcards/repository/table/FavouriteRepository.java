@@ -2,11 +2,9 @@ package com.raffier.mindcards.repository.table;
 
 import com.raffier.mindcards.errorHandling.EntityNotFoundException;
 import com.raffier.mindcards.model.table.Favourite;
-import com.raffier.mindcards.model.table.GroupMindcard;
 import com.raffier.mindcards.repository.AppDatabase;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
 import java.sql.ResultSet;
 
 @Component
@@ -75,8 +73,7 @@ public class FavouriteRepository extends EntityRepository<Favourite,Favourite> {
                     stmnt.setInt(1,entity.getDeckId());
                     stmnt.setInt(2,entity.getUserId());
                 },
-
-                ResultSet::next
+                ResultSet::next //Return true if result is found
         );
     }
 
@@ -92,5 +89,4 @@ public class FavouriteRepository extends EntityRepository<Favourite,Favourite> {
                     return 0;
                 });
     }
-
 }

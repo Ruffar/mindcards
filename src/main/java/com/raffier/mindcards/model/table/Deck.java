@@ -1,7 +1,6 @@
 package com.raffier.mindcards.model.table;
 
 import com.raffier.mindcards.util.CardType;
-
 import java.sql.Date;
 import java.time.Instant;
 
@@ -42,5 +41,4 @@ public class Deck extends TitledCardTable {
     public CardType getCardType() { return CardType.DECK; }
 
     public void setPrivate(boolean isPrivate) { this.isPrivate = isPrivate; }
-
 }

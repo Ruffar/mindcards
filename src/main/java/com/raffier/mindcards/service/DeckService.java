@@ -28,7 +28,8 @@ public class DeckService {
     }
 
     public void updateLastViewed(int deckId, int userId) {
-        favouriteRepository.save(new Favourite(deckId, userId)); //Saves the favourite with default time in the first constructor
+        //Saves the favourite again, with its time set to the current time in the constructor used
+        favouriteRepository.save(new Favourite(deckId, userId));
     }
 
     public int getTotalFavourites(int deckId) {

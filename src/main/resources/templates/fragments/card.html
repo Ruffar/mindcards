@@ -12,7 +12,11 @@
     <div id="parentButton" th:onclick="|navigateToParent(${deckId})|")>
         <i class="fa-solid fa-caret-left"></i>
         <a>Back to Deck</a>
-        <script th:src="@{/javascript/parentButton.js}"></script>
+        <script>
+            function navigateToParent(deckId) {
+                window.location.assign("/deck/"+deckId);
+            }
+        </script>
     </div>
 </th:block>
 
@@ -112,7 +116,7 @@
 
     <div class="mainCardAdder" th:classappend="|${cardType}|">
         <span th:if="${parentElement}" class="cardId" hidden th:text="${parentElement.card.getPrimaryKey()}"></span>
-        <i class="fas fa-plus plusSign"></i>
+        <i class="fa-solid fa-plus plusSign"></i>
     </div>
 
 </th:block>
@@ -136,7 +140,7 @@
         <div class="cornerButtons">
             <button th:if="${cardType} == 'deck'" class="favouriteButton" th:classappend="${cardElement.isFavourited()} ? 'favourited' : ''">
                 <span class="favouriteHeart">
-                    <i class="fa-heart" th:classappend="${cardElement.isFavourited()} ? 'fas' : 'far'"></i>
+                    <i class="fa-heart" th:classappend="${cardElement.isFavourited()} ? 'fa-solid' : 'fa-regular'"></i>
                 </span>
                 <span class="favouriteNumber" th:text="${cardElement.getTotalFavourites()}"></span>
             </button>
@@ -163,7 +167,7 @@
         <div class="cornerButtons">
             <button th:if="${cardType} == 'deck'" class="favouriteButton">
                 <span class="favouriteHeart">
-                    <i class="far fa-heart"></i>
+                    <i class="fa-regular fa-heart"></i>
                 </span>
                 <span class="favouriteNumber">0</span>
             </button>
@@ -188,7 +192,7 @@
         </div>
         <div class="cornerButtons">
             <button th:if="${isOwned}" class="removeFromGroupButton">
-                <i class="fas fa-times"></i>
+                <i class="fa-solid fa-times"></i>
             </button>
         </div>
     </div>
@@ -210,7 +214,7 @@
         </div>
         <div class="cornerButtons">
             <button th:if="${isOwned}" class="removeFromGroupButton">
-                <i class="fas fa-times"></i>
+                <i class="fa-solid fa-times"></i>
             </button>
         </div>
     </div>

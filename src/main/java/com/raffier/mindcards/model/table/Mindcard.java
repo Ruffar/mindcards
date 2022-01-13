@@ -25,5 +25,4 @@ public class Mindcard extends TitledCardTable {
     public int getMindcardId() { return this.mindcardId; }
     public int getDeckId() { return this.deckId; }
     public CardType getCardType() { return CardType.MINDCARD; }
-
 }

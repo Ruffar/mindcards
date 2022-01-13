@@ -25,5 +25,4 @@ public class CardGroup extends TitledCardTable {
     public int getCardGroupId() { return this.cardGroupId; }
     public int getDeckId() { return this.deckId; }
     public CardType getCardType() { return CardType.CARDGROUP; }
-
 }

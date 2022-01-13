@@ -16,13 +16,13 @@ public abstract class CardTable extends EntityTable<Integer> {
         this.primaryKeyName = primaryKeyName;
     }
 
-    protected CardTable(String tableName, String primaryKeyName, int imageId, String description) {
+    protected CardTable(String tableName, String primaryKeyName, int imageId, String description)
+    {
         this(tableName,primaryKeyName);
         this.imageId = imageId;
         this.description = description;
     }
 
-    public abstract Integer getPrimaryKey();
     public String getPrimaryKeyName() { return this.primaryKeyName; }
     public Integer getImageId() { return this.imageId; }
     public String getDescription() { return this.description; }
@@ -30,5 +30,4 @@ public abstract class CardTable extends EntityTable<Integer> {
 
     public void setImageId(Integer imageId) { this.imageId = imageId; }
     public void setDescription(String description) { this.description = description; }
-
 }

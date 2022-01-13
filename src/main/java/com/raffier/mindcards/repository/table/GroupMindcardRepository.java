@@ -5,7 +5,6 @@ import com.raffier.mindcards.model.table.GroupMindcard;
 import com.raffier.mindcards.repository.AppDatabase;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
 import java.sql.ResultSet;
 
 @Component
@@ -68,7 +67,7 @@ public class GroupMindcardRepository extends EntityRepository<GroupMindcard,Grou
                     stmnt.setInt(2,entity.getMindcardId());
                 },
 
-                ResultSet::next
+                ResultSet::next //Return true is a result is found
         );
     }
 

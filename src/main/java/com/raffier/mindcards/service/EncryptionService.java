@@ -26,12 +26,15 @@ public class EncryptionService {
     public String encryptPassword(String plainPassword, User user) {
         try {
 
+            //Generate a 16-byte salt with User ID as the seed
             byte[] salt = new byte[16];
             new Random(user.getUserId()).nextBytes(salt);
 
+            //Create the hash key
             KeySpec keySpec = new PBEKeySpec(plainPassword.toCharArray(), salt, 2^16, 256);
             SecretKey key = new SecretKeySpec(keyFactory.generateSecret(keySpec).getEncoded(), "AES");
 
+            //Return the encoded string from the key
             return Base64.getEncoder().encodeToString(key.getEncoded());
 
         } catch (InvalidKeySpecException e) {

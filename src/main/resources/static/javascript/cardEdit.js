@@ -43,13 +43,13 @@ $(document).on("click",".deleteCardButton",function(event){
 
     event.preventDefault();
     var cardDiv = $(this).closest(".card");
-    var form = $(this).closest(".cardBody.card-editor");
+    var form = cardDiv.find(".cardBody.card-editor");
     var cardData = new FormData(form[0]);
 
     var cardMain = cardDiv.hasClass("card-main");
 
     $.ajax({
-        type: "POST",
+        type: "DELETE",
         url: "/deleteCard",
         data: cardData,
         cache: false,
@@ -165,22 +165,20 @@ $(document).on("click",".mainCardAdder",function(event){
 
     event.preventDefault();
 
-    var parentId = 0;
-    if ($(this).find(".cardId")) {
-        parentId = $(this).find(".cardId").text();
+    var cardData = {};
+    var parentIdElement = $(this).find(".cardId");
+    if (parentIdElement != null && parentIdElement.text() != "") {
+        cardData.parentCardId = parentIdElement.text();
     }
-    var cardType = getCardType($(this));
+    cardData.cardType = getCardType($(this));
 
     $.ajax({
         type: "POST",
         url: "/addCard",
-        data: {cardType: cardType, parentCardId: parentId},
+        data: cardData,
 
         success: function(response) {
-            window.location.assign("/"+cardType+"/"+response.primaryKey);
-        },
-        error: function(response) {
-            console.log(response.responseJSON.message);
+            window.location.assign("/"+cardData.cardType+"/"+response.primaryKey);
         }
     });
 
@@ -195,15 +193,12 @@ $(document).on("click",".removeFromGroupButton",function(event){
     var cardGroupId = $(".maincontainer .card-main>.cardId").text();
 
     $.ajax({
-        type: "POST",
+        type: "DELETE",
         url: "/removeGroupMindcard",
         data: {"mindcardId": mindcardId, "cardGroupId": cardGroupId},
 
         success: function(response) {
             cardDiv.remove();
-        },
-        error: function(response) {
-            console.log(response.responseJSON.message);
         }
     });
 
@@ -244,9 +239,6 @@ $(document).on("submit",".groupMindcardPopup .popupSearch",function(event){
                 newDiv.appendTo(popupCardGrid);
                 updateCardElement(mindcard,newDiv);
             });
-        },
-        error: function(response) {
-            console.log(response.responseJSON.message);
         }
     });
 
@@ -263,10 +255,6 @@ $(document).on("click",".groupMindcardPopup .adderBrowserCard",function(event){
         type: "POST",
         url: "/addGroupMindcard",
         data: {mindcardId: mindcardId, cardGroupId: cardGroupId},
-
-        error: function(response) {
-            console.log(response.responseJSON.message);
-        }
     });
 
     popup.attr("hidden",true);

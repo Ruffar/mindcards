@@ -5,10 +5,7 @@ import com.raffier.mindcards.model.table.*;
 import com.raffier.mindcards.repository.AppDatabase;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -76,7 +73,7 @@ public class CardGroupRepository extends CardRepository<CardGroup> {
                     stmnt.setInt(1,cardId);
                     stmnt.setInt(2,user.getUserId());
                 },
-                (ResultSet::next)
+                (ResultSet::next) //Return true if a result is found
         );
     }
 

@@ -163,7 +163,7 @@ public class CardController {
         return new ResponseEntity<>(cardElement, HttpStatus.ACCEPTED);
     }
 
-    @PostMapping("deleteCard")
+    @DeleteMapping("deleteCard")
     public ResponseEntity<?> deleteCard(@ModelAttribute User user, @RequestParam String cardType, @RequestParam int cardId) {
 
         CardType cardTypeEnum = CardType.getCardTypeFromString(cardType);
@@ -190,11 +190,11 @@ public class CardController {
             throw new UnauthorisedAccessException();
         }
 
-        return new ResponseEntity<>(null,HttpStatus.OK);
+        return new ResponseEntity<>(HttpStatus.OK);
     }
 
     @PostMapping("addCard")
-    public ResponseEntity<CardElement<?>> addCard(@ModelAttribute User user, @RequestParam String cardType, @RequestParam int parentCardId) {
+    public ResponseEntity<CardElement<?>> addCard(@ModelAttribute User user, @RequestParam String cardType, @RequestParam(defaultValue = "0") int parentCardId) {
 
         CardType cardTypeEnum = CardType.getCardTypeFromString(cardType);
         boolean isOwner;
@@ -324,7 +324,7 @@ public class CardController {
         return new ResponseEntity<>(null,HttpStatus.BAD_REQUEST);
     }
 
-    @PostMapping("removeGroupMindcard")
+    @DeleteMapping("removeGroupMindcard")
     public ResponseEntity<?> removeGroupMindcard(@ModelAttribute User user, @RequestParam int mindcardId, @RequestParam int cardGroupId) {
 
         System.out.println("hey");

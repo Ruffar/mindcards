@@ -26,9 +26,6 @@ $(document).on("mouseover","a.cardHyperlink",function(event){
                var newDiv = $("#cardTemplates").find(".hoverCard."+cardType).clone();
                newDiv.appendTo(hyperlink);
                updateCardElement(response,newDiv);
-            },
-            error: function(response) {
-                console.log(response.responseJSON.message);
             }
         });
 

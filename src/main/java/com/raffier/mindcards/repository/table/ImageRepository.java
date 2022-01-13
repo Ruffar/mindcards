@@ -3,16 +3,9 @@ package com.raffier.mindcards.repository.table;
 import com.raffier.mindcards.errorHandling.EntityNotFoundException;
 import com.raffier.mindcards.model.table.CardTable;
 import com.raffier.mindcards.model.table.Image;
-import com.raffier.mindcards.model.table.Infocard;
 import com.raffier.mindcards.repository.AppDatabase;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
 
 @Component
 public class ImageRepository extends EntityRepository<Image, Integer> {
@@ -23,7 +16,6 @@ public class ImageRepository extends EntityRepository<Image, Integer> {
     }
 
     protected void throwEntityNotFound(Integer id) { throw new EntityNotFoundException("Image", id); }
-    protected void throwEntityNotFound(String path) { throw new EntityNotFoundException("Image", "path", "\""+path+"\""); }
 
     // Updates //
     public void save(Image entity) {
@@ -78,5 +70,4 @@ public class ImageRepository extends EntityRepository<Image, Integer> {
                     return null;
                 });
     }
-
 }

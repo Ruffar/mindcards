@@ -1,15 +1,11 @@
 package com.raffier.mindcards.repository.table;
 
 import com.raffier.mindcards.errorHandling.EntityNotFoundException;
-import com.raffier.mindcards.errorHandling.InvalidCardTypeException;
 import com.raffier.mindcards.model.table.*;
 import com.raffier.mindcards.repository.AppDatabase;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-
-import java.sql.Date;
 import java.sql.ResultSet;
-import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -82,7 +78,7 @@ public class DeckRepository extends CardRepository<Deck> {
                     stmnt.setInt(1,cardId);
                     stmnt.setInt(2,user.getUserId());
                 },
-                (ResultSet::next)
+                (ResultSet::next) //Return true if result is found
         );
     }
 
@@ -94,7 +90,7 @@ public class DeckRepository extends CardRepository<Deck> {
                         "(SELECT COUNT(CardGroup.cardGroupId) FROM CardGroup WHERE CardGroup.deckId = d1.deckId AND (CardGroup.title LIKE ? OR CardGroup.description LIKE ?)) AS groupScore, " +
                         "(SELECT COUNT(Infocard.infocardId) FROM Infocard, Mindcard WHERE Infocard.mindcardId = Mindcard.mindcardId AND Mindcard.deckId = d1.deckId AND Infocard.description LIKE ?) AS infocardScore " +
                         "FROM Deck d1 " +
-                        "WHERE Deck.deckId != 0" +
+                        "WHERE d1.deckId != 0 " +
                         "ORDER BY deckScore DESC, groupScore DESC, mindcardScore DESC, infocardScore DESC LIMIT ? OFFSET ?;",
 
                 (stmnt) -> {
@@ -103,23 +99,6 @@ public class DeckRepository extends CardRepository<Deck> {
                     }
                     stmnt.setInt(8,amount);
                     stmnt.setInt(9,offset);
-                },
-
-                (results) -> {
-                    List<Deck> outList = new ArrayList<>();
-                    while (results.next()) {
-                        outList.add( new Deck(results.getInt("deckId"),results.getInt("ownerId"),results.getString("title"),results.getInt("imageId"),results.getString("description"),results.getBoolean("isPrivate"),results.getDate("timeCreated")) );
-                    }
-                    return outList;
-                });
-    }
-
-    public List<Deck> getNewest(int amount, int offset) {
-        return executeQuery(
-                "SELECT * FROM Deck WHERE Deck.deckId != 0 ORDER BY timeCreated DESC LIMIT ? OFFSET ?",
-                (stmnt) -> {
-                    stmnt.setInt(1,amount);
-                    stmnt.setInt(2,offset);
                 },
 
                 (results) -> {
@@ -164,12 +143,30 @@ public class DeckRepository extends CardRepository<Deck> {
                 });
     }
 
-    public List<Deck> getOldestViewed(int amount, int offset) {
+    public List<Deck> getNewest(int amount, int offset) {
         return executeQuery(
-                "SELECT Deck.* FROM Deck, Favourite GROUP BY Favourite.deckId ORDER BY Favourite.lastViewed ASC LIMIT ? OFFSET ?",
+                "SELECT * FROM Deck WHERE Deck.deckId != 0 ORDER BY timeCreated DESC LIMIT ? OFFSET ?",
                 (stmnt) -> {
                     stmnt.setInt(1,amount);
                     stmnt.setInt(2,offset);
+                },
+
+                (results) -> {
+                    List<Deck> outList = new ArrayList<>();
+                    while (results.next()) {
+                        outList.add( new Deck(results.getInt("deckId"),results.getInt("ownerId"),results.getString("title"),results.getInt("imageId"),results.getString("description"),results.getBoolean("isPrivate"),results.getDate("timeCreated")) );
+                    }
+                    return outList;
+                });
+    }
+
+    public List<Deck> getOldestViewedFavourites(int userId, int amount, int offset) {
+        return executeQuery(
+                "SELECT Deck.* FROM Deck, Favourite WHERE Favourite.deckId=Deck.deckId AND Favourite.userId=? ORDER BY Favourite.lastViewed ASC LIMIT ? OFFSET ?",
+                (stmnt) -> {
+                    stmnt.setInt(1,userId);
+                    stmnt.setInt(2,amount);
+                    stmnt.setInt(3,offset);
                 },
 
                 (results) -> {
@@ -196,7 +193,4 @@ public class DeckRepository extends CardRepository<Deck> {
                     return outList;
                 });
     }
-
-
-
 }

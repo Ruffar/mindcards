@@ -8,8 +8,11 @@
 <body>
 
     <th:block th:fragment="searchBar(url)">
-        <form >
-            <input type="input"/>
+        <form th:action="${url}" method="get" class="searchBar">
+            <input type="search" name="search" placeholder="Search">
+            <button type="submit">
+                <i class="fa-solid fa-magnifying-glass"></i>
+            </button>
         </form>
     </th:block>
 

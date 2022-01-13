@@ -10,14 +10,14 @@ public enum CardType {
     INFOCARD("infocard",MINDCARD),
     CARDGROUP("cardgroup",DECK);
 
-    private final String name;
-    private final CardType parent;
+    private final String name; //The name of the enum
+    private final CardType parent; //The parent enum, can be null
 
-    private CardType(String name, CardType parent) {
+    CardType(String name, CardType parent) {
         this.name = name;
         this.parent = parent;
     }
-    private CardType(String name) {
+    CardType(String name) {
         this(name,null);
     }
 
@@ -26,9 +26,9 @@ public enum CardType {
 
     public static CardType getCardTypeFromString(String string) {
         if (string != null) {
-            String lowercase = string.toLowerCase();
-            for (CardType type : EnumSet.allOf(CardType.class)) {
-                if (type.name.equals(lowercase)) { return type; }
+            String lowercase = string.toLowerCase(); //ignore capitalization
+            for (CardType type : EnumSet.allOf(CardType.class)) { //Check all enums
+                if (type.name.equals(lowercase)) { return type; } //If they match, return the type
             }
         }
         return NONE;

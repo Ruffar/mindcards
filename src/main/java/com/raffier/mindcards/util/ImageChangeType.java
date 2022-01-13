@@ -11,7 +11,7 @@ public enum ImageChangeType {
 
     private final String name;
 
-    private ImageChangeType(String name) {
+    ImageChangeType(String name) {
         this.name = name;
     }
 

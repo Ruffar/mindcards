@@ -32,9 +32,9 @@
 
     <div class="maincontainer">
 
-        <form th:action="|/deck/${deck.card.getDeckId()}|" method="get">
-            <input class="searchBar" type="search" name="search"/>
-        </form>
+        <th:block th:insert="~{fragments/browse :: searchBar(url=${'/deck/'+deck.card.getDeckId()})}"></th:block>
+
+        <br>
 
         <th:block th:insert="~{fragments/card :: parentButton(deckId=${deck.card.getPrimaryKey()})}"></th:block>
 

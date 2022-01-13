@@ -1,4 +1,65 @@
 
+/* parent button */
+#parentButton {
+    cursor: pointer;
+    transition: 0.2s ease;
+    vertical-align: middle;
+}
+
+#parentButton:hover {
+    color: #f95;
+}
+
+#parentButton i {
+    font-size: 4rem;
+    vertical-align: middle;
+}
+
+#parentButton a {
+    vertical-align: middle;
+    display: inline-block;
+}
+
+
+/* search bar */
+form.searchBar {
+    margin-left: calc(25%);
+    width: 50%;
+    height: 3rem;
+    background: #333;
+    border-radius: 1rem;
+    border-style: hidden;
+    display: flex;
+}
+
+form.searchBar input[type="search"] {
+    width: calc(100% - 3rem);
+    height: 100%;
+    background: #0000;
+    border: hidden;
+    margin-left: 1em;
+    font-size: 1rem;
+    font-family: inherit;
+    color: #fff;
+}
+
+form.searchBar input:focus {
+    outline: none;
+}
+
+form.searchBar>* {
+    display: inline-block;
+}
+
+form.searchBar button {
+    width: 3rem;
+    background: #333;
+    font-size: 1.2rem;
+    cursor: pointer;
+}
+
+
+/* cards */
 .card {
     position: relative;
     width: 300px;
@@ -164,6 +225,7 @@ a:hover .card.hoverCard {
 
 .plusSign:hover {
     color: #f95;
+    transform: scale(1.2);
 }
 
 .mainCardAdder .plusSign {
@@ -260,10 +322,12 @@ a:hover .card.hoverCard {
 }
 
 .cornerButtons>* {
+    display: inline-block;
     background-color: #333;
     height: 30px;
     border-radius: 0 0 1em 1em;
     line-height: 30px;
+    vertical-align: middle
 
     transition: 0.2s;
 
@@ -287,6 +351,10 @@ a:hover .card.hoverCard {
 
 .favouriteNumber {
     font-size: 18px;
+}
+
+button.removeFromGroupButton:hover {
+    color: #f55;
 }
 
 button {

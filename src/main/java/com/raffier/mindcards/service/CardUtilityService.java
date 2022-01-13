@@ -24,17 +24,13 @@ public class CardUtilityService {
     DeckRepository deckRepository;
 
     public <T extends CardTable> Image getCardImage(T card) {
-        if (card.getImageId() != null && card.getImageId() != 0) {
-            try {
-                return imageRepository.getFromCard(card);
-            } catch(EntityNotFoundException e) {
-                card.setImageId(0);
-            }
+        if (card.getImageId() != null && card.getImageId() != 0) { //Check whether card has an image that is not deleted
+            return imageRepository.getFromCard(card);
         }
         return null;
     }
 
-    //
+    //Getting correct repository class from a CardType
     private CardRepository<?> getRepository(CardType cardType) {
         switch (cardType) {
             case INFOCARD:
@@ -55,16 +51,6 @@ public class CardUtilityService {
         if (user == null) return false;
         return getRepository(cardType).isOwner(user,cardId);
     }
-
-    //Access
-    /*public boolean canUserAccess(CardType cardType, User user, int cardId) {
-        CardRepository<?> repository = getRepository(cardType);
-        if ( repository.isPrivate(cardId) && user != null ) { //Check if the card is private, if it is then check if user is owner only if there is a registered user
-            return repository.isOwner(user,cardId);
-        } else {
-            return true;
-        }
-    }*/
 
     //Existence
     public boolean cardExists(CardType cardType, int cardId) {

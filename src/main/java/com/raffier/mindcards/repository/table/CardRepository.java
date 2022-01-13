@@ -11,5 +11,4 @@ public abstract class CardRepository<T extends CardTable> extends EntityReposito
     }
 
     public abstract boolean isOwner(User user, int cardId);
-
 }

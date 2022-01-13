@@ -1,6 +1,6 @@
 package com.raffier.mindcards.model.table;
 
-public abstract class EntityTable<ID> {
+public abstract class EntityTable<ID> { //ID is the data type of the primary key
 
     protected final String tableName;
 
@@ -12,5 +12,4 @@ public abstract class EntityTable<ID> {
     public String getTableName() { return this.tableName; }
 
     //Primary key should only be set at construction and couldn't be changed
-
 }

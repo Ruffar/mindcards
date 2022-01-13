@@ -9,7 +9,7 @@ public enum SortType {
 
     private final String name;
 
-    private SortType(String name) {
+    SortType(String name) {
         this.name = name;
     }
 
@@ -25,5 +25,4 @@ public enum SortType {
         }
         return NONE;
     }
-
 }

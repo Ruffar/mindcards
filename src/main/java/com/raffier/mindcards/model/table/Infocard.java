@@ -24,5 +24,4 @@ public class Infocard extends CardTable {
     public int getInfocardId() { return this.infocardId; }
     public int getMindcardId() { return this.mindcardId; }
     public CardType getCardType() { return CardType.INFOCARD; }
-
 }

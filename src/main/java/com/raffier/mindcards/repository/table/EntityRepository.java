@@ -3,14 +3,14 @@ package com.raffier.mindcards.repository.table;
 import com.raffier.mindcards.errorHandling.EntityNotFoundException;
 import com.raffier.mindcards.model.table.EntityTable;
 import com.raffier.mindcards.repository.AppDatabase;
-import com.raffier.mindcards.repository.SQLConsumer;
-import com.raffier.mindcards.repository.SQLFunction;
-
+import com.raffier.mindcards.repository.SQLStatementConsumer;
+import com.raffier.mindcards.repository.SQLResultFunction;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
+//T is the DTO class used which must be a sublcass of EntityTable using the same data type as its ID
 public abstract class EntityRepository<T extends EntityTable<ID>, ID> {
 
     protected Connection connection;
@@ -28,7 +28,7 @@ public abstract class EntityRepository<T extends EntityTable<ID>, ID> {
     Result function includes anything that should be done to the results of the query
      */
     //SQL Queries - any statements that only receive data
-    protected <S> S executeQuery(String statement, SQLConsumer<PreparedStatement> statementConsumer, SQLFunction<ResultSet,S> resultFunction) {
+    protected <S> S executeQuery(String statement, SQLStatementConsumer statementConsumer, SQLResultFunction<S> resultFunction) {
         try {
             PreparedStatement stmnt = connection.prepareStatement(statement);
             statementConsumer.accept(stmnt);
@@ -40,7 +40,7 @@ public abstract class EntityRepository<T extends EntityTable<ID>, ID> {
     }
 
     //SQL Updates - any statements that change data
-    protected int executeUpdate (String statement, SQLConsumer<PreparedStatement> statementConsumer) {
+    protected int executeUpdate (String statement, SQLStatementConsumer statementConsumer) {
         try {
             PreparedStatement stmnt = connection.prepareStatement(statement);
             statementConsumer.accept(stmnt);
@@ -69,5 +69,4 @@ public abstract class EntityRepository<T extends EntityTable<ID>, ID> {
 
     //Queries
     public abstract T getById(ID id); //Returns entity object representing an entity of the ID from the database
-
 }

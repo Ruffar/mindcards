@@ -4,7 +4,6 @@ import com.raffier.mindcards.model.web.CardElement;
 import com.raffier.mindcards.model.web.DeckElement;
 import com.raffier.mindcards.model.table.*;
 import com.raffier.mindcards.repository.table.*;
-import com.raffier.mindcards.util.CardType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -28,20 +27,26 @@ public class CardElementService {
     @Autowired
     private DeckRepository deckRepository;
 
+    // Card Element Conversion //
+
+    //Gets a card of an id from a repository and turns it into a CardElement of that type
     protected <T extends CardTable, S extends EntityRepository<T,Integer>> CardElement<T> getCardElement(int cardId, S repository) {
         T card = repository.getById(cardId);
         Image image = cardUtilityService.getCardImage(card);
         return new CardElement<>(card,image);
     }
 
+    //A deck has additional information on Favourites, so this should be used instead
     public DeckElement getDeckElement(User user, int cardId) {
         Deck card = deckRepository.getById(cardId);
         Image image = cardUtilityService.getCardImage(card);
+        //If there is a user, check whether card is favourited
         boolean isFavourited = user != null && deckService.hasUserFavourited(cardId, user.getUserId());
         int totalFavourites = deckService.getTotalFavourites(cardId);
         return new DeckElement(card,image,isFavourited,totalFavourites);
     }
 
+    //Takes a list of Cards or its subclasses and converts it into a list of card elements
     protected  <T extends CardTable> List<CardElement<T>> getCardElementList(List<T> list) {
         List<CardElement<T>> pairList = new ArrayList<>();
         for (T i: list) {
@@ -51,6 +56,7 @@ public class CardElementService {
         return pairList;
     }
 
+    //Takes a list of Decks and converts it into a list of Deck Elements
     protected List<DeckElement> getDeckElementList(User user, List<Deck> list) {
         List<DeckElement> pairList = new ArrayList<>();
         for (Deck i: list) {
@@ -78,7 +84,7 @@ public class CardElementService {
     }
     //GetDeckElement is already defined
 
-    //Parent Deck
+    //Get Parent Deck
     public DeckElement getMindcardDeck(User user, int cardId) {
         Mindcard card = mindcardRepository.getById(cardId);
         return getDeckElement(user, card.getDeckId());
@@ -131,7 +137,7 @@ public class CardElementService {
     }
 
     public List<DeckElement> getDeckOldestViewed(User user, int amount, int page) {
-        return getDeckElementList(user, deckRepository.getOldestViewed(amount,amount*page));
+        return getDeckElementList(user, deckRepository.getOldestViewedFavourites( user.getUserId(), amount, amount*page ));
     }
 
     //Searching
