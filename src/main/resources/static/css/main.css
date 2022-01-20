@@ -14,3 +14,28 @@ body {
   margin-left: 8rem;
   padding: 0 1rem;
 }
+
+/* home elements */
+.homenavigatebutton {
+    text-decoration: none;
+    color: #fff;
+    font-size: 2em;
+    font-weight: bold;
+    transition: 0.2s ease;
+    line-height: 3rem;
+}
+
+.homenavigatebutton:hover {
+    color: #f95;
+}
+
+.homenavigatebutton i {
+    text-align: center;
+    vertical-align: middle;
+    transition: 0.2s ease;
+    width: 3rem;
+}
+
+.homenavigatebutton:hover i {
+    font-size: 1.2em;
+}

@@ -12,7 +12,11 @@
     <th:block th:insert="~{fragments/pageLayout :: navbar('home')}"></th:block>
 
     <div class="maincontainer">
-        <p> Home </p>
+        <h3>Welcome to Mindcards!</h3>
+        <p>Start by browsing hundreds of cards defaby other people</p>
+        <a class="homenavigatebutton" href="/browse"> <i class="fa-solid fa-rectangle-list"></i> Browse</a>
+        <p>or create your own</p>
+        <a class="homenavigatebutton" href="/register?return=/home"> <i class="fa-solid fa-right-to-bracket"></i> Sign Up</a>
     </div>
 
 </body>
