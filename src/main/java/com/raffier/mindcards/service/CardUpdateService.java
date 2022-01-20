@@ -56,11 +56,14 @@ public class CardUpdateService {
     public <T extends CardTable> void setCardImage(T card, ImageUpdate imageUpdate) {
 
         Image image = cardUtilityService.getCardImage(card);
+
+        //If there is no image entity for the card and it's going to be changed to a new one, create an image entity
         if (image == null && imageUpdate.getChangeType() != ImageChangeType.REMOVE && imageUpdate.getChangeType() != ImageChangeType.NONE) {
-            image = imageRepository.add(new Image(0, ""));
-            card.setImageId(image.getImageId());
+            image = imageRepository.add(new Image(0, "")); //ImageID is automatically set by repository
+            card.setImageId(image.getImageId()); //Set the card's imageID to the new entity
         }
 
+        //If there is an image to be changed, change it
         if (image != null) {
 
             try {
@@ -81,7 +84,7 @@ public class CardUpdateService {
                 //Remove image
                 } else if (imageUpdate.getChangeType() == ImageChangeType.REMOVE) {
                     Files.deleteIfExists(path);
-                    card.setImageId(0);
+                    card.setImageId(0); //Set card's image to 0 (deleted image entity)
                     imageRepository.delete(image);
                 }
             } catch (IOException e) {
@@ -148,7 +151,7 @@ public class CardUpdateService {
         T card = repository.getById(cardId);
         Image image = cardUtilityService.getCardImage(card);
         if (image != null) {
-            imageRepository.delete(image);
+            imageRepository.delete(image); //Delete image if card has one
         }
         repository.delete(card);
     }
@@ -172,19 +175,20 @@ public class CardUpdateService {
         Matcher matcher = pattern.matcher(plainText);
         while (matcher.find()) {
 
-            String cardPath = matcher.group(2);
-            String[] cardPathVariables = cardPath.split("/");
+            String cardPath = matcher.group(2); //Get url path of card
+            String[] cardPathVariables = cardPath.split("/"); //Split path
+            //Proper URL path consists of one of the card types followed by its ID which should only be an integer number
             if (cardPathVariables.length == 2 && cardPathVariables[0].matches("mindcard|group|deck") && cardPathVariables[1].matches("[0-9]+")) {
 
                 CardType cardType = CardType.getCardTypeFromString(cardPathVariables[0]);
-                int cardId = Integer.parseInt(cardPathVariables[1]);
+                int cardId = Integer.parseInt(cardPathVariables[1]); //Convert the written ID to Integer
 
                 if (!cardUtilityService.cardExists(cardType,cardId)) {
-                    throw new InvalidHyperlinkException(cardPath);
+                    throw new InvalidHyperlinkException(cardPath); //If card doesn't exist then raise error
                 }
 
             } else {
-                throw new InvalidHyperlinkException(cardPath);
+                throw new InvalidHyperlinkException(cardPath); //Invalid URL Path format
             }
 
         }

@@ -68,7 +68,7 @@ public class UserRepository extends EntityRepository<User,Integer> {
                 });
     }
 
-    public List<User> getByEmail(String email) {
+    public User getByEmail(String email) {
 
         return executeQuery(
                 "SELECT * FROM User WHERE email=?",
@@ -77,12 +77,12 @@ public class UserRepository extends EntityRepository<User,Integer> {
                 },
 
                 (results) -> {
-                    List<User> outList = new ArrayList<>();
-                    while (results.next()) {
-                        outList.add(new User(results.getInt("userId"), results.getString("username"), results.getString("password"),
-                                email, results.getBoolean("isDeveloper")));
+                    if (results.next()) {
+                        return new User(results.getInt("userId"), results.getString("username"),
+                                results.getString("password"), email,
+                                results.getBoolean("isDeveloper"));
                     }
-                    return outList;
+                    throw new EntityNotFoundException("User with E-Mail "+email+" cannot be found...");
                 });
     }
 }
