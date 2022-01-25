@@ -17,8 +17,8 @@ public class MindcardsApplication {
 
 		//Port input
 		String port = null;
-		//Keep asking for port until the user inputs a valid non-empty port (only has numbers OR "default")
-		while(port == null || (!port.equals("default") && !port.matches("[0-9]+"))) {
+		//Keep asking for port until the user inputs a valid non-empty port (only has numbers which result in a valid port (0-65535) OR "default")
+		while(port == null || !(port.equals("default") || (port.matches("[0-9]+") && Integer.parseInt(port)<=65535))) {
 			System.out.println("Enter server port (or use 'default'): ");
 			port = scanner.nextLine();
 		}
