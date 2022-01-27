@@ -114,7 +114,15 @@ public class CardController {
     }
 
     @PostMapping("saveCard")
-    public ResponseEntity<CardElement<?>> saveCard(@ModelAttribute User user, @RequestParam String cardType, @RequestParam int cardId, @RequestParam(defaultValue="none") String imageChange, @RequestParam(required = false) MultipartFile imageFile, @RequestParam(required = false) String imageUrl, @RequestParam(defaultValue = "") String title, @RequestParam(defaultValue="") String description) {
+    public ResponseEntity<CardElement<?>> saveCard(@ModelAttribute User user,
+                                                   @RequestParam String cardType, //Type of card
+                                                   @RequestParam int cardId, //ID of the card
+                                                   @RequestParam(defaultValue="none") String imageChange, //What happens to the image, must be one of the imageChangeEnums
+                                                   @RequestParam(required = false) MultipartFile imageFile, //If imageChange = upload, this stores the image file
+                                                   @RequestParam(required = false) String imageUrl, //If imageChange = url, this stores the image URL
+                                                   @RequestParam(defaultValue = "") String title, //Title of the card
+                                                   @RequestParam(defaultValue="") String description) //Description of card
+    {
 
         CardType cardTypeEnum = CardType.getCardTypeFromString(cardType);
 
