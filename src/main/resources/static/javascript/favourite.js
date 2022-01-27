@@ -1,5 +1,5 @@
 
-$(document).on("click",".favouriteButton",function(event){
+$(document).on("click",".favouriteButton",function(event){ //Bind function to Click event on any element with favouriteButton class
 
     var favouriteButton = $(this); //Store because $(this) will change inside AJAX
     var isFavourited = $(this).hasClass("favourited");
@@ -9,12 +9,13 @@ $(document).on("click",".favouriteButton",function(event){
 
     if (isFavourited) {
         $.ajax({
-            type: "POST",
+            type: "DELETE",
             url: "/unfavouriteDeck",
             data: {
                 deckId: deckId
             },
             success: function(response) {
+                //Change HTML visuals
                 favouriteButton.removeClass("favourited");
                 icon.removeClass("fa-solid");
                 icon.addClass("fa-regular");
@@ -29,6 +30,7 @@ $(document).on("click",".favouriteButton",function(event){
                 deckId: deckId
             },
             success: function(response) {
+            //Change HTML visuals
                 favouriteButton.addClass("favourited");
                 icon.removeClass("fa-regular");
                 icon.addClass("fa-solid");

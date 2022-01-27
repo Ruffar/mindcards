@@ -29,19 +29,24 @@ public class DeckLibraryController {
     @Autowired
     UserService userService;
 
+    //Browse page request
     @GetMapping(value="browse")
     public ModelAndView browseView(@ModelAttribute User user, @RequestParam(required = false) String sort, @RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "") String search, ModelAndView mv) {
 
+        //Get sort type from parameter
         SortType sortType = SortType.getSortTypeFromString(sort);
+
         if (page < 1) {
-            throw new PageIndexException(page);
+            throw new PageIndexException(page); //Throw error if index is outside of range (< 1)
         }
 
+        //If search parameter is not empty, then do a deck search
         if (!search.equals("")) {
             mv.setViewName("deckLibrary/search");
             mv.addObject("decks", cardElementService.searchDecks(user, search, 12, page-1));
             mv.addObject("search",search);
         }
+        //If there is no search but a sort type, then decks by a sort order
         else if (sortType != SortType.NONE) {
             mv.setViewName("deckLibrary/filtered");
             switch(sortType) {
@@ -55,17 +60,20 @@ public class DeckLibraryController {
                     throw new RuntimeException("Invalid sorting method");
             }
         }
+        //If none of the above conditions are met, then give the user random decks
         else {
             mv.setViewName("deckLibrary/random");
             mv.addObject("decks", cardElementService.getDeckRandom(user, 12));
         }
 
+        //Set ModelView objects for HTML
         mv.addObject("sort",sort);
         mv.addObject("pageNo",page);
 
         return mv;
     }
 
+    //Revise page request
     @GetMapping(value="revise")
     public ModelAndView oldestViewedView(@ModelAttribute User user, @RequestParam(defaultValue = "1") int page, ModelAndView mv) {
 
@@ -84,62 +92,62 @@ public class DeckLibraryController {
         return mv;
     }
 
+
+    //Favourite deck request
     @PostMapping(value="favouriteDeck")
     public ResponseEntity<?> favouriteDeck(@ModelAttribute User user, @RequestParam int deckId) {
 
         if (user == null) {
-            throw new UnauthorisedAccessException();
+            throw new UnauthorisedAccessException(); //Deny this request if user is not logged in
         }
 
+        //Accept request if user hasn't favourited the deck yet
         if (!deckService.hasUserFavourited(deckId, user.getUserId())) {
             deckService.addFavourite(deckId, user.getUserId());
-            return new ResponseEntity<>(null,HttpStatus.OK);
+            return new ResponseEntity<>(null,HttpStatus.ACCEPTED);
         }
 
+        //Return error if neither conditions are met for any reason
         return new ResponseEntity<>(null,HttpStatus.BAD_REQUEST);
 
     }
 
-    @PostMapping(value="unfavouriteDeck")
+    //Unfavourite deck request
+    @DeleteMapping(value="unfavouriteDeck")
     public ResponseEntity<?> unfavouriteDeck(@ModelAttribute User user, @RequestParam int deckId) {
 
         if (user == null) {
-            throw new UnauthorisedAccessException();
+            throw new UnauthorisedAccessException(); //Deny this request if user is not logged in
         }
 
+        //Accept request if user has favourited the deck
         if (deckService.hasUserFavourited(deckId, user.getUserId())) {
             deckService.removeFavourite(deckId, user.getUserId());
-            return new ResponseEntity<>(null,HttpStatus.OK);
+            return new ResponseEntity<>(null,HttpStatus.ACCEPTED);
         }
 
+        //Return error if neither conditions are met for any reason
         return new ResponseEntity<>(null,HttpStatus.BAD_REQUEST);
 
     }
 
-    //
-    @GetMapping(value="getDeckRandom")
-    public ResponseEntity<List<DeckElement>> getRandom(@ModelAttribute User user, @RequestParam("amount") int amount) {
-        return new ResponseEntity<>(cardElementService.getDeckRandom( user, amount ), HttpStatus.OK);
-    }
 
-    @GetMapping(value="getDeckPopular")
-    public ResponseEntity<List<DeckElement>> getPopular (@ModelAttribute User user, @RequestParam("amount") int amount, @RequestParam(name="page",defaultValue="0") int page) {
-        return new ResponseEntity<>(cardElementService.getDeckPopular( user, amount, page ), HttpStatus.OK);
-    }
-
-    //Profile
+    //Profile default request
     @GetMapping(value="profile")
     public ModelAndView myProfile(@ModelAttribute("user") User user, ModelAndView mv) {
 
+        //If user isn't logged in, redirect to login page
         if (user == null) {
             mv.setViewName("redirect:/login");
             return mv;
         }
 
+        //Redirect to actual profile of user using userId
         mv.setViewName("redirect:/profile/"+user.getUserId());
         return mv;
     }
 
+    //Profile page request
     @GetMapping(value="profile/{userId}")
     public ModelAndView profile(@ModelAttribute("user") User user, @PathVariable int userId, ModelAndView mv) {
         mv.setViewName("profilePage");
@@ -152,7 +160,7 @@ public class DeckLibraryController {
         return mv;
     }
 
-    //
+    //Get the user attribute
     @ModelAttribute("user")
     public User getUser(HttpSession session) {
         return (User)session.getAttribute("user");

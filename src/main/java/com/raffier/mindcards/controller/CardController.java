@@ -53,11 +53,13 @@ public class CardController {
         mv.addObject("isOwned",userId == deck.getOwnerId());
     }
 
+    //Deck page
     @GetMapping(value="deck/{deckId}")
     public ModelAndView deckView(@ModelAttribute User user, @PathVariable int deckId, @RequestParam(defaultValue = "") String search, ModelAndView mv) {
         mv.setViewName("cards/deck");
 
-        DeckElement deck = cardElementService.getDeckElement( user, deckId );
+        DeckElement deck = cardElementService.getDeckElement( user, deckId ); //Get deck HTML element
+        //Get mindcards and card groups of the deck
         List<CardElement<Mindcard>> mindcards;
         List<CardElement<CardGroup>> cardGroups;
         if (!search.equals("")) {
@@ -115,6 +117,7 @@ public class CardController {
     public ResponseEntity<CardElement<?>> saveCard(@ModelAttribute User user, @RequestParam String cardType, @RequestParam int cardId, @RequestParam(defaultValue="none") String imageChange, @RequestParam(required = false) MultipartFile imageFile, @RequestParam(required = false) String imageUrl, @RequestParam(defaultValue = "") String title, @RequestParam(defaultValue="") String description) {
 
         CardType cardTypeEnum = CardType.getCardTypeFromString(cardType);
+
         //Create image update data
         ImageChangeType imageChangeEnum = ImageChangeType.getImageChangeTypeFromString(imageChange);
         ImageUpdate imageUpdateData;
@@ -132,10 +135,11 @@ public class CardController {
                 break;
         }
 
+        // Update card data //
         boolean isOwner = cardUtilityService.isUserCardOwner(cardTypeEnum, user, cardId);
 
         CardElement<?> cardElement;
-        if (isOwner && cardUpdateService.areHyperlinksValid(description)) {
+        if (isOwner && cardUpdateService.areHyperlinksValid(description)) { //Check if Hyperlinks are valid; if not, it will raise Invalid Hyperlink Exception
             switch (cardTypeEnum) {
                 case DECK:
                     cardUpdateService.updateDeck(cardId, title, imageUpdateData, description);
@@ -160,7 +164,7 @@ public class CardController {
             throw new UnauthorisedAccessException();
         }
 
-        return new ResponseEntity<>(cardElement, HttpStatus.ACCEPTED);
+        return new ResponseEntity<>(cardElement, HttpStatus.ACCEPTED); //Return card after updating
     }
 
     @DeleteMapping("deleteCard")
@@ -187,7 +191,7 @@ public class CardController {
                     throw new InvalidCardTypeException(cardTypeEnum);
             }
         } else {
-            throw new UnauthorisedAccessException();
+            throw new UnauthorisedAccessException(); //Can't delete card as user doesn't own the card
         }
 
         return new ResponseEntity<>(HttpStatus.OK);
@@ -197,6 +201,8 @@ public class CardController {
     public ResponseEntity<CardElement<?>> addCard(@ModelAttribute User user, @RequestParam String cardType, @RequestParam(defaultValue = "0") int parentCardId) {
 
         CardType cardTypeEnum = CardType.getCardTypeFromString(cardType);
+
+        // Check if the deck that card is being added for is owned by user (or immediately add if a deck is being added)
         boolean isOwner;
         if (cardTypeEnum == CardType.DECK) {
             isOwner = true;
@@ -205,6 +211,7 @@ public class CardController {
             isOwner = cardUtilityService.isUserCardOwner(parentType, user, parentCardId);
         }
 
+        // Add deck
         CardElement<?> cardElement;
         if (isOwner) {
             switch (cardTypeEnum) {
@@ -238,12 +245,13 @@ public class CardController {
         return new ResponseEntity<>(cardElement, HttpStatus.CREATED);
     }
 
+    //Get card element
     @GetMapping("getCardElement")
     public ResponseEntity<CardElement<?>> getCardElement(@ModelAttribute User user, @RequestParam String cardType, @RequestParam int cardId) {
 
         CardType cardTypeEnum = CardType.getCardTypeFromString(cardType);
-        //boolean isOwner = cardUtilityService.isUserCardOwner(cardTypeEnum, user, cardId);
 
+        //Get the card element from cardId and its cardType
         CardElement<?> cardElement;
         Deck deck;
         switch(cardTypeEnum) {

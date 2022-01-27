@@ -36,5 +36,4 @@ public class DeckService {
         return favouriteRepository.getTotalDeckFavourites(deckId);
     }
 
-
 }
