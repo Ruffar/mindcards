@@ -42,13 +42,13 @@ public class CardUtilityService {
             case DECK:
                 return deckRepository;
             default:
-                throw new InvalidCardTypeException(cardType);
+                throw new InvalidCardTypeException(cardType); //Card type is invalid and throws error
         }
     }
 
     //Ownership
     public boolean isUserCardOwner(CardType cardType, User user, int cardId) {
-        if (user == null) return false;
+        if (user == null) return false; //If the user isn't logged in, then they are definitely not the owner
         return getRepository(cardType).isOwner(user,cardId);
     }
 

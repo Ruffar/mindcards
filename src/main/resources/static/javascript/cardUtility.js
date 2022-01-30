@@ -35,14 +35,3 @@ function updateCardElement(cardDTO, cardDiv) {
     title.text(cardDTO.title);
   }
 }
-
-function getFormData(form) {
-  var rawData = form.serializeArray();
-  var outData = {};
-
-  $.map(rawData, function(rawElement, i) {
-    outData[rawElement["name"]] = rawElement["value"];
-  });
-
-  return outData;
-}

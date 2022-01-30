@@ -28,46 +28,11 @@ $(document).on("mouseover","a.cardHyperlink",function(event){
                updateCardElement(response,newDiv);
             }
         });
-
     }
-
 });
 
 
 // Markdown //
-//Stack
-class Stack {
-
-    constructor() {
-        this.items = [];
-        this.top = -1;
-    }
-
-    isEmpty() {
-        return this.top < 0;
-    }
-
-    push(item) {
-        this.top += 1;
-        this.items[this.top] = item;
-    }
-
-    peek() {
-        if (!this.isEmpty()) {
-            return this.items[this.top];
-        }
-        return null;
-    }
-
-    pop() {
-        if (!this.isEmpty()) {
-            this.top -= 1;
-            return this.items[this.top+1];
-        }
-        return null;
-    }
-
-}
 
 $(document).ready(function() {
     $(".card-view").map(function(){
@@ -133,6 +98,51 @@ function parseHyperlink(text) {
     return text.replace(/\[(.+?)]\((.+?)\)/g, '<a class="cardHyperlink" href="$2">$1</a>');
 }
 
+function parseBulletList(text) {
+    return text.replace(/^-(.+?)$/gm,'<ul><li>$1</li></ul>').replace(/<\/ul>(\s*?)<ul>/g,'');
+}
+
+function parseNumberList(text) {
+    return text.replace(/^[0-9]+?\.(.+?)$/gm,'<ol><li>$1</li></ol>').replace(/<\/ol>(\s*?)<ol>/g,'');
+}
+
+function parseLineBreak(text) {
+    return text.replace(/\>\n/g,'>').replace(/\n\</g,'<').replace(/\n/g,'<br/>');
+}
+
+//Math expressions
+//Stack
+class Stack {
+    constructor() {
+        this.items = [];
+        this.top = -1;
+    }
+
+    isEmpty() {
+        return this.top < 0;
+    }
+
+    push(item) {
+        this.top += 1;
+        this.items[this.top] = item;
+    }
+
+    peek() {
+        if (!this.isEmpty()) {
+            return this.items[this.top];
+        }
+        return null;
+    }
+
+    pop() {
+        if (!this.isEmpty()) {
+            this.top -= 1;
+            return this.items[this.top+1];
+        }
+        return null;
+    }
+}
+
 function parseMathExpression(text) {
     return text.replace(/\\\((.+?)\\\)/g,(match,$1)=> {
         var expression = match.slice(2,match.length-2);
@@ -145,8 +155,8 @@ function parseMathExpression(text) {
 
                 currentChar = expression[i];
 
-                var isAlphanumeric = currentChar.match(/[a-z0-9]/i);
-                if (!isTerm && isAlphanumeric) { //i means not case sensitive
+                var isAlphanumeric = currentChar.match(/[a-z0-9]/i); //i means not case sensitive
+                if (!isTerm && isAlphanumeric) {
                     output += "<span class='term'>";
                     isTerm = true;
                 } else if (isTerm && !isAlphanumeric) {
@@ -154,8 +164,8 @@ function parseMathExpression(text) {
                     isTerm = false;
                 }
 
-                var isAlphabet = currentChar.match(/[a-z]/i);
-                if (!isVariable && isAlphabet) { //i means not case sensitive
+                var isAlphabet = currentChar.match(/[a-z]/i); //i means not case sensitive
+                if (!isVariable && isAlphabet) {
                     output += "<span class='variables'>";
                     isVariable = true;
                 } else if (isVariable && !isAlphabet) {
@@ -233,16 +243,4 @@ function parseMathExpression(text) {
 
             return output+"</span>";
     });
-}
-
-function parseBulletList(text) {
-    return text.replace(/^-(.+?)$/gm,'<ul><li>$1</li></ul>').replace(/<\/ul>(\s*?)<ul>/g,'');
-}
-
-function parseNumberList(text) {
-    return text.replace(/^[0-9]+?\.(.+?)$/gm,'<ol><li>$1</li></ol>').replace(/<\/ol>(\s*?)<ol>/g,'');
-}
-
-function parseLineBreak(text) {
-    return text.replace(/\>\n/g,'>').replace(/\n\</g,'<').replace(/\n/g,'<br/>');
 }

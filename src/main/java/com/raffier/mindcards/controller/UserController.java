@@ -20,6 +20,7 @@ public class UserController {
     @Autowired
     private UserService userService;
 
+    //Login page
     @GetMapping(value="login")
     public ModelAndView loginPage(@ModelAttribute("user") User user, HttpSession session) {
         ModelAndView mv = new ModelAndView("user/login");
@@ -31,6 +32,7 @@ public class UserController {
         return mv;
     }
 
+    //Login to user request
     @PostMapping(value="login")
     @ResponseBody
     public AppResponse loginSubmit(@RequestParam String email, @RequestParam String password, HttpSession session) {
@@ -45,6 +47,7 @@ public class UserController {
 
     }
 
+    //Register page
     @GetMapping(value="register")
     public ModelAndView registerPage(@ModelAttribute("user") User user, HttpSession session) {
         ModelAndView mv = new ModelAndView("user/register");
@@ -56,6 +59,7 @@ public class UserController {
         return mv;
     }
 
+    //Register new user request
     @PostMapping(value="register")
     public AppResponse registerSubmit(@RequestParam String username, @RequestParam String email, @RequestParam String password, HttpSession session) {
 
@@ -69,13 +73,14 @@ public class UserController {
 
     }
 
+    //Logout request
     @GetMapping(value="logout")
     public ModelAndView logout(HttpSession session, SessionStatus status, HttpServletRequest request) {
 
-        status.setComplete();
-        session.removeAttribute("user");
+        status.setComplete(); //Say that the request is completed without doing anything else
+        session.removeAttribute("user"); //Remove the user account attribute from their session
 
-        return new ModelAndView("redirect:"+request.getHeader("Referer"));
+        return new ModelAndView("redirect:"+request.getHeader("Referer")); //Redirect user to same page
     }
 
     @ModelAttribute("user")

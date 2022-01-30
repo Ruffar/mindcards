@@ -91,7 +91,6 @@ public class CardUpdateService {
                 throw new ImageChangeException();
             }
         }
-
     }
 
     //Update card main information
@@ -169,7 +168,7 @@ public class CardUpdateService {
         deleteCard(cardId,deckRepository);
     }
 
-    //Hyperlink is valid
+    //Hyperlink validation
     public boolean areHyperlinksValid(String plainText) {
         Pattern pattern = Pattern.compile("\\[(.+?)]\\((.+?)\\)");
         Matcher matcher = pattern.matcher(plainText);
@@ -177,7 +176,7 @@ public class CardUpdateService {
 
             String cardPath = matcher.group(2); //Get url path of card
             String[] cardPathVariables = cardPath.split("/"); //Split path
-            //Proper URL path consists of one of the card types followed by its ID which should only be an integer number
+            //Proper URL path consists of one of the card types followed by its ID which should only be an integer number (e.g. 'mindcard/3')
             if (cardPathVariables.length == 2 && cardPathVariables[0].matches("mindcard|group|deck") && cardPathVariables[1].matches("[0-9]+")) {
 
                 CardType cardType = CardType.getCardTypeFromString(cardPathVariables[0]);
@@ -190,7 +189,6 @@ public class CardUpdateService {
             } else {
                 throw new InvalidHyperlinkException(cardPath); //Invalid URL Path format
             }
-
         }
 
         return true;

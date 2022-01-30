@@ -234,6 +234,7 @@ $(document).on("submit",".groupMindcardPopup .popupSearch",function(event){
         data: {deckId: deckId, search: searchString},
 
         success: function(response) {
+            //Add each received mindcard onto the popup
             response.forEach(function(mindcard, i) {
                 var newDiv = $("#cardTemplates").find(".adderBrowserCard.mindcard").clone();
                 newDiv.appendTo(popupCardGrid);

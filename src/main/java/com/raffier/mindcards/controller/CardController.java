@@ -62,9 +62,11 @@ public class CardController {
         //Get mindcards and card groups of the deck
         List<CardElement<Mindcard>> mindcards;
         List<CardElement<CardGroup>> cardGroups;
+        //If something is being searched, show mindcards and groups that best match it
         if (!search.equals("")) {
             mindcards = cardElementService.searchMindcards(deckId, search, 12, 0);
             cardGroups = cardElementService.searchCardGroups(deckId, search, 12, 0);
+        //otherwise, get random cards
         } else {
             mindcards = cardElementService.getRandomMindcardsFromDeck(deckId, 12);
             cardGroups = cardElementService.getRandomCardGroupsFromDeck(deckId, 12);
@@ -72,6 +74,7 @@ public class CardController {
 
         handleCardPage(user, deck.getCard(), mv);
 
+        //Add ModelView data
         mv.addObject("deck",deck);
         mv.addObject("mindcards",mindcards);
         mv.addObject("cardGroups",cardGroups);
@@ -79,16 +82,21 @@ public class CardController {
         return mv;
     }
 
+    //Card Group page
     @GetMapping(value="cardGroup/{cardGroupId}")
     public ModelAndView groupView(@ModelAttribute User user, @PathVariable int cardGroupId, ModelAndView mv) {
         mv.setViewName("cards/group");
 
-        CardElement<CardGroup> group = cardElementService.getCardGroupElement( cardGroupId);
+        //Get the card group
+        CardElement<CardGroup> group = cardElementService.getCardGroupElement(cardGroupId);
+        //Get mindcards belonging to the group
         List<CardElement<Mindcard>> mindcards = cardElementService.getMindcardsFromCardGroup( group.getCard().getCardGroupId() );
+        //Get deck
         DeckElement deck = cardElementService.getDeckElement( user, group.getCard().getDeckId() );
 
         handleCardPage(user, deck.getCard(), mv);
 
+        //Add ModelView data
         mv.addObject("deck",deck);
         mv.addObject("mindcards",mindcards);
         mv.addObject("cardGroup",group);
@@ -96,16 +104,21 @@ public class CardController {
         return mv;
     }
 
+    //Mindcard page
     @GetMapping(value="mindcard/{mindcardId}")
     public ModelAndView mindcardView(@ModelAttribute User user, @PathVariable int mindcardId, ModelAndView mv) {
         mv.setViewName("cards/mindcard");
 
+        //Get mindcard
         CardElement<Mindcard> mindcard = cardElementService.getMindcardElement( mindcardId );
+        //Get infocards belong to the mindcard
         List<CardElement<Infocard>> infocards = cardElementService.getInfocardsFromMindcard( mindcardId );
+        //Get deck
         DeckElement deck = cardElementService.getDeckElement( user, mindcard.getCard().getDeckId() );
 
         handleCardPage(user, deck.getCard(), mv);
 
+        //Add ModelView data
         mv.addObject("deck",deck);
         mv.addObject("mindcard",mindcard);
         mv.addObject("infocards",infocards);
@@ -300,8 +313,6 @@ public class CardController {
     @GetMapping("searchDeckMindcards")
     public ResponseEntity<List<CardElement<Mindcard>>> getCardElement(@ModelAttribute User user, @RequestParam int deckId, @RequestParam String search) {
 
-        //boolean isOwner = cardUtilityService.isUserCardOwner(cardTypeEnum, user, cardId);
-
         Deck deck = cardElementService.getDeckElement( user, deckId ).getCard();
         List<CardElement<Mindcard>> mindcards = cardElementService.searchMindcards(deckId, search, 10, 0);
 
@@ -330,9 +341,9 @@ public class CardController {
     @PostMapping("addGroupMindcard")
     public ResponseEntity<?> addMindcardToCardGroup(@ModelAttribute User user, @RequestParam int mindcardId, @RequestParam int cardGroupId) {
 
-        handleCardGroupAccess(user,cardGroupId);
+        handleCardGroupAccess(user,cardGroupId); //Ensure user has access to add mindcard
 
-        if (!cardGroupService.isMindcardInCardGroup(mindcardId,cardGroupId)) {
+        if (!cardGroupService.isMindcardInCardGroup(mindcardId,cardGroupId)) { //Add mindcard if it's not added yet
             cardGroupService.addMindcardToCardGroup(mindcardId, cardGroupId);
             return new ResponseEntity<>(null,HttpStatus.CREATED);
         }
@@ -343,16 +354,13 @@ public class CardController {
     @DeleteMapping("removeGroupMindcard")
     public ResponseEntity<?> removeGroupMindcard(@ModelAttribute User user, @RequestParam int mindcardId, @RequestParam int cardGroupId) {
 
-        System.out.println("hey");
-        handleCardGroupAccess(user,cardGroupId);
+        handleCardGroupAccess(user,cardGroupId); //Ensure user has access to delete mindcard
 
-        if (cardGroupService.isMindcardInCardGroup(mindcardId,cardGroupId)) {
-            System.out.println("hi");
+        if (cardGroupService.isMindcardInCardGroup(mindcardId,cardGroupId)) { //Remove mindcard if it's in the group
             cardGroupService.removeMindcardFromCardGroup(mindcardId, cardGroupId);
             return new ResponseEntity<>(new AppResponse(HttpStatus.OK),HttpStatus.OK);
         }
 
-        System.out.println("bye");
         return new ResponseEntity<>(new AppResponse(HttpStatus.BAD_REQUEST),HttpStatus.BAD_REQUEST);
     }
 
