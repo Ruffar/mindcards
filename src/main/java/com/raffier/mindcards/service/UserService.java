@@ -7,8 +7,6 @@ import com.raffier.mindcards.repository.table.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 @Service
 public class UserService {
 
@@ -56,10 +54,11 @@ public class UserService {
 
     /*
     "^" and "&" represents the start and end of a RegEx expression respectively
-    "." means check for every character in the string
-    "*" means check if there is at least one character that matches a condition
+    "." means any type of character may match this
+    "*" means the previous character may exists 0 or more times
+    "+" means check if there is at least one of the previous character
     "[]" means a condition group e.g. [0-9] checks for characters between 0 and 9
-    "{a,b}" means check if the string's length is between a and b, either can be omitted
+    "{a,b}" means check if the character repeats between a and b times inclusive, either can be omitted
      */
 
     private boolean isValidUsername(String username) {
@@ -67,7 +66,7 @@ public class UserService {
     }
 
     private boolean isCorrectEmailFormat(String email) {
-        return email.contains("@");
+        return email.matches("^.+@.+$");
     }
 
     private boolean isCorrectPasswordFormat(String password) {
