@@ -12,6 +12,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.sql.SQLException;
 
 @Controller
 @SessionAttributes("user")
@@ -35,7 +36,7 @@ public class UserController {
     //Login to user request
     @PostMapping(value="login")
     @ResponseBody
-    public AppResponse loginSubmit(@RequestParam String email, @RequestParam String password, HttpSession session) {
+    public AppResponse loginSubmit(@RequestParam String email, @RequestParam String password, HttpSession session) throws SQLException {
 
         User user = userService.userLogin(email, password);
         if (user != null) {
@@ -61,7 +62,7 @@ public class UserController {
 
     //Register new user request
     @PostMapping(value="register")
-    public AppResponse registerSubmit(@RequestParam String username, @RequestParam String email, @RequestParam String password, HttpSession session) {
+    public AppResponse registerSubmit(@RequestParam String username, @RequestParam String email, @RequestParam String password, HttpSession session) throws SQLException {
 
         User user = userService.userRegister(username, email, password);
         if (user != null) {

@@ -5,6 +5,8 @@ import com.raffier.mindcards.model.table.User;
 import com.raffier.mindcards.repository.AppDatabase;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,7 +21,8 @@ public class UserRepository extends EntityRepository<User,Integer> {
     protected void throwEntityNotFound(Integer id) { throw new EntityNotFoundException("User", id); }
 
     // Updates //
-    public void save(User entity) {
+    public void save(User entity) throws SQLException {
+        getById(entity.getPrimaryKey());
         executeUpdate(
                 "UPDATE User SET username=?,password=?,email=?,isDeveloper=? WHERE userId=?",
                 (stmnt) -> {
@@ -31,7 +34,7 @@ public class UserRepository extends EntityRepository<User,Integer> {
                 });
     }
 
-    public User add(User entity) {
+    public User add(User entity) throws SQLException {
         int newId = executeUpdate(
                 "INSERT INTO User (username,password,email,isDeveloper) VALUES (?,?,?,?)",
                 (stmnt) -> {
@@ -44,7 +47,8 @@ public class UserRepository extends EntityRepository<User,Integer> {
         return getById(newId);
     }
 
-    public void deleteById(Integer id) {
+    public void deleteById(Integer id) throws SQLException {
+        getById(id);
         executeUpdate(
                 "DELETE FROM User WHERE userId=?",
                 (stmnt) -> stmnt.setInt(1,id));
@@ -52,7 +56,7 @@ public class UserRepository extends EntityRepository<User,Integer> {
     }
 
     // Queries //
-    public User getById(Integer id) {
+    public User getById(Integer id) throws SQLException {
         return executeQuery(
                 "SELECT * FROM User WHERE userId=?",
                 (stmnt) -> stmnt.setInt(1,id),
@@ -68,7 +72,7 @@ public class UserRepository extends EntityRepository<User,Integer> {
                 });
     }
 
-    public User getByEmail(String email) {
+    public User getByEmail(String email) throws SQLException {
 
         return executeQuery(
                 "SELECT * FROM User WHERE email=?",

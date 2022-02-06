@@ -6,6 +6,7 @@ import com.raffier.mindcards.repository.AppDatabase;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,31 +21,34 @@ public class CardGroupRepository extends CardRepository<CardGroup> {
     protected void throwEntityNotFound(Integer id) { throw new EntityNotFoundException("Card Group", id); }
 
     // Updates //
-    public void save(CardGroup entity) {
+    public void save(CardGroup entity) throws SQLException {
+        getById(entity.getPrimaryKey());
         executeUpdate(
                 "UPDATE CardGroup SET deckId=?, title=?, imageId=?, description=? WHERE cardGroupId=?",
                 (stmnt) -> {
                     stmnt.setInt(2, entity.getDeckId());
                     stmnt.setString(1, entity.getTitle());
-                    stmnt.setInt(3, entity.getImageId());
+                    stmnt.setObject(3, entity.getImageId());
                     stmnt.setString(4, entity.getDescription());
+                    stmnt.setInt(5, entity.getCardGroupId());
                 });
     }
 
-    public CardGroup add(CardGroup entity) {
+    public CardGroup add(CardGroup entity) throws SQLException {
         int newId = executeUpdate(
                 "INSERT INTO CardGroup (deckId, title, imageId, description) VALUES (?,?,?,?)",
                 (stmnt) -> {
                     stmnt.setInt(1, entity.getDeckId());
                     stmnt.setString(2, entity.getTitle());
-                    stmnt.setInt(3, entity.getImageId());
+                    stmnt.setObject(3, entity.getImageId());
                     stmnt.setString(4, entity.getDescription());
                 });
         System.out.println("Card Group with ID "+newId+" successfully created.");
         return getById(newId);
     }
 
-    public void deleteById(Integer id) {
+    public void deleteById(Integer id) throws SQLException {
+        getById(id);
         executeUpdate(
                 "DELETE FROM CardGroup WHERE cardGroupId=?",
                 (stmnt) -> stmnt.setInt(1, id));
@@ -52,7 +56,7 @@ public class CardGroupRepository extends CardRepository<CardGroup> {
     }
 
     // Queries //
-    public CardGroup getById(Integer id) {
+    public CardGroup getById(Integer id) throws SQLException {
         return executeQuery(
                 "SELECT * FROM CardGroup WHERE cardGroupId=?",
                 (stmnt) -> stmnt.setInt(1,id),
@@ -66,7 +70,7 @@ public class CardGroupRepository extends CardRepository<CardGroup> {
                 });
     }
 
-    public boolean isOwner(User user, int cardId) {
+    public boolean isOwner(User user, int cardId) throws SQLException {
         return executeQuery(
                 "SELECT Deck.* FROM Deck, CardGroup WHERE cardGroupId=? AND CardGroup.deckId=Deck.deckId AND ownerId=?",
                 (stmnt) -> {
@@ -77,7 +81,7 @@ public class CardGroupRepository extends CardRepository<CardGroup> {
         );
     }
 
-    public List<CardGroup> getRandomFromDeck(int deckId, int amount) {
+    public List<CardGroup> getRandomFromDeck(int deckId, int amount) throws SQLException {
         return executeQuery(
                 "SELECT * FROM CardGroup WHERE CardGroup.deckId = ? ORDER BY RANDOM() LIMIT ?",
                 (stmnt) -> {
@@ -95,7 +99,7 @@ public class CardGroupRepository extends CardRepository<CardGroup> {
                 });
     }
 
-    public List<CardGroup> search(int deckId, String searchString, int amount, int offset) {
+    public List<CardGroup> search(int deckId, String searchString, int amount, int offset) throws SQLException {
         return executeQuery(
                 "SELECT g1.*, " +
                         "(SELECT COUNT(g2.cardGroupId) FROM CardGroup g2 WHERE g1.deckId = g2.deckId AND (g2.title LIKE ? OR g2.description LIKE ?)) AS groupScore, " + //deckScore = 1 if title or description of a deck matches

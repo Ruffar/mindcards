@@ -6,6 +6,7 @@ import com.raffier.mindcards.repository.AppDatabase;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,30 +21,32 @@ public class InfocardRepository extends CardRepository<Infocard> {
     protected void throwEntityNotFound(Integer id) { throw new EntityNotFoundException("Infocard", id); }
 
     // Updates //
-    public void save(Infocard entity) {
+    public void save(Infocard entity) throws SQLException {
+        getById(entity.getPrimaryKey());
         executeUpdate(
                 "UPDATE Infocard SET mindcardId=?,imageId=?,description=? WHERE infocardId=?",
                 (stmnt) -> {
                     stmnt.setInt(1, entity.getMindcardId());
-                    stmnt.setInt(2, entity.getImageId());
+                    stmnt.setObject(2, entity.getImageId());
                     stmnt.setString(3, entity.getDescription());
                     stmnt.setInt(4, entity.getInfocardId());
                 });
     }
 
-    public Infocard add(Infocard entity) {
+    public Infocard add(Infocard entity) throws SQLException {
         int newId = executeUpdate(
                 "INSERT INTO Infocard (mindcardId, imageId, description) VALUES (?,?,?)",
                 (stmnt) -> {
                     stmnt.setInt(1, entity.getMindcardId());
-                    stmnt.setInt(2, entity.getImageId());
+                    stmnt.setObject(2, entity.getImageId());
                     stmnt.setString(3, entity.getDescription());
                 });
         System.out.println("Infocard with ID "+newId+" successfully created.");
         return getById(newId);
     }
 
-    public void deleteById(Integer id) {
+    public void deleteById(Integer id) throws SQLException {
+        getById(id);
         executeUpdate(
                 "DELETE FROM Infocard WHERE infocardId=?",
                 (stmnt) -> stmnt.setInt(1,id));
@@ -51,7 +54,7 @@ public class InfocardRepository extends CardRepository<Infocard> {
     }
 
     // Queries //
-    public Infocard getById(Integer id) {
+    public Infocard getById(Integer id) throws SQLException {
         return executeQuery(
                 "SELECT * FROM Infocard WHERE infocardId=?",
                 (stmnt) -> stmnt.setInt(1,id),
@@ -65,7 +68,7 @@ public class InfocardRepository extends CardRepository<Infocard> {
                 });
     }
 
-    public List<Infocard> getFromMindcard(int mindcardId) {
+    public List<Infocard> getFromMindcard(int mindcardId) throws SQLException {
         return executeQuery(
                 "SELECT * FROM Infocard WHERE mindcardId = ? ORDER BY RANDOM()",
                 (stmnt) -> stmnt.setInt(1,mindcardId),
@@ -79,7 +82,7 @@ public class InfocardRepository extends CardRepository<Infocard> {
                 });
     }
 
-    public boolean isOwner(User user, int cardId) {
+    public boolean isOwner(User user, int cardId) throws SQLException {
         return executeQuery(
                 "SELECT Deck.* FROM Deck, Mindcard, Infocard WHERE infocardId=? AND Infocard.mindcardId=Mindcard.mindcardId AND Mindcard.deckId=Deck.deckId AND ownerId=?",
                 (stmnt) -> {

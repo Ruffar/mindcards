@@ -19,6 +19,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
+import java.sql.SQLException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -38,6 +39,8 @@ public class CardUpdateService {
     private DeckRepository deckRepository;
     @Autowired
     private ImageRepository imageRepository;
+    @Autowired
+    private UserRepository userRepository;
 
     private final Path imageDirectory;
 
@@ -53,7 +56,7 @@ public class CardUpdateService {
     /*
     Saves the image into the database but DOES NOT save the card
      */
-    public <T extends CardTable> void setCardImage(T card, ImageUpdate imageUpdate) {
+    public <T extends CardTable> void setCardImage(T card, ImageUpdate imageUpdate) throws SQLException {
 
         Image image = cardUtilityService.getCardImage(card);
 
@@ -94,7 +97,7 @@ public class CardUpdateService {
     }
 
     //Update card main information
-    public void updateDeck(int cardId, String title, ImageUpdate imageUpdate, String description) {
+    public void updateDeck(int cardId, String title, ImageUpdate imageUpdate, String description) throws SQLException {
         Deck card = deckRepository.getById(cardId);
         card.setTitle(title);
         setCardImage(card,imageUpdate);
@@ -102,7 +105,7 @@ public class CardUpdateService {
         deckRepository.save(card);
     }
 
-    public void updateCardGroup(int cardId, String title, ImageUpdate imageUpdate, String description) {
+    public void updateCardGroup(int cardId, String title, ImageUpdate imageUpdate, String description) throws SQLException {
         CardGroup card = cardGroupRepository.getById(cardId);
         card.setTitle(title);
         setCardImage(card,imageUpdate);
@@ -110,7 +113,7 @@ public class CardUpdateService {
         cardGroupRepository.save(card);
     }
 
-    public void updateMindcard(int cardId, String title, ImageUpdate imageUpdate, String description) {
+    public void updateMindcard(int cardId, String title, ImageUpdate imageUpdate, String description) throws SQLException {
         Mindcard card = mindcardRepository.getById(cardId);
         card.setTitle(title);
         setCardImage(card,imageUpdate);
@@ -118,7 +121,7 @@ public class CardUpdateService {
         mindcardRepository.save(card);
     }
 
-    public void updateInfocard(int cardId, ImageUpdate imageUpdate, String description) {
+    public void updateInfocard(int cardId, ImageUpdate imageUpdate, String description) throws SQLException {
         Infocard card = infocardRepository.getById(cardId);
         setCardImage(card,imageUpdate);
         card.setDescription(description);
@@ -126,27 +129,31 @@ public class CardUpdateService {
     }
 
     //Add cards
-    private <T extends CardTable, S extends EntityRepository<T,Integer>> T addCard(T newCard, S repository) {
+    private <T extends CardTable, S extends EntityRepository<T,Integer>> T addCard(T newCard, S repository) throws SQLException {
         T card = repository.add(newCard);
         repository.save(card);
         return card;
     }
 
-    public Mindcard addMindcard(int deckId) {
+    public Mindcard addMindcard(int deckId) throws SQLException {
+        deckRepository.getById(deckId);
         return addCard( new Mindcard(0,deckId,"New Mindcard",0,"Description"), mindcardRepository);
     }
-    public Infocard addInfocard(int mindcardId) {
+    public Infocard addInfocard(int mindcardId) throws SQLException {
+        mindcardRepository.getById(mindcardId);
         return addCard( new Infocard(0,mindcardId,0,"Description"), infocardRepository);
     }
-    public CardGroup addCardGroup(int deckId) {
+    public CardGroup addCardGroup(int deckId) throws SQLException {
+        deckRepository.getById(deckId);
         return addCard( new CardGroup(0,deckId, "New Group",0,"Description"), cardGroupRepository);
     }
-    public Deck addDeck(int ownerId) {
+    public Deck addDeck(int ownerId) throws SQLException {
+        userRepository.getById(ownerId);
         return addCard( new Deck(0,ownerId,"New Deck",0,"Description"), deckRepository);
     }
 
     //Delete cards
-    private <T extends CardTable, S extends EntityRepository<T,Integer>> void deleteCard(int cardId, S repository) {
+    private <T extends CardTable, S extends EntityRepository<T,Integer>> void deleteCard(int cardId, S repository) throws SQLException {
         T card = repository.getById(cardId);
         Image image = cardUtilityService.getCardImage(card);
         if (image != null) {
@@ -155,16 +162,16 @@ public class CardUpdateService {
         repository.delete(card);
     }
 
-    public void deleteMindcard(int cardId) {
+    public void deleteMindcard(int cardId) throws SQLException {
         deleteCard(cardId,mindcardRepository);
     }
-    public void deleteInfocard(int cardId) {
+    public void deleteInfocard(int cardId) throws SQLException {
         deleteCard(cardId,infocardRepository);
     }
-    public void deleteCardGroup(int cardId) {
+    public void deleteCardGroup(int cardId) throws SQLException {
         deleteCard(cardId,cardGroupRepository);
     }
-    public void deleteDeck(int cardId) {
+    public void deleteDeck(int cardId) throws SQLException {
         deleteCard(cardId,deckRepository);
     }
 

@@ -5,7 +5,10 @@ import com.raffier.mindcards.model.table.Favourite;
 import com.raffier.mindcards.repository.AppDatabase;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
+
+import java.sql.Date;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 
 @Component
 public class FavouriteRepository extends EntityRepository<Favourite,Favourite> {
@@ -18,7 +21,8 @@ public class FavouriteRepository extends EntityRepository<Favourite,Favourite> {
     protected void throwEntityNotFound(Favourite id) { throw new EntityNotFoundException("Favourite", id); }
 
     // Updates //
-    public void save(Favourite entity) {
+    public void save(Favourite entity) throws SQLException {
+        getById(entity);
         executeUpdate(
                 "UPDATE Favourite SET lastViewed=? WHERE deckId=? AND userId=?",
                 (stmnt) -> {
@@ -28,7 +32,7 @@ public class FavouriteRepository extends EntityRepository<Favourite,Favourite> {
                 });
     }
 
-    public Favourite add(Favourite entity) {
+    public Favourite add(Favourite entity) throws SQLException {
         executeUpdate(
                 "INSERT INTO Favourite (deckId, userId, lastViewed) VALUES (?,?,?)",
                 (stmnt) -> {
@@ -39,7 +43,8 @@ public class FavouriteRepository extends EntityRepository<Favourite,Favourite> {
         return entity; //No values are changed, so the same entity can be returned
     }
 
-    public void deleteById(Favourite id) {
+    public void deleteById(Favourite id) throws SQLException {
+        getById(id);
         executeUpdate(
                 "DELETE FROM Favourite WHERE deckId=? AND userId=?",
                 (stmnt) -> {
@@ -50,7 +55,7 @@ public class FavouriteRepository extends EntityRepository<Favourite,Favourite> {
     }
 
     // Queries //
-    public Favourite getById(Favourite id) {
+    public Favourite getById(Favourite id) throws SQLException {
         return executeQuery(
                 "SELECT * FROM Favourite WHERE deckId=? AND userId=?",
                 (stmnt) -> {
@@ -59,14 +64,14 @@ public class FavouriteRepository extends EntityRepository<Favourite,Favourite> {
                 },
                 (results) -> {
                     if (results.next()) {
-                        return new Favourite(results.getInt("deckId"), results.getInt("userId"), results.getDate("lastViewed"));
+                        return new Favourite(results.getInt("deckId"), results.getInt("userId"), new Date(results.getLong("lastViewed")));
                     }
                     throwEntityNotFound(id);
                     return null;
                 });
     }
 
-    public boolean exists(Favourite entity) {
+    public boolean exists(Favourite entity) throws SQLException {
         return executeQuery(
                 "SELECT * FROM Favourite WHERE deckId=? AND userId=?",
                 (stmnt) -> {
@@ -77,7 +82,7 @@ public class FavouriteRepository extends EntityRepository<Favourite,Favourite> {
         );
     }
 
-    public int getTotalDeckFavourites(int deckId) {
+    public int getTotalDeckFavourites(int deckId) throws SQLException {
         return executeQuery(
                 "SELECT COUNT(*) AS total FROM Favourite WHERE deckId=?",
                 (stmnt) -> stmnt.setInt(1,deckId),

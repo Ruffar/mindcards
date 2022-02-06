@@ -7,6 +7,8 @@ import com.raffier.mindcards.repository.AppDatabase;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.sql.SQLException;
+
 @Component
 public class ImageRepository extends EntityRepository<Image, Integer> {
 
@@ -18,7 +20,8 @@ public class ImageRepository extends EntityRepository<Image, Integer> {
     protected void throwEntityNotFound(Integer id) { throw new EntityNotFoundException("Image", id); }
 
     // Updates //
-    public void save(Image entity) {
+    public void save(Image entity) throws SQLException {
+        getById(entity.getPrimaryKey());
         executeUpdate(
                 "UPDATE Image SET imagePath=? WHERE imageId=?",
                 (stmnt) -> {
@@ -27,7 +30,7 @@ public class ImageRepository extends EntityRepository<Image, Integer> {
                 });
     }
 
-    public Image add(Image entity) {
+    public Image add(Image entity) throws SQLException {
         int newId = executeUpdate(
                 "INSERT INTO Image (imagePath) VALUES (?)",
                 (stmnt) -> stmnt.setString(1, entity.getImagePath()));
@@ -35,7 +38,8 @@ public class ImageRepository extends EntityRepository<Image, Integer> {
         return getById(newId);
     }
 
-    public void deleteById(Integer id) {
+    public void deleteById(Integer id) throws SQLException {
+        getById(id);
         executeUpdate(
                 "DELETE FROM Image WHERE imageId=?",
                 (stmnt) -> stmnt.setInt(1,id));
@@ -43,7 +47,7 @@ public class ImageRepository extends EntityRepository<Image, Integer> {
     }
 
     // Queries //
-    public Image getById(Integer id) {
+    public Image getById(Integer id) throws SQLException {
         return executeQuery(
                 "SELECT * FROM Image WHERE imageId=?",
                 (stmnt) -> stmnt.setInt(1,id),
@@ -57,7 +61,7 @@ public class ImageRepository extends EntityRepository<Image, Integer> {
                 });
     }
 
-    public <S extends CardTable> Image getFromCard(S card) {
+    public <S extends CardTable> Image getFromCard(S card) throws SQLException {
         return executeQuery(
                 "SELECT Image.imageId, Image.imagePath FROM "+card.getTableName()+", Image WHERE "+card.getPrimaryKeyName()+" = ? AND "+card.getTableName()+".imageId = Image.imageId",
                 (stmnt) -> stmnt.setInt(1,card.getPrimaryKey()),

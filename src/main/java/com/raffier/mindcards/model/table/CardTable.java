@@ -14,6 +14,7 @@ public abstract class CardTable extends EntityTable<Integer> {
     protected CardTable(String tableName, String primaryKeyName) {
         super(tableName);
         this.primaryKeyName = primaryKeyName;
+        this.description = "";
     }
 
     protected CardTable(String tableName, String primaryKeyName, int imageId, String description)

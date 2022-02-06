@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.servlet.ModelAndView;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 import javax.servlet.http.HttpServletRequest;
+import java.sql.SQLException;
 
 //Controller Advice makes it so any controller logic not handled will be redirected to this class
 //Any errors thrown within a controller's call stack will be handled here
@@ -16,6 +17,11 @@ import javax.servlet.http.HttpServletRequest;
 public class AppExceptionHandler extends ResponseEntityExceptionHandler {
 
     //Exceptions
+    @ExceptionHandler(SQLException.class)
+    private Object handleSQLException(SQLException e, HttpServletRequest request) {
+        return buildResponse(request, new AppResponse(HttpStatus.BAD_REQUEST, e.getMessage()));
+    }
+
     @ExceptionHandler(ImageChangeException.class)
     private Object handleImageChangeException(ImageChangeException e, HttpServletRequest request) {
         return buildResponse(request, new AppResponse(HttpStatus.NOT_ACCEPTABLE, e.getMessage()));

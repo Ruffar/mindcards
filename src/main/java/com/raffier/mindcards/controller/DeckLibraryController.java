@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpSession;
+import java.sql.SQLException;
 import java.util.List;
 
 @Controller
@@ -31,7 +32,7 @@ public class DeckLibraryController {
 
     //Browse page request
     @GetMapping(value="browse")
-    public ModelAndView browseView(@ModelAttribute User user, @RequestParam(required = false) String sort, @RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "") String search, ModelAndView mv) {
+    public ModelAndView browseView(@ModelAttribute User user, @RequestParam(required = false) String sort, @RequestParam(defaultValue = "1") int page, @RequestParam(defaultValue = "") String search, ModelAndView mv) throws SQLException {
 
         //Get sort type from parameter
         SortType sortType = SortType.getSortTypeFromString(sort);
@@ -75,7 +76,7 @@ public class DeckLibraryController {
 
     //Revise page request
     @GetMapping(value="revise")
-    public ModelAndView oldestViewedView(@ModelAttribute User user, @RequestParam(defaultValue = "1") int page, ModelAndView mv) {
+    public ModelAndView oldestViewedView(@ModelAttribute User user, @RequestParam(defaultValue = "1") int page, ModelAndView mv) throws SQLException {
 
         if (page < 1) {
             throw new PageIndexException(page);
@@ -95,7 +96,7 @@ public class DeckLibraryController {
 
     //Favourite deck request
     @PostMapping(value="favouriteDeck")
-    public ResponseEntity<?> favouriteDeck(@ModelAttribute User user, @RequestParam int deckId) {
+    public ResponseEntity<?> favouriteDeck(@ModelAttribute User user, @RequestParam int deckId) throws SQLException {
 
         if (user == null) {
             throw new UnauthorisedAccessException(); //Deny this request if user is not logged in
@@ -114,7 +115,7 @@ public class DeckLibraryController {
 
     //Unfavourite deck request
     @DeleteMapping(value="unfavouriteDeck")
-    public ResponseEntity<?> unfavouriteDeck(@ModelAttribute User user, @RequestParam int deckId) {
+    public ResponseEntity<?> unfavouriteDeck(@ModelAttribute User user, @RequestParam int deckId) throws SQLException {
 
         if (user == null) {
             throw new UnauthorisedAccessException(); //Deny this request if user is not logged in
@@ -149,7 +150,7 @@ public class DeckLibraryController {
 
     //Profile page request
     @GetMapping(value="profile/{userId}")
-    public ModelAndView profile(@ModelAttribute("user") User user, @PathVariable int userId, ModelAndView mv) {
+    public ModelAndView profile(@ModelAttribute("user") User user, @PathVariable int userId, ModelAndView mv) throws SQLException {
         mv.setViewName("profilePage");
 
         User profileUser = userService.getUser(userId);

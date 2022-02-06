@@ -17,6 +17,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.ModelAndView;
 
 import javax.servlet.http.HttpSession;
+import java.sql.SQLException;
 import java.util.List;
 
 @Controller
@@ -34,7 +35,7 @@ public class CardController {
     @Autowired
     CardGroupService cardGroupService;
 
-    private void handleCardPage(User user, Deck deck, ModelAndView mv) {
+    private void handleCardPage(User user, Deck deck, ModelAndView mv) throws SQLException {
         int deckId = deck.getDeckId();
         int userId = user == null ? 0 : user.getUserId(); //userId is 0 (deleted) if there is no user because int can't be null
         //Make sure that card does not have ID 0 (i.e. the card is deleted)
@@ -55,7 +56,7 @@ public class CardController {
 
     //Deck page
     @GetMapping(value="deck/{deckId}")
-    public ModelAndView deckView(@ModelAttribute User user, @PathVariable int deckId, @RequestParam(defaultValue = "") String search, ModelAndView mv) {
+    public ModelAndView deckView(@ModelAttribute User user, @PathVariable int deckId, @RequestParam(defaultValue = "") String search, ModelAndView mv) throws SQLException {
         mv.setViewName("cards/deck");
 
         DeckElement deck = cardElementService.getDeckElement( user, deckId ); //Get deck HTML element
@@ -84,7 +85,7 @@ public class CardController {
 
     //Card Group page
     @GetMapping(value="cardGroup/{cardGroupId}")
-    public ModelAndView groupView(@ModelAttribute User user, @PathVariable int cardGroupId, ModelAndView mv) {
+    public ModelAndView groupView(@ModelAttribute User user, @PathVariable int cardGroupId, ModelAndView mv) throws SQLException {
         mv.setViewName("cards/group");
 
         //Get the card group
@@ -106,7 +107,7 @@ public class CardController {
 
     //Mindcard page
     @GetMapping(value="mindcard/{mindcardId}")
-    public ModelAndView mindcardView(@ModelAttribute User user, @PathVariable int mindcardId, ModelAndView mv) {
+    public ModelAndView mindcardView(@ModelAttribute User user, @PathVariable int mindcardId, ModelAndView mv) throws SQLException {
         mv.setViewName("cards/mindcard");
 
         //Get mindcard
@@ -134,7 +135,7 @@ public class CardController {
                                                    @RequestParam(required = false) MultipartFile imageFile, //If imageChange = upload, this stores the image file
                                                    @RequestParam(required = false) String imageUrl, //If imageChange = url, this stores the image URL
                                                    @RequestParam(defaultValue = "") String title, //Title of the card
-                                                   @RequestParam(defaultValue="") String description) //Description of card
+                                                   @RequestParam(defaultValue="") String description) throws SQLException //Description of card
     {
 
         CardType cardTypeEnum = CardType.getCardTypeFromString(cardType);
@@ -189,7 +190,7 @@ public class CardController {
     }
 
     @DeleteMapping("deleteCard")
-    public ResponseEntity<?> deleteCard(@ModelAttribute User user, @RequestParam String cardType, @RequestParam int cardId) {
+    public ResponseEntity<?> deleteCard(@ModelAttribute User user, @RequestParam String cardType, @RequestParam int cardId) throws SQLException {
 
         CardType cardTypeEnum = CardType.getCardTypeFromString(cardType);
         boolean isOwner = cardUtilityService.isUserCardOwner(cardTypeEnum, user, cardId);
@@ -219,7 +220,7 @@ public class CardController {
     }
 
     @PostMapping("addCard")
-    public ResponseEntity<CardElement<?>> addCard(@ModelAttribute User user, @RequestParam String cardType, @RequestParam(defaultValue = "0") int parentCardId) {
+    public ResponseEntity<CardElement<?>> addCard(@ModelAttribute User user, @RequestParam String cardType, @RequestParam(defaultValue = "0") int parentCardId) throws SQLException {
 
         CardType cardTypeEnum = CardType.getCardTypeFromString(cardType);
 
@@ -268,7 +269,7 @@ public class CardController {
 
     //Get card element
     @GetMapping("getCardElement")
-    public ResponseEntity<CardElement<?>> getCardElement(@ModelAttribute User user, @RequestParam String cardType, @RequestParam int cardId) {
+    public ResponseEntity<CardElement<?>> getCardElement(@ModelAttribute User user, @RequestParam String cardType, @RequestParam int cardId) throws SQLException {
 
         CardType cardTypeEnum = CardType.getCardTypeFromString(cardType);
 
@@ -311,7 +312,7 @@ public class CardController {
     }
 
     @GetMapping("searchDeckMindcards")
-    public ResponseEntity<List<CardElement<Mindcard>>> getCardElement(@ModelAttribute User user, @RequestParam int deckId, @RequestParam String search) {
+    public ResponseEntity<List<CardElement<Mindcard>>> getCardElement(@ModelAttribute User user, @RequestParam int deckId, @RequestParam String search) throws SQLException {
 
         Deck deck = cardElementService.getDeckElement( user, deckId ).getCard();
         List<CardElement<Mindcard>> mindcards = cardElementService.searchMindcards(deckId, search, 10, 0);
@@ -330,7 +331,7 @@ public class CardController {
     }
 
     //Group Mindcards
-    private void handleCardGroupAccess(User user, int cardGroupId) {
+    private void handleCardGroupAccess(User user, int cardGroupId) throws SQLException {
 
         if (user == null || !cardUtilityService.isUserCardOwner(CardType.CARDGROUP,user,cardGroupId)) {
             throw new UnauthorisedAccessException("You do not own this card group!");
@@ -339,7 +340,7 @@ public class CardController {
     }
 
     @PostMapping("addGroupMindcard")
-    public ResponseEntity<?> addMindcardToCardGroup(@ModelAttribute User user, @RequestParam int mindcardId, @RequestParam int cardGroupId) {
+    public ResponseEntity<?> addMindcardToCardGroup(@ModelAttribute User user, @RequestParam int mindcardId, @RequestParam int cardGroupId) throws SQLException {
 
         handleCardGroupAccess(user,cardGroupId); //Ensure user has access to add mindcard
 
@@ -352,7 +353,7 @@ public class CardController {
     }
 
     @DeleteMapping("removeGroupMindcard")
-    public ResponseEntity<?> removeGroupMindcard(@ModelAttribute User user, @RequestParam int mindcardId, @RequestParam int cardGroupId) {
+    public ResponseEntity<?> removeGroupMindcard(@ModelAttribute User user, @RequestParam int mindcardId, @RequestParam int cardGroupId) throws SQLException {
 
         handleCardGroupAccess(user,cardGroupId); //Ensure user has access to delete mindcard
 

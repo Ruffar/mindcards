@@ -6,6 +6,7 @@ import com.raffier.mindcards.repository.AppDatabase;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 
 @Component
 public class GroupMindcardRepository extends EntityRepository<GroupMindcard,GroupMindcard> {
@@ -22,7 +23,7 @@ public class GroupMindcardRepository extends EntityRepository<GroupMindcard,Grou
         //Saving GroupMindcard does not change anything as all columns are primary keys
     }
 
-    public GroupMindcard add(GroupMindcard entity) {
+    public GroupMindcard add(GroupMindcard entity) throws SQLException {
         executeUpdate(
                 "INSERT INTO GroupMindcard (cardGroupId, mindcardId) VALUES (?,?)",
                 (stmnt) -> {
@@ -32,7 +33,8 @@ public class GroupMindcardRepository extends EntityRepository<GroupMindcard,Grou
         return entity; //No values are changed, so the same entity can be returned
     }
 
-    public void deleteById(GroupMindcard id) {
+    public void deleteById(GroupMindcard id) throws SQLException {
+        getById(id);
         executeUpdate(
                 "DELETE FROM GroupMindcard WHERE cardGroupId=? AND mindcardId=?",
                 (stmnt) -> {
@@ -43,7 +45,7 @@ public class GroupMindcardRepository extends EntityRepository<GroupMindcard,Grou
     }
 
     // Queries //
-    public GroupMindcard getById(GroupMindcard id) {
+    public GroupMindcard getById(GroupMindcard id) throws SQLException {
         return executeQuery(
                 "SELECT * FROM GroupMindcard WHERE cardGroupId=? AND mindcardId=?",
                 (stmnt) -> {
@@ -59,7 +61,7 @@ public class GroupMindcardRepository extends EntityRepository<GroupMindcard,Grou
                 });
     }
 
-    public boolean exists(GroupMindcard entity) {
+    public boolean exists(GroupMindcard entity) throws SQLException {
         return executeQuery(
                 "SELECT * FROM GroupMindcard WHERE cardGroupId=? AND mindcardId=?",
                 (stmnt) -> {

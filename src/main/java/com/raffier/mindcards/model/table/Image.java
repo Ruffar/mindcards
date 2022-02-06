@@ -9,6 +9,7 @@ public class Image extends EntityTable<Integer> {
     public Image(int imageId) {
         super("Image");
         this.imageId = imageId;
+        this.imagePath = "";
     }
 
     public Image(int imageId, String imagePath) {

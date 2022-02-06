@@ -11,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.TestPropertySource;
 
+import java.sql.SQLException;
+
 import static org.assertj.core.api.Assertions.*;
 
 @SpringBootTest
@@ -26,63 +28,63 @@ public class UserAndEncryptionTest {
 
 
 	@Test
-	public void TestU10() {
+	public void TestU65() throws SQLException {
 		assertThat(userService.getUser(1).getEmail().matches("admin@mindcards.com")).isTrue();
 	}
 
 	@Test
-	public void TestU11() {
+	public void TestU66() {
 		assertThatThrownBy(()->userService.getUser(100)).isInstanceOf(EntityNotFoundException.class);
 	}
 
 	@Test
-	public void TestU12() {
+	public void TestU67() throws SQLException {
 		assertThat(userService.userRegister("johnny","johnny@fakemail.com","NewP4ssword").getUsername().equals("johnny")).isTrue();
 	}
 
 	@Test
-	public void TestU13() {
+	public void TestU68() {
 		assertThatThrownBy(()->userService.userRegister("bo","bob@amail.com","Password123")).isInstanceOf(FormFieldException.class);
 	}
 
 	@Test
-	public void TestU14() {
+	public void TestU69() throws SQLException {
 		userService.userRegister("bob","bob@amail.com","Password123");
-		assertThatThrownBy(()->userRepository.getByEmail("bob@amail.com")).doesNotThrowAnyException();
+		assertThatCode(()->userRepository.getByEmail("bob@amail.com")).doesNotThrowAnyException();
 	}
 
 	@Test
-	public void TestU15() {
+	public void TestU70() {
 		assertThatThrownBy(()->userService.userRegister("jack","thisisanemail","Password123")).isInstanceOf(FormFieldException.class);
 	}
 
 	@Test
-	public void TestU16() {
+	public void TestU71() {
 		assertThatThrownBy(()->userService.userRegister("jack","@","Password123")).isInstanceOf(FormFieldException.class);
 	}
 
 	@Test
-	public void TestU17() {
+	public void TestU72() {
 		assertThatThrownBy(()->userService.userRegister("jack","jack@fakemail","qwertyui")).isInstanceOf(FormFieldException.class);
 	}
 
 	@Test
-	public void TestU18() {
+	public void TestU73() {
 		assertThatThrownBy(()->userService.userRegister("jack","jack@fakemail","QWERT1234")).isInstanceOf(FormFieldException.class);
 	}
 
 	@Test
-	public void TestU19() {
+	public void TestU74() {
 		assertThatThrownBy(()->userService.userRegister("jack","jack@fakemail","Qwer123")).isInstanceOf(FormFieldException.class);
 	}
 
 	@Test
-	public void TestU20() {
-		assertThatThrownBy(()->userService.userRegister("jack","jack@fakemail","Qwert1234")).doesNotThrowAnyException();
+	public void TestU75() {
+		assertThatCode(()->userService.userRegister("jack","jack@fakemail","Qwert1234")).doesNotThrowAnyException();
 	}
 
 	@Test
-	public void TestU21() {
+	public void TestU76() {
 		String firstPass = encryptionService.encryptPassword("Password123", new User(1));
 		String secondPass = encryptionService.encryptPassword("Password123", new User(2));
 

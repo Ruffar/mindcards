@@ -8,6 +8,8 @@ import com.raffier.mindcards.util.CardType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.sql.SQLException;
+
 @Service
 public class CardUtilityService {
 
@@ -23,7 +25,7 @@ public class CardUtilityService {
     @Autowired
     DeckRepository deckRepository;
 
-    public <T extends CardTable> Image getCardImage(T card) {
+    public <T extends CardTable> Image getCardImage(T card) throws SQLException {
         if (card.getImageId() != null && card.getImageId() != 0) { //Check whether card has an image that is not deleted
             return imageRepository.getFromCard(card);
         }
@@ -47,7 +49,7 @@ public class CardUtilityService {
     }
 
     //Ownership
-    public boolean isUserCardOwner(CardType cardType, User user, int cardId) {
+    public boolean isUserCardOwner(CardType cardType, User user, int cardId) throws SQLException {
         if (user == null) return false; //If the user isn't logged in, then they are definitely not the owner
         return getRepository(cardType).isOwner(user,cardId);
     }
@@ -57,7 +59,7 @@ public class CardUtilityService {
         //If a card does not exist, normally an entity not found exception is raised; however, we want to return false in this case
         try {
             return getRepository(cardType).getById(cardId) != null;
-        } catch (EntityNotFoundException e) {
+        } catch (EntityNotFoundException | SQLException e) {
             return false;
         }
     }

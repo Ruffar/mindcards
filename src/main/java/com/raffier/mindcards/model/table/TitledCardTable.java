@@ -6,6 +6,7 @@ public abstract class TitledCardTable extends CardTable {
 
     protected TitledCardTable(String tableName, String primaryKeyName) {
         super(tableName,primaryKeyName);
+        this.title = "";
     }
 
     public String getTitle() { return this.title; }

@@ -6,6 +6,7 @@ import com.raffier.mindcards.repository.AppDatabase;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,32 +21,34 @@ public class MindcardRepository extends CardRepository<Mindcard> {
     protected void throwEntityNotFound(Integer id) { throw new EntityNotFoundException("Mindcard", id); }
 
     // Updates //
-    public void save(Mindcard entity) {
+    public void save(Mindcard entity) throws SQLException {
+        getById(entity.getPrimaryKey());
         executeUpdate(
                 "UPDATE Mindcard SET deckId=?,title=?,imageId=?,description=? WHERE mindcardId=?",
                 (stmnt) -> {
                     stmnt.setInt(1, entity.getDeckId());
                     stmnt.setString(2, entity.getTitle());
-                    stmnt.setInt(3, entity.getImageId());
+                    stmnt.setObject(3, entity.getImageId());
                     stmnt.setString(4, entity.getDescription());
                     stmnt.setInt(5, entity.getMindcardId());
                 });
     }
 
-    public Mindcard add(Mindcard entity) {
+    public Mindcard add(Mindcard entity) throws SQLException {
         int newId = executeUpdate(
                 "INSERT INTO Mindcard (deckId, title, imageId, description) VALUES (?,?,?,?)",
                 (stmnt) -> {
                     stmnt.setInt(1, entity.getDeckId());
                     stmnt.setString(2, entity.getTitle());
-                    stmnt.setInt(3, entity.getImageId());
+                    stmnt.setObject(3, entity.getImageId());
                     stmnt.setString(4, entity.getDescription());
                 });
         System.out.println("Mindcard with ID "+newId+" successfully created.");
         return getById(newId);
     }
 
-    public void deleteById(Integer id) {
+    public void deleteById(Integer id) throws SQLException {
+        getById(id);
         executeUpdate(
                 "DELETE FROM Mindcard WHERE mindcardId=?",
                 (stmnt) -> stmnt.setInt(1,id));
@@ -53,7 +56,7 @@ public class MindcardRepository extends CardRepository<Mindcard> {
     }
 
     // Queries //
-    public Mindcard getById(Integer id) {
+    public Mindcard getById(Integer id) throws SQLException {
         return executeQuery(
                 "SELECT * FROM Mindcard WHERE mindcardId=?",
                 (stmnt) -> stmnt.setInt(1,id),
@@ -67,7 +70,7 @@ public class MindcardRepository extends CardRepository<Mindcard> {
                 });
     }
 
-    public boolean isOwner(User user, int cardId) {
+    public boolean isOwner(User user, int cardId) throws SQLException {
         return executeQuery(
                 "SELECT Deck.* FROM Deck, Mindcard WHERE mindcardId=? AND Mindcard.deckId=Deck.deckId AND ownerId=?",
                 (stmnt) -> {
@@ -78,7 +81,7 @@ public class MindcardRepository extends CardRepository<Mindcard> {
         );
     }
 
-    public List<Mindcard> getRandomFromDeck(int deckId, int amount) {
+    public List<Mindcard> getRandomFromDeck(int deckId, int amount) throws SQLException {
         return executeQuery(
                 "SELECT * FROM Mindcard WHERE Mindcard.deckId = ? ORDER BY RANDOM() LIMIT ?",
                 (stmnt) -> {
@@ -95,7 +98,7 @@ public class MindcardRepository extends CardRepository<Mindcard> {
                 });
     }
 
-    public List<Mindcard> getFromCardGroup(int cardGroupId) {
+    public List<Mindcard> getFromCardGroup(int cardGroupId) throws SQLException {
         return executeQuery(
                 "SELECT Mindcard.* FROM Mindcard, GroupMindcard WHERE GroupMindcard.cardGroupId = ? AND GroupMindcard.mindcardId=Mindcard.mindcardId",
                 (stmnt) -> stmnt.setInt(1, cardGroupId),
@@ -109,7 +112,7 @@ public class MindcardRepository extends CardRepository<Mindcard> {
                 });
     }
 
-    public List<Mindcard> search(int deckId, String searchString, int amount, int offset) {
+    public List<Mindcard> search(int deckId, String searchString, int amount, int offset) throws SQLException {
         return executeQuery(
                 "SELECT m1.*, " +
                         "(SELECT COUNT(m2.mindcardId) FROM Mindcard m2 WHERE m2.deckId = m1.deckId AND (m2.title LIKE ? OR m2.description LIKE ?)) AS mindcardScore, " + //deckScore = 1 if title or description of a deck matches

@@ -7,6 +7,8 @@ import com.raffier.mindcards.repository.table.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.sql.SQLException;
+
 @Service
 public class UserService {
 
@@ -15,11 +17,11 @@ public class UserService {
     @Autowired
     private UserRepository userRepository;
 
-    public User getUser(int userId) {
+    public User getUser(int userId) throws SQLException {
         return userRepository.getById(userId);
     }
 
-    public User userLogin(String email, String password) {
+    public User userLogin(String email, String password) throws SQLException {
         //Validate Email and then Password
         if (!isCorrectEmailFormat(email)) throw new FormFieldException("E-Mail must be in the format \"name@mail\"");
         if (!isCorrectPasswordFormat(password)) throw new FormFieldException("Password must have at least one number, lowercase alphabet, and uppercase alphabet and be at least 8 characters");//throw new FormFieldException("Password must have at least 8 characters and an uppercase, a lowercase letter, and a number");
@@ -32,7 +34,7 @@ public class UserService {
         throw new FormFieldException("Could not find user with matching E-Mail and Password");
     }
 
-    public User userRegister(String username, String email, String password) {
+    public User userRegister(String username, String email, String password) throws SQLException {
         //Validate Username, Email and Password
         if (!isValidUsername(username)) throw new FormFieldException("Username must have at least 3 characters");
         if (!isCorrectEmailFormat(email)) throw new FormFieldException("E-Mail must be in the format \"name@mail\"");
@@ -41,15 +43,14 @@ public class UserService {
         //Check if a User with this Email already exists
         try {
             userRepository.getByEmail(email);
-        } catch (EntityNotFoundException e) {
             throw new FormFieldException("User with E-Mail already exists!");
+        } catch (EntityNotFoundException | SQLException e) {
+            User newUser = userRepository.add(new User(0,username,password,email,false)); //User id does not matter as adding the entity will automatically assign an ID
+            newUser.setPassword(encryptionService.encryptPassword(password, newUser)); //Change user password to its encrypted version
+            userRepository.save(newUser);
+
+            return newUser;
         }
-
-        User newUser = userRepository.add(new User(0,username,password,email,false)); //User id does not matter as adding the entity will automatically assign an ID
-        newUser.setPassword(encryptionService.encryptPassword(password, newUser)); //Change user password to its encrypted version
-        userRepository.save(newUser);
-
-        return newUser;
     }
 
     /*

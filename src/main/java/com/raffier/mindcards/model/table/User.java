@@ -3,20 +3,20 @@ package com.raffier.mindcards.model.table;
 public class User extends EntityTable<Integer> {
 
     //Database columns
-    private int userId;
+    private final int userId;
 
     private String username;
     private String password;
     private String email;
     private boolean isDeveloper;
 
-    public User() {
-        super("user");
-    }
-
     public User(int userId) {
-        super("User");
+        super("user");
         this.userId = userId;
+        this.username = "";
+        this.password = "";
+        this.email = "";
+        this.isDeveloper = false;
     }
 
     public User(int userId, String username, String password, String email, boolean isDeveloper) {
