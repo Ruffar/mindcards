@@ -115,7 +115,7 @@ public class DeckRepository extends CardRepository<Deck> {
 
     public List<Deck> getRandom(int amount) throws SQLException {
         return executeQuery(
-                "SELECT * FROM Deck WHERE deckId != 0 ORDER BY RANDOM() LIMIT ?",
+                "SELECT * FROM Deck WHERE deckId != 0 AND isPrivate = FALSE ORDER BY RANDOM() LIMIT ?",
                 (stmnt) -> {
                     stmnt.setInt(1,amount);
                 },
@@ -131,7 +131,7 @@ public class DeckRepository extends CardRepository<Deck> {
 
     public List<Deck> getPopular(int amount, int offset) throws SQLException {
         return executeQuery(
-                "SELECT Deck.*, COUNT(Favourite.deckId) AS favCount FROM Deck, Favourite WHERE Deck.deckId != 0 AND Deck.deckId = Favourite.deckId GROUP BY Favourite.deckId ORDER BY favCount DESC LIMIT ? OFFSET ?",
+                "SELECT Deck.*, COUNT(Favourite.deckId) AS favCount FROM Deck, Favourite WHERE Deck.deckId != 0 AND Deck.deckId = Favourite.deckId AND Deck.isPrivate = FALSE GROUP BY Favourite.deckId ORDER BY favCount DESC LIMIT ? OFFSET ?",
                 (stmnt) -> {
                     stmnt.setInt(1,amount);
                     stmnt.setInt(2,offset);
@@ -148,7 +148,7 @@ public class DeckRepository extends CardRepository<Deck> {
 
     public List<Deck> getNewest(int amount, int offset) throws SQLException {
         return executeQuery(
-                "SELECT * FROM Deck WHERE Deck.deckId != 0 ORDER BY timeCreated DESC LIMIT ? OFFSET ?",
+                "SELECT * FROM Deck WHERE Deck.deckId != 0 AND Deck.isPrivate ORDER BY timeCreated DESC LIMIT ? OFFSET ?",
                 (stmnt) -> {
                     stmnt.setInt(1,amount);
                     stmnt.setInt(2,offset);
