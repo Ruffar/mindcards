@@ -148,7 +148,7 @@ public class DeckRepository extends CardRepository<Deck> {
 
     public List<Deck> getNewest(int amount, int offset) throws SQLException {
         return executeQuery(
-                "SELECT * FROM Deck WHERE Deck.deckId != 0 AND Deck.isPrivate ORDER BY timeCreated DESC LIMIT ? OFFSET ?",
+                "SELECT * FROM Deck WHERE Deck.deckId != 0 AND Deck.isPrivate = FALSE ORDER BY timeCreated DESC LIMIT ? OFFSET ?",
                 (stmnt) -> {
                     stmnt.setInt(1,amount);
                     stmnt.setInt(2,offset);
