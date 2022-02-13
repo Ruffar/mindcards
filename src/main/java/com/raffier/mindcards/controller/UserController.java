@@ -5,6 +5,7 @@ import com.raffier.mindcards.model.table.User;
 import com.raffier.mindcards.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.support.SessionStatus;
@@ -62,15 +63,15 @@ public class UserController {
 
     //Register new user request
     @PostMapping(value="register")
-    public AppResponse registerSubmit(@RequestParam String username, @RequestParam String email, @RequestParam String password, HttpSession session) throws SQLException {
+    public ResponseEntity<?> registerSubmit(@RequestParam String username, @RequestParam String email, @RequestParam String password, HttpSession session) throws SQLException {
 
         User user = userService.userRegister(username, email, password);
         if (user != null) {
             session.setAttribute("user", user);
-            return new AppResponse(HttpStatus.OK);
+            return new ResponseEntity<>(HttpStatus.OK);
         }
 
-        return new AppResponse(HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
 
     }
 

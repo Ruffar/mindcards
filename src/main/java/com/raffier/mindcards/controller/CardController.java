@@ -346,10 +346,10 @@ public class CardController {
 
         if (!cardGroupService.isMindcardInCardGroup(mindcardId,cardGroupId)) { //Add mindcard if it's not added yet
             cardGroupService.addMindcardToCardGroup(mindcardId, cardGroupId);
-            return new ResponseEntity<>(null,HttpStatus.CREATED);
+            return new ResponseEntity<>(HttpStatus.CREATED);
         }
 
-        return new ResponseEntity<>(null,HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
     @DeleteMapping("removeGroupMindcard")
@@ -359,10 +359,10 @@ public class CardController {
 
         if (cardGroupService.isMindcardInCardGroup(mindcardId,cardGroupId)) { //Remove mindcard if it's in the group
             cardGroupService.removeMindcardFromCardGroup(mindcardId, cardGroupId);
-            return new ResponseEntity<>(new AppResponse(HttpStatus.OK),HttpStatus.OK);
+            return new ResponseEntity<>(HttpStatus.OK);
         }
 
-        return new ResponseEntity<>(new AppResponse(HttpStatus.BAD_REQUEST),HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
     }
 
     //Model attributes

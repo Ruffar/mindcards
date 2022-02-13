@@ -26,8 +26,8 @@ public class CardGroupRepository extends CardRepository<CardGroup> {
         executeUpdate(
                 "UPDATE CardGroup SET deckId=?, title=?, imageId=?, description=? WHERE cardGroupId=?",
                 (stmnt) -> {
-                    stmnt.setInt(2, entity.getDeckId());
-                    stmnt.setString(1, entity.getTitle());
+                    stmnt.setInt(1, entity.getDeckId());
+                    stmnt.setString(2, entity.getTitle());
                     stmnt.setObject(3, entity.getImageId());
                     stmnt.setString(4, entity.getDescription());
                     stmnt.setInt(5, entity.getCardGroupId());
@@ -102,7 +102,7 @@ public class CardGroupRepository extends CardRepository<CardGroup> {
     public List<CardGroup> search(int deckId, String searchString, int amount, int offset) throws SQLException {
         return executeQuery(
                 "SELECT g1.*, " +
-                        "(SELECT COUNT(g2.cardGroupId) FROM CardGroup g2 WHERE g1.deckId = g2.deckId AND (g2.title LIKE ? OR g2.description LIKE ?)) AS groupScore, " + //deckScore = 1 if title or description of a deck matches
+                        "(SELECT COUNT(g2.cardGroupId) FROM CardGroup g2 WHERE g1.cardGroupId = g2.cardGroupId AND (g2.title LIKE ? OR g2.description LIKE ?)) AS groupScore, " + //deckScore = 1 if title or description of a deck matches
                         "(SELECT COUNT(Mindcard.mindcardId) FROM Mindcard, GroupMindcard WHERE GroupMindcard.cardGroupId = g1.cardGroupId AND GroupMindcard.mindcardId = Mindcard.mindcardId AND (Mindcard.title LIKE ? OR Mindcard.description LIKE ?)) AS mindcardScore, " + //mindcardScore
                         "(SELECT COUNT(Infocard.infocardId) FROM Infocard, GroupMindcard WHERE GroupMindcard.cardGroupId = g1.cardGroupId AND GroupMindcard.mindcardId = Infocard.mindcardId AND Infocard.description LIKE ?) AS infocardScore " +
                         "FROM CardGroup g1 " +

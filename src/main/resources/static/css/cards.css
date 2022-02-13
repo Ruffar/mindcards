@@ -168,7 +168,7 @@ input.title {
 }
 
 a .card.hoverCard {
-    opacity: 0;
+    display: none;
 
     position: absolute;
     z-index: 1;
@@ -179,7 +179,7 @@ a .card.hoverCard {
 }
 
 a:hover .card.hoverCard {
-    opacity: 1;
+    display: block;
 }
 
 .hoverCard .cardBody {
@@ -403,6 +403,7 @@ blockquote {
 .mathExp span {
     display: inline-block;
     vertical-align: middle;
+    text-align: center;
 }
 
 .variables {
@@ -422,6 +423,10 @@ blockquote {
 
 .fracExp {
     text-align: center;
+}
+
+.sqrtBox {
+    display: inline-block;
 }
 
 .sqrtLine {

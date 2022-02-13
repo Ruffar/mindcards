@@ -1,11 +1,4 @@
 
-/*$(".description").load(function(event) {
-    console.log("poopoo");
-    var thisHtml = $(this).html();
-    $(this).html(convertMarkdown(thisHtml));
-    $(this).html("poop");
-});*/
-
 // Hyperlink Hover //
 $(document).on("mouseover","a.cardHyperlink",function(event){
 
@@ -15,8 +8,8 @@ $(document).on("mouseover","a.cardHyperlink",function(event){
     if (hoverCard.length == 0) { //If there is no hoverCard inside of the hyperlink, create one
 
         var linkParam = hyperlink.attr("href").split("/");
-        var cardType = linkParam[0];
-        var cardId = linkParam[1];
+        var cardType = linkParam[1];
+        var cardId = linkParam[2];
         $.ajax({
             type: "GET",
             url: "/getCardElement",
@@ -95,7 +88,7 @@ function parseHorizontalRule(text) {
 }
 
 function parseHyperlink(text) {
-    return text.replace(/\[(.+?)]\((.+?)\)/g, '<a class="cardHyperlink" href="$2">$1</a>');
+    return text.replace(/\[(.+?)]\((.+?)\)/g, '<a class="cardHyperlink" href="/$2">$1</a>');
 }
 
 function parseBulletList(text) {
@@ -155,6 +148,7 @@ function parseMathExpression(text) {
 
                 currentChar = expression[i];
 
+                //Terms
                 var isAlphanumeric = currentChar.match(/[a-z0-9]/i); //i means not case sensitive
                 if (!isTerm && isAlphanumeric) {
                     output += "<span class='term'>";
@@ -164,6 +158,7 @@ function parseMathExpression(text) {
                     isTerm = false;
                 }
 
+                //Variables
                 var isAlphabet = currentChar.match(/[a-z]/i); //i means not case sensitive
                 if (!isVariable && isAlphabet) {
                     output += "<span class='variables'>";
@@ -173,37 +168,58 @@ function parseMathExpression(text) {
                     isVariable = false;
                 }
 
+                //Special Math Symbols
                 if (currentChar == '\\') {
+                    //Fraction
                     if (expression.slice(i+1,i+5) == "frac") {
                         output += "<span class='frac'><span class='fracExp'>";
                         symbolStack.push("frac");
                         i += 4;
+                    //Square Root
                     } else if (expression.slice(i+1,i+5) == "sqrt") {
-                        output += "&#x221A;<span><hr class='sqrtLine'>";
+                        output += "&#x221A;<span class='sqrtBox'><hr class='sqrtLine'>";
                         symbolStack.push("sqrt");
                         i+=4;
+                    //Integration Sign
                     } else if (expression.slice(i+1,i+4) == "int") {
                         output += "&#x222b;";
                         i += 3;
+                    //Infinity
                     } else if (expression.slice(i+1,i+6) == "infty") {
                         output += "&#x221e;"
                         i += 5;
                     }
+                //Superscript
                 } else if (currentChar == '^') {
                     output += "<sup>"
                     symbolStack.push("^");
+                //Subscript
                 } else if (currentChar == '_') {
                     output += "<sub>"
                     symbolStack.push("_");
+                //Math Symbol Bracket
                 } else if (currentChar == '{') {
                     symbolStack.push("{");
+                //No matching symbols...
                 } else {
+                    //Closing Bracket
                     if (currentChar == '}' && symbolStack.peek() == '{') {
                         symbolStack.pop();
                     } else {
                         output += currentChar;
+                        if (symbolStack.peek() != '{') {
+                            if (isTerm) {
+                                output += "</span>";
+                                isTerm = false;
+                            }
+                            if (isVariable) {
+                                output += "</span>";
+                                isVariable = false;
+                            }
+                        }
                     }
 
+                    //Close any symbols
                     if (!symbolStack.isEmpty()) {
                         var symbol = symbolStack.peek();
                         switch(symbol) {
@@ -235,12 +251,12 @@ function parseMathExpression(text) {
             }
 
             if (isVariable) {
-                output += "</span>";
+                output += "</span>"; //Close variable if variable hasn't been closed yet
             }
             if (isTerm) {
-                output += "</span>"
+                output += "</span>" //Close term if term hasn't been closed yet
             }
 
-            return output+"</span>";
+            return output+"</span>"; //Return output and close the math expression tag
     });
 }

@@ -131,7 +131,7 @@ public class DeckRepository extends CardRepository<Deck> {
 
     public List<Deck> getPopular(int amount, int offset) throws SQLException {
         return executeQuery(
-                "SELECT Deck.*, COUNT(Favourite.deckId) AS favCount FROM Deck, Favourite WHERE Deck.deckId != 0 GROUP BY Favourite.deckId ORDER BY favCount DESC LIMIT ? OFFSET ?",
+                "SELECT Deck.*, COUNT(Favourite.deckId) AS favCount FROM Deck, Favourite WHERE Deck.deckId != 0 AND Deck.deckId = Favourite.deckId GROUP BY Favourite.deckId ORDER BY favCount DESC LIMIT ? OFFSET ?",
                 (stmnt) -> {
                     stmnt.setInt(1,amount);
                     stmnt.setInt(2,offset);

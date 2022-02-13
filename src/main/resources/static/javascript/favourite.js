@@ -10,10 +10,7 @@ $(document).on("click",".favouriteButton",function(event){ //Bind function to Cl
     if (isFavourited) {
         $.ajax({
             type: "DELETE",
-            url: "/unfavouriteDeck",
-            data: {
-                deckId: deckId
-            },
+            url: "/unfavouriteDeck?deckId="+deckId,
             success: function(response) {
                 //Change HTML visuals
                 favouriteButton.removeClass("favourited");

@@ -18,7 +18,7 @@ $(document).on("click",".editCardButton",function(event){
     cardEditor.find(">.card-text>.description").val(cardView.find(">.card-text>.description").text());
 
     if (cardView.find(">.card-text>.title") != null) {
-        cardEditor.find(">.card-text>.title").val(cardView.find(">.title").text());
+        cardEditor.find(">.card-text>.title").val(cardView.find(">.card-text>.title").text());
     }
 
     //Toggle the visibility of the elements
@@ -194,8 +194,7 @@ $(document).on("click",".removeFromGroupButton",function(event){
 
     $.ajax({
         type: "DELETE",
-        url: "/removeGroupMindcard",
-        data: {"mindcardId": mindcardId, "cardGroupId": cardGroupId},
+        url: "/removeGroupMindcard?mindcardId="+mindcardId+"&cardGroupId="+cardGroupId,
 
         success: function(response) {
             cardDiv.remove();

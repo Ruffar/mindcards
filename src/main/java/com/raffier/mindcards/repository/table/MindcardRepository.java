@@ -115,7 +115,7 @@ public class MindcardRepository extends CardRepository<Mindcard> {
     public List<Mindcard> search(int deckId, String searchString, int amount, int offset) throws SQLException {
         return executeQuery(
                 "SELECT m1.*, " +
-                        "(SELECT COUNT(m2.mindcardId) FROM Mindcard m2 WHERE m2.deckId = m1.deckId AND (m2.title LIKE ? OR m2.description LIKE ?)) AS mindcardScore, " + //deckScore = 1 if title or description of a deck matches
+                        "(SELECT COUNT(m2.mindcardId) FROM Mindcard m2 WHERE m2.mindcardId = m1.mindcardId AND (m2.title LIKE ? OR m2.description LIKE ?)) AS mindcardScore, " + //mindcardScore = 1 if title or description of a mindcard matches
                         "(SELECT COUNT(Infocard.infocardId) FROM Infocard WHERE Infocard.mindcardId = m1.mindcardId AND Infocard.description LIKE ?) AS infocardScore " +
                         "FROM Mindcard m1 " +
                         "WHERE m1.deckId = ? " +
