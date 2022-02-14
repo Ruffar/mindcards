@@ -13,8 +13,6 @@ import javax.servlet.http.HttpServletRequest;
 @Controller
 public class AppErrorController implements ErrorController {
 
-
-
     @GetMapping("error")
     private ModelAndView errorPage(HttpServletRequest request) {
         ModelAndView mv = new ModelAndView("error");
